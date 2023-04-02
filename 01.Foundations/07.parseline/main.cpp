@@ -32,15 +32,19 @@ std::vector<std::vector<int>> read_board(std::string path) {
     return board;
 }
 
-int main() {
-    std::string path = "01.Foundations/07.parseline/1.board";
-    auto board = read_board(path);
-
+void print_board(std::vector<std::vector<int>> board) {
     for (auto& line : board) {
         for (int elem : line) {
-            std::cout << elem << ", ";
+            std::cout << elem << " ";
         }
         std::cout << "\n";
     }
+    return;
+}
+
+int main() {
+    std::string path = "01.Foundations/07.parseline/1.board";
+    auto board = read_board(path);
+    print_board(board);
     return 0;
 }
