@@ -8,6 +8,12 @@
 
 There are several built-in types in C++. These include integral types (which represent whole numbers), floating-point (which represent fractional numbers) and void (which represents an empty set of values).
 
+### Vector
+
+**What is a vector**? it's simply a linear sequence of contiguously allocated memory.
+
+The hash tables and maps for collection of data that's kept sorted.
+
 ## Resources
 
 * [vscode variable reference](https://code.visualstudio.com/docs/editor/variables-reference)  
