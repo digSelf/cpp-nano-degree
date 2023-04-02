@@ -14,6 +14,13 @@ There are several built-in types in C++. These include integral types (which rep
 
 The hash tables and maps for collection of data that's kept sorted.
 
+### Comments
+
+The comments should be used to say things that you cannot do well in code.
+Obviously, the code thells you **how** something is done. it doesn't tell you what a high level it's been done or why it's being done.  
+
+The comments are used to tell you what the code is supposed to do. For things that you can't say wall in code, if there's a complicated piece of code, explain what's supposed to do.
+
 ## Resources
 
 * [vscode variable reference](https://code.visualstudio.com/docs/editor/variables-reference)  
