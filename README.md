@@ -2,7 +2,13 @@
 
 ## Foundations
 
-# Resources
+### Primitive Variable Types
+
+**What are "types" in C++**? The type determines the kind of data that can be stored in a variable, as well as the operations could be performed on that data.  
+
+There are several built-in types in C++. These include integral types (which represent whole numbers), floating-point (which represent fractional numbers) and void (which represents an empty set of values).
+
+## Resources
 
 * [vscode variable reference](https://code.visualstudio.com/docs/editor/variables-reference)  
 * [preLaunchTask template](https://code.visualstudio.com/docs/cpp/config-clang-mac)  
