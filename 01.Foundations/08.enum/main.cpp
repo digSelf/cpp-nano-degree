@@ -29,7 +29,7 @@ std::vector<State> parse_line(std::string line) {
     return result;
 }
 
-std::vector<std::vector<State>> read_board(std::string path) {
+std::vector<std::vector<State>> read_board_file(std::string path) {
     std::ifstream file(path);
     if (!file) {
         std::cout << "create file stream failed\n";
@@ -66,7 +66,7 @@ void print_board(std::vector<std::vector<State>> board) {
 
 int main() {
     std::string path = "01.Foundations/08.enum/1.board";
-    auto board = read_board(path);
+    auto board = read_board_file(path);
     print_board(board);
     return 0;
 }
