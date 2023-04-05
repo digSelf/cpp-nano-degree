@@ -18,7 +18,6 @@
 		"command": "clang++",
 		"args": [
 		  "-std=c++17",
-		  "-stdlib=libc++",
 		  "-g",
 		  "-Wall",
 		  "${file}",
