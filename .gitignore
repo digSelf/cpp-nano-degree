@@ -1,2 +1,12 @@
 .DS_Store
 **/build/*
+
+**/*.swp
+**/*.osm
+**/!map.osm
+**/*.o
+**/draw.cpp
+**/test.cpp
+**/bin/
+**/lib/
+**/.github/**

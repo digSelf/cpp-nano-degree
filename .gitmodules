@@ -1,0 +1,9 @@
+[submodule "CppND-Route-Planning-Project/thirdparty/P0267_RefImpl"]
+	path = CppND-Route-Planning-Project/thirdparty/P0267_RefImpl
+	url = https://github.com/cpp-io2d/P0267_RefImpl.git
+[submodule "CppND-Route-Planning-Project/thirdparty/pugixml"]
+	path = CppND-Route-Planning-Project/thirdparty/pugixml
+	url = https://github.com/zeux/pugixml.git
+[submodule "CppND-Route-Planning-Project/thirdparty/googletest"]
+	path = CppND-Route-Planning-Project/thirdparty/googletest
+	url = https://github.com/abseil/googletest.git
