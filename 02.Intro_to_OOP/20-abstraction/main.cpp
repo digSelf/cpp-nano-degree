@@ -2,6 +2,9 @@
 #include <string>
 #include <vector>
 
+// abstraction refers to the sepration of a class's interface from its implemention.
+// the interface is a way to interact with objects without knowing how the class works.
+
 class Date
 {
 public:
