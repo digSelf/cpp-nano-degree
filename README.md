@@ -464,13 +464,13 @@ int main() {
     cout << "The int a still equals: " << a << "\n";
 }
 ```
-    * In the code above, `a` is passed by value to the function, so the variable `a` is not affected by what happens inside the function.
+* In the code above, `a` is passed by value to the function, so the variable `a` is not affected by what happens inside the function.
     
-    * But what if we wanted to change the value of `a` itself? For example, it might be that the variable you are passing into a function maintains some state in the program, and you want to write the function to update that state. 
+* But what if we wanted to change the value of `a` itself? For example, it might be that the variable you are passing into a function maintains some state in the program, and you want to write the function to update that state. 
     
-    * It turns out, it is possible to modify `a` from within the function. To do this, you must pass a _reference_ to the variable `a`, instead of the _value_ of `a`. In C++, _a reference is just an alternative name for the same variable_.
+* It turns out, it is possible to modify `a` from within the function. To do this, you must pass a _reference_ to the variable `a`, instead of the _value_ of `a`. In C++, _a reference is just an alternative name for the same variable_.
     
-    * To pass by reference, you simply need to add an ampersand `&` before the variable in the function declaration. Try the code below to see how this works:
+* To pass by reference, you simply need to add an ampersand `&` before the variable in the function declaration. Try the code below to see how this works:
     
 ```cpp
 #include <iostream>
@@ -491,7 +491,7 @@ int main() {
 }
 ```
     
-    * In the code above, `a` is passed by reference to the function `MultiplyByTwo` since the argument to `MultiplyByTwo` is a reference: `&i`. This means that `i` is becomes another name for whatever variable that is passed into the function. When the function changes the value of `i`, then the value of `a` is changed as well.
+* In the code above, `a` is passed by reference to the function `MultiplyByTwo` since the argument to `MultiplyByTwo` is a reference: `&i`. This means that `i` is becomes another name for whatever variable that is passed into the function. When the function changes the value of `i`, then the value of `a` is changed as well.
     
 ```cpp
 #include <iostream>
@@ -668,7 +668,8 @@ OuterFunction(a);
 
     * The `#include` statement for the header used quotes " " around the file name, and not angle brackets <>. We have stored the header in the same directory as the .cpp file, and the quotes tell the preprocessor to look for the file in the same directory as the current file - not in the usual set of directories where libraries are typically stored.
 
-    Finally, there is a preprocessor directive:
+    * Finally, there is a preprocessor directive:
+    
 ```cpp
 #ifndef HEADER_EXAMPLE_H
 #define HEADER_EXAMPLE_H
