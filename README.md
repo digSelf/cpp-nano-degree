@@ -169,14 +169,14 @@ C++ has several "primitive" variable types, which are things like `int`s (intege
 
     * You may have noticed comments in some of the code up until this point. C++ provides two kinds of comments:
 
-        * ```
-            // You can use two forward slashes for single line comments.
-            
-            /*
-            For longer comments, you can enclose the text with an opening
-            slash-star and closing star-slash.
-            */ 
-            ```
+```
+// You can use two forward slashes for single line comments.
+
+/*
+For longer comments, you can enclose the text with an opening
+slash-star and closing star-slash.
+*/ 
+```
     
     * You have now seen how to store basic types and vectors containing those types. As you practiced declaring variables, in each case you indicated the type of the variable. It is possible for C++ to do automatic type inference, using the `auto` keyword.
 
@@ -214,42 +214,42 @@ You will only use the *post-increment operator* `i++` for now, but if you are cu
 
 C++ offers several ways to iterate over containers. One way is to use an index-based loop as above. Another way is using a "range-based loop", which you will see frequently in the rest of this course. See the following code for an example of how this works:
 
-* ```cpp
-    #include <iostream>
-    #include <vector>
-    using std::cout;
-    using std::vector;
-    
-    int main() {
-        // Add your code here.
-        vector<int> a {1, 2, 3, 4, 5};
-        for (int i: a) {
-            cout << i << "\n";
-        }
-    }
-    ```
+```cpp
+#include <iostream>
+#include <vector>
+using std::cout;
+using std::vector;
+
+int main() {
+// Add your code here.
+vector<int> a {1, 2, 3, 4, 5};
+for (int i: a) {
+    cout << i << "\n";
+}
+}
+```
 
 ### Functions
 
 In the cell below, there is a simple function to add two numbers and return the result. Test the code below, and click the button for a more in-depth explanation.
 
-* ```cpp
-    #include <iostream>
-    using std::cout;
-    
-    // Function declared and defined here.
-    int AdditionFunction(int i, int j) 
-    {
-        return i + j;
-    }
-    
-    int main() 
-    {
-        auto d = 3;
-        auto f = 7;
-        cout << AdditionFunction(d, f) << "\n";
-    }
-    ```
+```cpp
+#include <iostream>
+using std::cout;
+
+// Function declared and defined here.
+int AdditionFunction(int i, int j) 
+{
+return i + j;
+}
+
+int main() 
+{
+auto d = 3;
+auto f = 7;
+cout << AdditionFunction(d, f) << "\n";
+}
+```
 
 
 ### File Input Streams
@@ -259,10 +259,10 @@ In the cell below, there is a simple function to add two numbers and return the 
 * In C++, you can use the `std::ifstream` object to handle input file streams. To do this, you will need to include the header file that provides the file streaming classes: `<fstream>`. 
 
 * Once the `<fstream>` header is included, a new input stream object can be declared and initialized using a file path `path`:
-    * ```cpp
-        std::ifstream my_file;
-        my_file.open(path);
-        ```
+```cpp
+std::ifstream my_file;
+my_file.open(path);
+```
 
 * Alternatively, the declaration and initialization can be done in a single line as follows:
     * `std::ifstream my_file(path);`
@@ -271,42 +271,42 @@ In the cell below, there is a simple function to add two numbers and return the 
 
 * The following cell creates an input stream from the file `"files/1.board"`:
 
-* ```cpp
-    #include <fstream>
-    #include <iostream>
-    #include <string>
-    
-    int main()
-    {
-        std::ifstream my_file;
-        my_file.open("files/1.board");
-        if (my_file) {
-        std::cout << "The file stream has been created!" << "\n";
-        }    
-    }
-    ```
+```cpp
+#include <fstream>
+#include <iostream>
+#include <string>
+
+int main()
+{
+std::ifstream my_file;
+my_file.open("files/1.board");
+if (my_file) {
+std::cout << "The file stream has been created!" << "\n";
+}    
+}
+```
 
 ### Reading Data from the Stream
 
 * If the input file stream object has been successfully created, the lines of the input stream can be read using the `getline` method. In the cell below, a while loop has been added to the previous example to get each line from the stream and print it to the console.
 
-* ```cpp
-    #include <fstream>
-    #include <iostream>
-    #include <string>
-    
-    int main() {
-        std::ifstream my_file;
-        my_file.open("files/1.board");
-        if (my_file) {
-            std::cout << "The file stream has been created!" << "\n";
-            std::string line;
-            while (getline(my_file, line)) {
-                std::cout << line << "\n";
-            }
-        }
+```cpp
+#include <fstream>
+#include <iostream>
+#include <string>
+
+int main() {
+std::ifstream my_file;
+my_file.open("files/1.board");
+if (my_file) {
+    std::cout << "The file stream has been created!" << "\n";
+    std::string line;
+    while (getline(my_file, line)) {
+        std::cout << line << "\n";
     }
-    ```
+}
+}
+```
 
 
 ## Streaming `int`s from a `string` with istringstream
@@ -411,28 +411,28 @@ int main() {
 
 * To do this clearly in your code, you will learn about and use something called an enum. An enum, short for enumerator, is a way to define a type in C++ with values that are restricted to a fixed range. For an explanation and examples, see the notebook below.
 
-* ```cpp
-    #include <iostream>
-    using std::cout;
-    
-    int main()
-    {
-        enum class Direction {kUp, kDown, kLeft, kRight};
-    
-        Direction a = Direction::kUp;
-    
-        switch (a) {
-        case Direction::kUp : cout << "Going up!" << "\n";
-            break;
-        case Direction::kDown : cout << "Going down!" << "\n";
-            break;
-        case Direction::kLeft : cout << "Going left!" << "\n";
-            break;
-        case Direction::kRight : cout << "Going right!" << "\n";
-            break;
-        }
-    }
-    ```
+```cpp
+#include <iostream>
+using std::cout;
+
+int main()
+{
+enum class Direction {kUp, kDown, kLeft, kRight};
+
+Direction a = Direction::kUp;
+
+switch (a) {
+case Direction::kUp : cout << "Going up!" << "\n";
+    break;
+case Direction::kDown : cout << "Going down!" << "\n";
+    break;
+case Direction::kLeft : cout << "Going left!" << "\n";
+    break;
+case Direction::kRight : cout << "Going right!" << "\n";
+    break;
+}
+}
+```
 
 ## Foundations / A* Search
 
@@ -446,24 +446,24 @@ int main() {
 
     * In the following example, the _value_ of `int i` is passed to the function `MultiplyByTwo`. Look carefully at the code and try to guess what the output will be before you execute it. When you are finished executing, click the button for an explanation.
 
-    * ```cpp
-        #include <iostream>
-        using std::cout;
+```cpp
+#include <iostream>
+using std::cout;
 
 
-        int MultiplyByTwo(int i) {
-            i = 2*i;
-            return i;
-        }
-    
-        int main() {
-            int a = 5;
-            cout << "The int a equals: " << a << "\n";
-            int b = MultiplyByTwo(a);
-            cout << "The int b equals: " << b << "\n";
-            cout << "The int a still equals: " << a << "\n";
-        }
-        ```
+int MultiplyByTwo(int i) {
+    i = 2*i;
+    return i;
+}
+
+int main() {
+    int a = 5;
+    cout << "The int a equals: " << a << "\n";
+    int b = MultiplyByTwo(a);
+    cout << "The int b equals: " << b << "\n";
+    cout << "The int a still equals: " << a << "\n";
+}
+```
     * In the code above, `a` is passed by value to the function, so the variable `a` is not affected by what happens inside the function.
     
     * But what if we wanted to change the value of `a` itself? For example, it might be that the variable you are passing into a function maintains some state in the program, and you want to write the function to update that state. 
@@ -472,46 +472,46 @@ int main() {
     
     * To pass by reference, you simply need to add an ampersand `&` before the variable in the function declaration. Try the code below to see how this works:
     
-    * ```cpp
-        #include <iostream>
-        using std::cout;
+```cpp
+#include <iostream>
+using std::cout;
 
 
-        int MultiplyByTwo(int &i) {
-            i = 2*i;
-            return i;
-        }
-    
-        int main() {
-            int a = 5;
-            cout << "The int a equals: " << a << "\n";
-            int b = MultiplyByTwo(a);
-            cout << "The int b equals: " << b << "\n";
-            cout << "The int a now equals: " << a << "\n";
-        }
-        ```
+int MultiplyByTwo(int &i) {
+    i = 2*i;
+    return i;
+}
+
+int main() {
+    int a = 5;
+    cout << "The int a equals: " << a << "\n";
+    int b = MultiplyByTwo(a);
+    cout << "The int b equals: " << b << "\n";
+    cout << "The int a now equals: " << a << "\n";
+}
+```
     
     * In the code above, `a` is passed by reference to the function `MultiplyByTwo` since the argument to `MultiplyByTwo` is a reference: `&i`. This means that `i` is becomes another name for whatever variable that is passed into the function. When the function changes the value of `i`, then the value of `a` is changed as well.
     
-    * ```cpp
-        #include <iostream>
-        #include <string>
-        using std::cout;
-        using std::string;
+```cpp
+#include <iostream>
+#include <string>
+using std::cout;
+using std::string;
 
 
-        void DoubleString(string value) {
-            // Concatentate the string with a space and itself.
-            value = value + " " + value;
-        }
-    
-        int main() {
-            string s = "Hello";
-            cout << "The string s is: " << s << "\n";
-            DoubleString(s);
-            cout << "The string s is now: " << s << "\n";
-        }
-        ```
+void DoubleString(string value) {
+    // Concatentate the string with a space and itself.
+    value = value + " " + value;
+}
+
+int main() {
+    string s = "Hello";
+    cout << "The string s is: " << s << "\n";
+    DoubleString(s);
+    cout << "The string s is now: " << s << "\n";
+}
+```
 
 ### Constants 
 
@@ -520,62 +520,62 @@ int main() {
 * `const`: meaning roughly " I promise not to change this value."...The compiler enforces the promise made by `const`....
 * `constexpr`: meaning roughly "to be evaluated at compile time." This is used primarily to specify constants...
 
-* ```cpp
-    #include <iostream>
-    
-    int main()
-    {
-        int i;
-        std::cout << "Enter an integer value for i: ";
-        std::cin >> i;
-        const int j = i * 2;  // "j can only be evaluated at run time."
-                            // "But I promise not to change it after it is initialized."
-        
-        constexpr int k = 3;  // "k, in contrast, can be evaluated at compile time."
-        
-        std::cout << "j = " << j << "\n";
-        std::cout << "k = " << k << "\n";
-    }
-    ```
+```cpp
+#include <iostream>
+
+int main()
+{
+int i;
+std::cout << "Enter an integer value for i: ";
+std::cin >> i;
+const int j = i * 2;  // "j can only be evaluated at run time."
+                    // "But I promise not to change it after it is initialized."
+
+constexpr int k = 3;  // "k, in contrast, can be evaluated at compile time."
+
+std::cout << "j = " << j << "\n";
+std::cout << "k = " << k << "\n";
+}
+```
 
 * The major difference between `const` and `constexpr`, though, is that `constexpr` must be evaluated at compile time.
 
 * The compiler will catch a `constexpr` variable that cannot be evaluated at compile time.
 
-* ```cpp
-    #include <iostream>
-    
-    int main()
-    {
-        int i;
-        std::cout << "Enter an integer value for i: ";
-        std::cin >> i;
-        constexpr int j = i * 2;  // "j can only be evaluated at run time."
-                                // "constexpr must be evaluated at compile time."
-                                // "So this code will produce a compilation error."
-    }
-    ```
+```cpp
+#include <iostream>
+
+int main()
+{
+int i;
+std::cout << "Enter an integer value for i: ";
+std::cin >> i;
+constexpr int j = i * 2;  // "j can only be evaluated at run time."
+                        // "constexpr must be evaluated at compile time."
+                        // "So this code will produce a compilation error."
+}
+```
 
 * A common usage of `const` is to guard against accidentally changing a variable, especially when it is passed-by-reference as a function argument.
 
-* ```cpp
-    #include <iostream>
-    #include <vector>
-    
-    int sum(const std::vector<int> &v)
-    {
-        int sum = 0;
-        for(int i : v)
-            sum += i;
-        return sum;
-    }
-    
-    int main()
-    {
-        std::vector<int> v {0, 1, 2, 3, 4};
-        std::cout << sum(v) << "\n";
-    }
-    ```
+```cpp
+#include <iostream>
+#include <vector>
+
+int sum(const std::vector<int> &v)
+{
+int sum = 0;
+for(int i : v)
+    sum += i;
+return sum;
+}
+
+int main()
+{
+std::vector<int> v {0, 1, 2, 3, 4};
+std::cout << sum(v) << "\n";
+}
+```
 
 ### Arrays
 
@@ -595,26 +595,26 @@ const int delta[4][2]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 
 * In the following code example, the functions are out of order, and the code will not compile. Try to fix this by rearranging the functions to be in the correct order.
 
-* ```cpp
-    #include <iostream>
-    using std::cout;
-    
-    void OuterFunction(int i) 
-    {
-        InnerFunction(i);
-    }
-    
-    void InnerFunction(int i) 
-    {
-        cout << "The value of the integer is: " << i << "\n";
-    }
-    
-    int main() 
-    {
-        int a = 5;
-        OuterFunction(a);
-    }
-    ```
+```cpp
+#include <iostream>
+using std::cout;
+
+void OuterFunction(int i) 
+{
+InnerFunction(i);
+}
+
+void InnerFunction(int i) 
+{
+cout << "The value of the integer is: " << i << "\n";
+}
+
+int main() 
+{
+int a = 5;
+OuterFunction(a);
+}
+```
 
 * In the mini-project for the first half of the course, the instructions were very careful to indicate where each function should be placed, so you didn't run into the problem of functions being out of order.
 
@@ -624,42 +624,43 @@ const int delta[4][2]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
 
 To avoid a single file from becomming cluttered with declarations and definitions for every function, it is customary to declare the functions in another file, called the header file. In C++, the header file will have filetype `.h`, and the contents of the header file must be included at the top of the `.cpp` file. See the following example for a refactoring of the code above into a header and a cpp file.
 
-* ```cpp
-    // The header file with just the function declarations.
-    // When you click the "Run Code" button, this file will
-    // be saved as header_example.h.
-    #ifndef HEADER_EXAMPLE_H
-    #define HEADER_EXAMPLE_H
-    
-    void OuterFunction(int);
-    void InnerFunction(int);
-    
-    #endif
-    ```
-* ```cpp
-    // The contents of header_example.h are included in 
-    // the corresponding .cpp file using quotes:
-    #include "header_example.h"
-    
-    #include <iostream>
-    using std::cout;
-    
-    void OuterFunction(int i) 
-    {
-        InnerFunction(i);
-    }
-    
-    void InnerFunction(int i) 
-    {
-        cout << "The value of the integer is: " << i << "\n";
-    }
-    
-    int main() 
-    {
-        int a = 5;
-        OuterFunction(a);
-    }
-    ```
+```cpp
+// The header file with just the function declarations.
+// When you click the "Run Code" button, this file will
+// be saved as header_example.h.
+#ifndef HEADER_EXAMPLE_H
+#define HEADER_EXAMPLE_H
+
+void OuterFunction(int);
+void InnerFunction(int);
+
+#endif
+```
+
+```cpp
+// The contents of header_example.h are included in 
+// the corresponding .cpp file using quotes:
+#include "header_example.h"
+
+#include <iostream>
+using std::cout;
+
+void OuterFunction(int i) 
+{
+InnerFunction(i);
+}
+
+void InnerFunction(int i) 
+{
+cout << "The value of the integer is: " << i << "\n";
+}
+
+int main() 
+{
+int a = 5;
+OuterFunction(a);
+}
+```
 
 * Notice that the code from the first example was fixed without having to rearrange the functions! In the code above, you might also have noticed several other things:
 
@@ -668,10 +669,10 @@ To avoid a single file from becomming cluttered with declarations and definition
     * The `#include` statement for the header used quotes " " around the file name, and not angle brackets <>. We have stored the header in the same directory as the .cpp file, and the quotes tell the preprocessor to look for the file in the same directory as the current file - not in the usual set of directories where libraries are typically stored.
 
     Finally, there is a preprocessor directive:
-    ```cpp
-        #ifndef HEADER_EXAMPLE_H
-        #define HEADER_EXAMPLE_H
-    ```
+```cpp
+#ifndef HEADER_EXAMPLE_H
+#define HEADER_EXAMPLE_H
+```
     
     * at the top of the header, along with an `#endif` at the end. This is called an **"include guard"**. Since the header will be included into another file, and `#include` just pastes contents into a file, the include guard prevents the same file from being pasted multiple times into another file. This might happen if multiple files include the same header, and then are all included into the same main.cpp, for example. The `ifndef` checks if HEADER_EXAMPLE_H has not been defined in the file already. If it has not been defined yet, then it is defined with #define HEADER_EXAMPLE_H, and the rest of the header is used. If HEADER_EXAMPLE_H has already been defined, then the preprocessor does not enter the ifndef block. Note: There are other ways to do this. Another common way is to use an **#pragma** oncepreprocessor directive, but we won't cover that in detail here. See this Wikipedia article for examples.
 
@@ -729,10 +730,10 @@ To avoid a single file from becomming cluttered with declarations and definition
     * The first lines that you'll want in your CMakeLists.txt are lines that specifies the minimum versions of cmake and C++ required to build the project. Add the following lines to your CMakeLists.txt and save the file:
 
 
-        * ```
-            cmake_minimum_required(VERSION 3.5.1)
-            set(CMAKE_CXX_STANDARD 14)
-            ```
+```
+cmake_minimum_required(VERSION 3.5.1)
+set(CMAKE_CXX_STANDARD 14)
+```
         * These lines set the minimum cmake version required to 3.5.1 and set the environment variable CMAKE_CXX_STANDARD so CMake uses C++ 14. On your own computer, if you have a recent g++ compiler, you could use C++ 17 instead.
     
     * CMake requires that we name the project, so you should choose a name for the project and then add the following line to CMakeLists.txt:
@@ -745,13 +746,13 @@ To avoid a single file from becomming cluttered with declarations and definition
     
     * A typical CMake project will have a build directory in the same place as the top-level CMakeLists.txt. Make a build directory in the /home/workspace/cmake_example folder:
     
-    * ```bash
-        root@abc123defg:/home/workspace/cmake_example# mkdir build
-        root@abc123defg:/home/workspace/cmake_example# cd build
-        root@abc123defg:/home/workspace/cmake_example/build# cmake ..
-        root@abc123defg:/home/workspace/cmake_example/build# make
-        root@abc123defg:/home/workspace/cmake_example/build# ./your_executable_name
-        ```
+```bash
+root@abc123defg:/home/workspace/cmake_example# mkdir build
+root@abc123defg:/home/workspace/cmake_example# cd build
+root@abc123defg:/home/workspace/cmake_example/build# cmake ..
+root@abc123defg:/home/workspace/cmake_example/build# make
+root@abc123defg:/home/workspace/cmake_example/build# ./your_executable_name
+```
         * The first line directs the cmake command at the top-level CMakeLists.txt file with ... This command uses the CMakeLists.txt to configure the project and create a Makefile in the build directory.
     
         * In the second line, make finds the Makefile and uses the instructions in the Makefile to build the project.
@@ -768,31 +769,31 @@ To avoid a single file from becomming cluttered with declarations and definition
 
 * As mentioned previously, a reference is another name given to an existing variable. On the left hand side of any variable declaration, the & operator can be used to declare a reference.
 
-* ```cpp
-    #include <iostream>
-    using std::cout;
-    
-    int main() 
-    {
-        int i = 1;
-        
-        // Declare a reference to i.
-        int& j = i;
-        cout << "The value of j is: " << j << "\n";
-        
-        // Change the value of i.
-        i = 5;
-        cout << "The value of i is changed to: " << i << "\n";
-        cout << "The value of j is now: " << j << "\n";
-        
-        // Change the value of the reference.
-        // Since reference is just another name for the variable,
-        // th
-        j = 7;
-        cout << "The value of j is now: " << j << "\n";
-        cout << "The value of i is changed to: " << i << "\n";
-    }
-    ```
+```cpp
+#include <iostream>
+using std::cout;
+
+int main() 
+{
+int i = 1;
+
+// Declare a reference to i.
+int& j = i;
+cout << "The value of j is: " << j << "\n";
+
+// Change the value of i.
+i = 5;
+cout << "The value of i is changed to: " << i << "\n";
+cout << "The value of j is now: " << j << "\n";
+
+// Change the value of the reference.
+// Since reference is just another name for the variable,
+// th
+j = 7;
+cout << "The value of j is now: " << j << "\n";
+cout << "The value of i is changed to: " << i << "\n";
+}
+```
 
 ### Pointers
 
@@ -808,166 +809,166 @@ To avoid a single file from becomming cluttered with declarations and definition
 
 * Each variable in a program stores its contents in the computer's memory, and each chunk of the memory has an address number. For a given variable, the memory address can be accessed using an ampersand in front of the variable. To see an example of this, execute the following code which displays the hexadecimal memory addresses of the variables i and j:
 
-    * ```cpp
-        #include <iostream>
-        using std::cout;
-        
-        int main() {
-            int i = 5;
-            int j = 6;
-            
-            // Print the memory addresses of i and j
-            cout << "The address of i is: " << &i << "\n";
-            cout << "The address of j is: " << &j << "\n";
-        }
-        ```
+```cpp
+#include <iostream>
+using std::cout;
+
+int main() {
+    int i = 5;
+    int j = 6;
+    
+    // Print the memory addresses of i and j
+    cout << "The address of i is: " << &i << "\n";
+    cout << "The address of j is: " << &j << "\n";
+}
+```
 * At this point, you might be wondering why the same symbol & can be used to both access memory addresses and, as you've seen before, pass references into a function. This is a great thing to wonder about. The overloading of the ampersand symbol & and the * symbol probably contribute to much of the confusion around pointers.
 
     * The symbols & and * have a different meaning, depending on which side of an equation they appear.
 
     * This is extremely important to remember. For the & symbol, if it appears on the left side of an equation (e.g. when declaring a variable), it means that the variable is declared as a reference. If the & appears on the right side of an equation, or before a previously defined variable, it is used to return a memory address, as in the example above.
 
-    * ```cpp
-        #include <iostream>
-        using std::cout;
-        
-        int main() 
-        {
-            int i = 5;
-            // A pointer pointer_to_i is declared and initialized to the address of i.
-            int* pointer_to_i = &i;
-            
-            // Print the memory addresses of i and j
-            cout << "The address of i is:          " << &i << "\n";
-            cout << "The variable pointer_to_i is: " << pointer_to_i << "\n";
-        }
-        ```
+```cpp
+#include <iostream>
+using std::cout;
+
+int main() 
+{
+    int i = 5;
+    // A pointer pointer_to_i is declared and initialized to the address of i.
+    int* pointer_to_i = &i;
+    
+    // Print the memory addresses of i and j
+    cout << "The address of i is:          " << &i << "\n";
+    cout << "The variable pointer_to_i is: " << pointer_to_i << "\n";
+}
+```
     
     * As you can see from the code, the variable pointer_to_i is declared as a pointer to an int using the * symbol, and pointer_to_i is set to the address of i. From the printout, it can be seen that pointer_to_i holds the same value as the address of i.
 
     * Once you have a pointer, you may want to retrieve the object it is pointing to. In this case, the * symbol can be used again. This time, however, it will appear on the right hand side of an equation or in front of an already-defined variable, so the meaning is different. In this case, it is called the "dereferencing operator", and it returns the object being pointed to. You can see how this works with the code below:
 
-    * ```cpp
-        #include <iostream>
-        using std::cout;
-        
-        int main() 
-        {
-            int i = 5;
-            // A pointer pointer_to_i is declared and initialized to the address of i.
-            int* pointer_to_i = &i;
-            
-            // Print the memory addresses of i and j
-            cout << "The address of i is:          " << &i << "\n";
-            cout << "The variable pointer_to_i is: " << pointer_to_i << "\n";
-            cout << "The value of the variable pointed to by pointer_to_i is: " << *pointer_to_i << "\n";
-        }
-        ```
+```cpp
+#include <iostream>
+using std::cout;
+
+int main() 
+{
+    int i = 5;
+    // A pointer pointer_to_i is declared and initialized to the address of i.
+    int* pointer_to_i = &i;
+    
+    // Print the memory addresses of i and j
+    cout << "The address of i is:          " << &i << "\n";
+    cout << "The variable pointer_to_i is: " << pointer_to_i << "\n";
+    cout << "The value of the variable pointed to by pointer_to_i is: " << *pointer_to_i << "\n";
+}
+```
     
     * In the following example, the code is similar to above, except that the object that is being pointed to is changed before the pointer is dereferenced. Before executing the following code, guess what you think will happen to the value of the dereferenced pointer.
 
-        * ```cpp
-            #include <iostream>
-            using std::cout;
-            
-            int main() {
-                int i = 5;
-                // A pointer pointer_to_i is declared and initialized to the address of i.
-                int* pointer_to_i = &i;
-                
-                // Print the memory addresses of i and j
-                cout << "The address of i is:          " << &i << "\n";
-                cout << "The variable pointer_to_i is: " << pointer_to_i << "\n";
-                
-                // The value of i is changed.
-                i = 7;
-                cout << "The new value of the variable i is                     : " << i << "\n";
-                cout << "The value of the variable pointed to by pointer_to_i is: " << *pointer_to_i << "\n";
-            }
-            ```
+```cpp
+#include <iostream>
+using std::cout;
+
+int main() {
+int i = 5;
+// A pointer pointer_to_i is declared and initialized to the address of i.
+int* pointer_to_i = &i;
+
+// Print the memory addresses of i and j
+cout << "The address of i is:          " << &i << "\n";
+cout << "The variable pointer_to_i is: " << pointer_to_i << "\n";
+
+// The value of i is changed.
+i = 7;
+cout << "The new value of the variable i is                     : " << i << "\n";
+cout << "The value of the variable pointed to by pointer_to_i is: " << *pointer_to_i << "\n";
+}
+```
     
     * In the previous concept, you were introduced to int pointers, and you learned the syntax for creating a pointer and retrieving an object from a pointer.
 
     * Although the type of object being pointed to must be included in a pointer declaration, pointers hold the same kind of value for every type of object: just a memory address to where the object is stored. In the following code, a vector is declared. Write your own code to create a pointer to the address of that vector. Then, dereference your pointer and print the value of the first item in the vector.
 
-        * ```cpp
-            #include <iostream>
-            #include <vector>
-            using std::cout;
-            using std::vector;
-            
-            int main() {
-                // Vector v is declared and initialized to {1, 2, 3}
-                vector<int> v {1, 2, 3};
-                
-                // Declare and initialize a pointer to the address of v here:
-                vector<int> *pointer_to_v = &v;
-            
-                // The following loops over each int a in the vector v and prints.
-                // Note that this uses a "range-based" for loop: https://www.geeksforgeeks.org/range-based-loop-c/
-                for (int a: v) {
-                    cout << a << "\n";
-                }
-                
-                // Dereference your pointer to v and print the int at index 0 here (note: you should print 1):
-                cout << "The first element of v is: " << (*pointer_to_v)[0] << "\n";
-            }
-            ```
+```cpp
+    #include <iostream>
+    #include <vector>
+    using std::cout;
+    using std::vector;
+    
+    int main() {
+        // Vector v is declared and initialized to {1, 2, 3}
+        vector<int> v {1, 2, 3};
+        
+        // Declare and initialize a pointer to the address of v here:
+        vector<int> *pointer_to_v = &v;
+    
+        // The following loops over each int a in the vector v and prints.
+        // Note that this uses a "range-based" for loop: https://www.geeksforgeeks.org/range-based-loop-c/
+        for (int a: v) {
+            cout << a << "\n";
+        }
+        
+        // Dereference your pointer to v and print the int at index 0 here (note: you should print 1):
+        cout << "The first element of v is: " << (*pointer_to_v)[0] << "\n";
+    }
+    ```
     
     * Pointers can be used in another form of pass-by-reference when working with functions. When used in this context, they work much like the references that you used for pass-by reference previously. If the pointer is pointing to a large object, it can be much more efficient to pass the pointer to a function than to pass a copy of the object as with pass-by-value.
 
         * In the following code, a pointer to an int is created, and that pointer is passed to a function. The object pointed to is then modified in the function.
 
-        * ```cpp
-            #include <iostream>
-            using std::cout;
-            
-            void AddOne(int* j)
-            {
-                // Dereference the pointer and increment the int being pointed to.
-                (*j)++;
-            }
-            
-            int main() 
-            {
-                int i = 1;
-                cout << "The value of i is: " << i << "\n";
-                
-                // Declare a pointer to i:
-                int* pi = &i;
-                AddOne(pi);
-                cout << "The value of i is now: " << i << "\n";
-            }
-            ```
+```cpp
+#include <iostream>
+using std::cout;
+
+void AddOne(int* j)
+{
+// Dereference the pointer and increment the int being pointed to.
+(*j)++;
+}
+
+int main() 
+{
+int i = 1;
+cout << "The value of i is: " << i << "\n";
+
+// Declare a pointer to i:
+int* pi = &i;
+AddOne(pi);
+cout << "The value of i is now: " << i << "\n";
+}
+```
 
     * You can also return a pointer from a function. As mentioned just above, if you do this, you must be careful that the object being pointed to doesn't go out of scope when the function finishes executing. If the object goes out of scope, the memory address being pointed to might then be used for something else.
 
     * In the example below, a reference is passed into a function and a pointer is returned. This is safe since the pointer being returned points to a reference - a variable that exists outside of the function and will not go out of scope in the function.
 
-    * ```cpp
-        #include <iostream>
-        using std::cout;
-        
-        int* AddOne(int& j) 
-        {
-            // Increment the referenced int and return the
-            // address of j.
-            j++;
-            return &j;
-        }
-        
-        int main() 
-        {
-            int i = 1;
-            cout << "The value of i is: " << i << "\n";
-            
-            // Declare a pointer and initialize to the value
-            // returned by AddOne:
-            int* my_pointer = AddOne(i);
-            cout << "The value of i is now: " << i << "\n";
-            cout << "The value of the int pointed to by my_pointer is: " << *my_pointer << "\n";
-        }
-        ```
+```cpp
+#include <iostream>
+using std::cout;
+
+int* AddOne(int& j) 
+{
+    // Increment the referenced int and return the
+    // address of j.
+    j++;
+    return &j;
+}
+
+int main() 
+{
+    int i = 1;
+    cout << "The value of i is: " << i << "\n";
+    
+    // Declare a pointer and initialize to the value
+    // returned by AddOne:
+    int* my_pointer = AddOne(i);
+    cout << "The value of i is now: " << i << "\n";
+    cout << "The value of the int pointed to by my_pointer is: " << *my_pointer << "\n";
+}
+```
 
 ### References vs Pointers
 
@@ -1006,70 +1007,70 @@ To avoid a single file from becomming cluttered with declarations and definition
 
 * We haven't covered iterators in this course, and you won't need them for this project, but they are a lot like pointers that can "iterate" forward or backward through a range.
 
-* ```cpp
-    #include <iostream>
-    #include <vector>
-    #include <unordered_map>
-    #include <string>
-    using std::vector;
-    using std::cout;
-    using std::unordered_map;
-    using std::string;
+```cpp
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <string>
+using std::vector;
+using std::cout;
+using std::unordered_map;
+using std::string;
 
 
-    int main() {
-        // Create strings to use in the hash table.
-        string key = "word";
-        string def_1 = "a unit of language, consisting of one or more spoken sounds or their written representation, that functions as a principal carrier of meaning";
-        string def_2 = "speech or talk: to express one's emotion in words";
-        string def_3 = "a short talk or conversation: 'Marston, I'd like a word with you.'";
-        string def_4 = "an expression or utterance: a word of warning";
-        unordered_map <string, vector<string>> my_dictionary;
+int main() {
+// Create strings to use in the hash table.
+string key = "word";
+string def_1 = "a unit of language, consisting of one or more spoken sounds or their written representation, that functions as a principal carrier of meaning";
+string def_2 = "speech or talk: to express one's emotion in words";
+string def_3 = "a short talk or conversation: 'Marston, I'd like a word with you.'";
+string def_4 = "an expression or utterance: a word of warning";
+unordered_map <string, vector<string>> my_dictionary;
+
+// Check if key is in the hash table.
+if (my_dictionary.find(key) == my_dictionary.end()) {
+    cout << "The key 'word' is not in the dictionary." << "\n";
+    cout << "Inserting a key-value pair into the dictionary." << "\n\n";
+    // Set the value for the key.
+    my_dictionary[key] = vector<string> {def_1, def_2, def_3, def_4};
+}
+
+// The key should now be in the hash table. You can access the
+// value corresponding to the key with square brackets [].
+// Here, the value my_dictionary[key] is a vector of strings.
+// We iterate over the vector and print the strings.
+cout << key << ": \n";
+auto definitions = my_dictionary[key];
+for (string definition : definitions) {
+    cout << definition << "\n";
+}
+}
+```
     
-        // Check if key is in the hash table.
-        if (my_dictionary.find(key) == my_dictionary.end()) {
-            cout << "The key 'word' is not in the dictionary." << "\n";
-            cout << "Inserting a key-value pair into the dictionary." << "\n\n";
-            // Set the value for the key.
-            my_dictionary[key] = vector<string> {def_1, def_2, def_3, def_4};
-        }
-    
-        // The key should now be in the hash table. You can access the
-        // value corresponding to the key with square brackets [].
-        // Here, the value my_dictionary[key] is a vector of strings.
-        // We iterate over the vector and print the strings.
-        cout << key << ": \n";
-        auto definitions = my_dictionary[key];
-        for (string definition : definitions) {
-            cout << definition << "\n";
-        }
+```cpp
+#include<unordered_map>
+#include<string>
+#include<iostream>
+#include<vector>
+using std::unordered_map;
+using std::string;
+using std::cout;
+using std::vector;
+
+// Write your program here.
+int main()
+{
+    unordered_map<int, string> IDD_codes {{972, "Israel"}, {93, "Afghanistan"}, {355, "Albania"}, {213, "Algeria"}, {376, "Andorra"}, {244, "Angola"}, {54, "Argentina"}, {374, "Armenia"}, {297, "Aruba"}, {61, "Australia"}, {43, "Austria"}, {994, "Azerbaijan"}, {973, "Bahrain"}, {880, "Bangladesh"}, {375, "Belarus"}, {32, "Belgium"}, {501, "Belize"}, {229, "Benin"}, {975, "Bhutan"}, {387, "Bosnia and Herzegovina"}, {267, "Botswana"}, {55, "Brazil"}, {246, "British Indian Ocean Territory"}, {359, "Bulgaria"}, {226, "Burkina Faso"}, {257, "Burundi"}, {855, "Cambodia"}, {237, "Cameroon"}, {1, "Canada"}, {238, "Cape Verde"}, {236, "Central African Republic"}, {235, "Chad"}, {56, "Chile"}, {86, "China"}, {61, "Christmas Island"}, {57, "Colombia"}, {269, "Comoros"}, {242, "Congo"}, {682, "Cook Islands"}, {506, "Costa Rica"}, {385, "Croatia"}, {53, "Cuba"}, {537, "Cyprus"}, {420, "Czech Republic"}, {45, "Denmark"}, {253, "Djibouti"}, {593, "Ecuador"}, {20, "Egypt"}, {503, "El Salvador"}, {240, "Equatorial Guinea"}, {291, "Eritrea"}, {372, "Estonia"}, {251, "Ethiopia"}, {298, "Faroe Islands"}, {679, "Fiji"}, {358, "Finland"}, {33, "France"}, {594, "French Guiana"}, {689, "French Polynesia"}, {241, "Gabon"}, {220, "Gambia"}, {995, "Georgia"}, {49, "Germany"}, {233, "Ghana"}, {350, "Gibraltar"}, {30, "Greece"}, {299, "Greenland"}, {590, "Guadeloupe"}, {502, "Guatemala"}, {224, "Guinea"}, {245, "Guinea-Bissau"}, {595, "Guyana"}, {509, "Haiti"}, {504, "Honduras"}, {36, "Hungary"}, {354, "Iceland"}, {91, "India"}, {62, "Indonesia"}, {964, "Iraq"}, {353, "Ireland"}, {972, "Israel"}, {39, "Italy"}, {81, "Japan"}, {962, "Jordan"}, {254, "Kenya"}, {686, "Kiribati"}, {965, "Kuwait"}, {996, "Kyrgyzstan"}, {371, "Latvia"}, {961, "Lebanon"}, {266, "Lesotho"}, {231, "Liberia"}, {423, "Liechtenstein"}, {370, "Lithuania"}, {352, "Luxembourg"}, {261, "Madagascar"}, {265, "Malawi"}, {60, "Malaysia"}, {223, "Mali"}, {356, "Malta"}, {692, "Marshall Islands"}, {596, "Martinique"}, {222, "Mauritania"}, {230, "Mauritius"}, {262, "Mayotte"}, {52, "Mexico"}, {377, "Monaco"}, {976, "Mongolia"}, {382, "Montenegro"}, {212, "Morocco"}, {95, "Myanmar"}, {264, "Namibia"}, {674, "Nauru"}, {977, "Nepal"}, {31, "Netherlands"}, {599, "Netherlands Antilles"}, {687, "New Caledonia"}, {64, "New Zealand"}, {505, "Nicaragua"}, {227, "Niger"}, {234, "Nigeria"}, {683, "Niue"}, {672, "Norfolk Island"}, {47, "Norway"}, {968, "Oman"}, {92, "Pakistan"}, {680, "Palau"}, {507, "Panama"}, {675, "Papua New Guinea"}, {595, "Paraguay"}, {51, "Peru"}, {63, "Philippines"}, {48, "Poland"}, {351, "Portugal"}, {974, "Qatar"}, {40, "Romania"}, {250, "Rwanda"}, {685, "Samoa"}, {378, "San Marino"}, {966, "Saudi Arabia"}, {221, "Senegal"}, {381, "Serbia"}, {248, "Seychelles"}, {232, "Sierra Leone"}, {65, "Singapore"}, {421, "Slovakia"}, {386, "Slovenia"}, {677, "Solomon Islands"}, {27, "South Africa"}, {500, "South Georgia and the South Sandwich Islands"}, {34, "Spain"}, {94, "Sri Lanka"}, {249, "Sudan"}, {597, "Suriname"}, {268, "Swaziland"}, {46, "Sweden"}, {41, "Switzerland"}, {992, "Tajikistan"}, {66, "Thailand"}, {228, "Togo"}, {690, "Tokelau"}, {676, "Tonga"}, {216, "Tunisia"}, {90, "Turkey"}, {993, "Turkmenistan"}, {688, "Tuvalu"}, {256, "Uganda"}, {380, "Ukraine"}, {971, "United Arab Emirates"}, {44, "United Kingdom"}, {1, "United States"}, {598, "Uruguay"}, {998, "Uzbekistan"}, {678, "Vanuatu"}, {681, "Wallis and Futuna"}, {967, "Yemen"}, {260, "Zambia"}, {263, "Zimbabwe"}, {591, "Bolivia, Plurinational State of"}, {673, "Brunei Darussalam"}, {61, "Cocos (Keeling) Islands"}, {243, "Congo, The Democratic Republic of the"}, {225, "Cote dIvoire"}, {500, "Falkland Islands (Malvinas)"}, {44, "Guernsey"}, {379, "Holy See (Vatican City State)"}, {852, "Hong Kong"}, {98, "Iran, Islamic Republic of"}, {44, "Isle of Man"}, {44, "Jersey"}, {850, "Korea, Democratic People's Republic of"}, {82, "Korea, Republic of"}, {856, "Lao People's Democratic Republic"}, {218, "Libyan Arab Jamahiriya"}, {853, "Macao"}, {389, "Macedonia, The Former Yugoslav Republic of"}, {691, "Micronesia, Federated States of"}, {373, "Moldova, Republic of"}, {258, "Mozambique"}, {970, "Palestinian Territory, Occupied"}, {872, "Pitcairn"}, {262, "Réunion"}, {7, "Russia"}, {590, "Saint Barthélemy"}, {290, "Saint Helena, Ascension and Tristan Da Cunha"}, {590, "Saint Martin"}, {508, "Saint Pierre and Miquelon"}, {239, "Sao Tome and Principe"}, {252, "Somalia"}, {47, "Svalbard and Jan Mayen"}, {963, "Syrian Arab Republic"}, {886, "Taiwan, Province of China"}, {255, "Tanzania, United Republic of"}, {670, "Timor-Leste"}, {58, "Venezuela, Bolivarian Republic of"}, {84, "Viet Nam"}};
+    if (IDD_codes.find(960) == IDD_codes.end()) {
+        IDD_codes[960] = "Maldives";
     }
-    ```
     
-    * ```cpp
-        #include<unordered_map>
-        #include<string>
-        #include<iostream>
-        #include<vector>
-        using std::unordered_map;
-        using std::string;
-        using std::cout;
-        using std::vector;
-    
-        // Write your program here.
-        int main()
-        {
-            unordered_map<int, string> IDD_codes {{972, "Israel"}, {93, "Afghanistan"}, {355, "Albania"}, {213, "Algeria"}, {376, "Andorra"}, {244, "Angola"}, {54, "Argentina"}, {374, "Armenia"}, {297, "Aruba"}, {61, "Australia"}, {43, "Austria"}, {994, "Azerbaijan"}, {973, "Bahrain"}, {880, "Bangladesh"}, {375, "Belarus"}, {32, "Belgium"}, {501, "Belize"}, {229, "Benin"}, {975, "Bhutan"}, {387, "Bosnia and Herzegovina"}, {267, "Botswana"}, {55, "Brazil"}, {246, "British Indian Ocean Territory"}, {359, "Bulgaria"}, {226, "Burkina Faso"}, {257, "Burundi"}, {855, "Cambodia"}, {237, "Cameroon"}, {1, "Canada"}, {238, "Cape Verde"}, {236, "Central African Republic"}, {235, "Chad"}, {56, "Chile"}, {86, "China"}, {61, "Christmas Island"}, {57, "Colombia"}, {269, "Comoros"}, {242, "Congo"}, {682, "Cook Islands"}, {506, "Costa Rica"}, {385, "Croatia"}, {53, "Cuba"}, {537, "Cyprus"}, {420, "Czech Republic"}, {45, "Denmark"}, {253, "Djibouti"}, {593, "Ecuador"}, {20, "Egypt"}, {503, "El Salvador"}, {240, "Equatorial Guinea"}, {291, "Eritrea"}, {372, "Estonia"}, {251, "Ethiopia"}, {298, "Faroe Islands"}, {679, "Fiji"}, {358, "Finland"}, {33, "France"}, {594, "French Guiana"}, {689, "French Polynesia"}, {241, "Gabon"}, {220, "Gambia"}, {995, "Georgia"}, {49, "Germany"}, {233, "Ghana"}, {350, "Gibraltar"}, {30, "Greece"}, {299, "Greenland"}, {590, "Guadeloupe"}, {502, "Guatemala"}, {224, "Guinea"}, {245, "Guinea-Bissau"}, {595, "Guyana"}, {509, "Haiti"}, {504, "Honduras"}, {36, "Hungary"}, {354, "Iceland"}, {91, "India"}, {62, "Indonesia"}, {964, "Iraq"}, {353, "Ireland"}, {972, "Israel"}, {39, "Italy"}, {81, "Japan"}, {962, "Jordan"}, {254, "Kenya"}, {686, "Kiribati"}, {965, "Kuwait"}, {996, "Kyrgyzstan"}, {371, "Latvia"}, {961, "Lebanon"}, {266, "Lesotho"}, {231, "Liberia"}, {423, "Liechtenstein"}, {370, "Lithuania"}, {352, "Luxembourg"}, {261, "Madagascar"}, {265, "Malawi"}, {60, "Malaysia"}, {223, "Mali"}, {356, "Malta"}, {692, "Marshall Islands"}, {596, "Martinique"}, {222, "Mauritania"}, {230, "Mauritius"}, {262, "Mayotte"}, {52, "Mexico"}, {377, "Monaco"}, {976, "Mongolia"}, {382, "Montenegro"}, {212, "Morocco"}, {95, "Myanmar"}, {264, "Namibia"}, {674, "Nauru"}, {977, "Nepal"}, {31, "Netherlands"}, {599, "Netherlands Antilles"}, {687, "New Caledonia"}, {64, "New Zealand"}, {505, "Nicaragua"}, {227, "Niger"}, {234, "Nigeria"}, {683, "Niue"}, {672, "Norfolk Island"}, {47, "Norway"}, {968, "Oman"}, {92, "Pakistan"}, {680, "Palau"}, {507, "Panama"}, {675, "Papua New Guinea"}, {595, "Paraguay"}, {51, "Peru"}, {63, "Philippines"}, {48, "Poland"}, {351, "Portugal"}, {974, "Qatar"}, {40, "Romania"}, {250, "Rwanda"}, {685, "Samoa"}, {378, "San Marino"}, {966, "Saudi Arabia"}, {221, "Senegal"}, {381, "Serbia"}, {248, "Seychelles"}, {232, "Sierra Leone"}, {65, "Singapore"}, {421, "Slovakia"}, {386, "Slovenia"}, {677, "Solomon Islands"}, {27, "South Africa"}, {500, "South Georgia and the South Sandwich Islands"}, {34, "Spain"}, {94, "Sri Lanka"}, {249, "Sudan"}, {597, "Suriname"}, {268, "Swaziland"}, {46, "Sweden"}, {41, "Switzerland"}, {992, "Tajikistan"}, {66, "Thailand"}, {228, "Togo"}, {690, "Tokelau"}, {676, "Tonga"}, {216, "Tunisia"}, {90, "Turkey"}, {993, "Turkmenistan"}, {688, "Tuvalu"}, {256, "Uganda"}, {380, "Ukraine"}, {971, "United Arab Emirates"}, {44, "United Kingdom"}, {1, "United States"}, {598, "Uruguay"}, {998, "Uzbekistan"}, {678, "Vanuatu"}, {681, "Wallis and Futuna"}, {967, "Yemen"}, {260, "Zambia"}, {263, "Zimbabwe"}, {591, "Bolivia, Plurinational State of"}, {673, "Brunei Darussalam"}, {61, "Cocos (Keeling) Islands"}, {243, "Congo, The Democratic Republic of the"}, {225, "Cote dIvoire"}, {500, "Falkland Islands (Malvinas)"}, {44, "Guernsey"}, {379, "Holy See (Vatican City State)"}, {852, "Hong Kong"}, {98, "Iran, Islamic Republic of"}, {44, "Isle of Man"}, {44, "Jersey"}, {850, "Korea, Democratic People's Republic of"}, {82, "Korea, Republic of"}, {856, "Lao People's Democratic Republic"}, {218, "Libyan Arab Jamahiriya"}, {853, "Macao"}, {389, "Macedonia, The Former Yugoslav Republic of"}, {691, "Micronesia, Federated States of"}, {373, "Moldova, Republic of"}, {258, "Mozambique"}, {970, "Palestinian Territory, Occupied"}, {872, "Pitcairn"}, {262, "Réunion"}, {7, "Russia"}, {590, "Saint Barthélemy"}, {290, "Saint Helena, Ascension and Tristan Da Cunha"}, {590, "Saint Martin"}, {508, "Saint Pierre and Miquelon"}, {239, "Sao Tome and Principe"}, {252, "Somalia"}, {47, "Svalbard and Jan Mayen"}, {963, "Syrian Arab Republic"}, {886, "Taiwan, Province of China"}, {255, "Tanzania, United Republic of"}, {670, "Timor-Leste"}, {58, "Venezuela, Bolivarian Republic of"}, {84, "Viet Nam"}};
-            if (IDD_codes.find(960) == IDD_codes.end()) {
-                IDD_codes[960] = "Maldives";
-            }
-            
-            vector<int> my_codes {1, 55, 960};
-            for (int code : my_codes) {
-                cout << code << ": " << IDD_codes[code] << "\n";
-            }
-        }
-        ```
+    vector<int> my_codes {1, 55, 960};
+    for (int code : my_codes) {
+        cout << code << ": " << IDD_codes[code] << "\n";
+    }
+}
+```
 
 ### Classes and Object-Oriented Programming
 
@@ -1081,111 +1082,111 @@ To avoid a single file from becomming cluttered with declarations and definition
 
 * In the next cell, the code above has been rewritten with a `Car` class.
 
-* ```cpp
-    #include <iostream>
-    #include <string>
-    using std::string;
-    using std::cout;
-    
-    // The Car class
-    class Car {
-    public:
-        // Method to print data.
-        void PrintCarData() 
-        {
-            cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
-        }
-        
-        // Method to increment the distance travelled.
-        void IncrementDistance() 
-        {
-            distance++;
-        }
-        
-        // Class/object attributes
-        string color;
-        int distance = 0;
-        int number;
-    };
-    
-    int main() 
-    {
-        // Create class instances for each car.
-        Car car_1, car_2, car_3;
-    
-        // Set each instance's color.
-        car_1.color = "green";
-        car_2.color = "red";
-        car_3.color = "blue";
-    
-        // Set each instance's number.
-        car_1.number = 1;
-        car_2.number = 2;
-        car_3.number = 3;
-    
-        // Increment car_1's position by 1.
-        car_1.IncrementDistance();
-    
-        // Print out the position and color of each car.
-        car_1.PrintCarData();
-        car_2.PrintCarData();
-        car_3.PrintCarData();
-    
-    }
-    ```
+```cpp
+#include <iostream>
+#include <string>
+using std::string;
+using std::cout;
+
+// The Car class
+class Car {
+public:
+// Method to print data.
+void PrintCarData() 
+{
+    cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
+}
+
+// Method to increment the distance travelled.
+void IncrementDistance() 
+{
+    distance++;
+}
+
+// Class/object attributes
+string color;
+int distance = 0;
+int number;
+};
+
+int main() 
+{
+// Create class instances for each car.
+Car car_1, car_2, car_3;
+
+// Set each instance's color.
+car_1.color = "green";
+car_2.color = "red";
+car_3.color = "blue";
+
+// Set each instance's number.
+car_1.number = 1;
+car_2.number = 2;
+car_3.number = 3;
+
+// Increment car_1's position by 1.
+car_1.IncrementDistance();
+
+// Print out the position and color of each car.
+car_1.PrintCarData();
+car_2.PrintCarData();
+car_3.PrintCarData();
+
+}
+```
 
 * This looks ok, and you have reduced the number of variables in main, so you might see how this could be more organized going forward. However, there is now a lot more code than you started with, and the main doesn't seem much more organzied. The code above still sets the attributes for each car after the car has been created.
 
 * The best way to fix this is to add a constructor to the Car class. The constructor allows you to instantiate new objects with the data that you want. In the next code cell, we have added a constructor for Car that allows the number and color to be passed in. This means that each Car object can be created with those variables.
 
-* ```cpp
-    #include <iostream>
-    #include <string>
-    using std::string;
-    using std::cout;
-    
-    class Car {
-    public:
-        void PrintCarData() 
-        {
-            cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
-        }
-    
-        void IncrementDistance() 
-        {
-            distance++;
-        }
-        
-        // Adding a constructor here:
-        Car(string c, int n) 
-        {
-            // Setting the class attributes with
-            // The values passed into the constructor.
-            color = c;
-            number = n;
-        }
-        
-        string color;
-        int distance = 0;
-        int number;
-    };
-    
-    int main() 
-    {
-        // Create class instances for each car.
-        Car car_1 = Car("green", 1);
-        Car car_2 = Car("red", 2);
-        Car car_3 = Car("blue", 3);
-    
-        // Increment car_1's position by 1.
-        car_1.IncrementDistance();
-    
-        // Print out the position and color of each car.
-        car_1.PrintCarData();
-        car_2.PrintCarData();
-        car_3.PrintCarData();
-    }
-    ```
+```cpp
+#include <iostream>
+#include <string>
+using std::string;
+using std::cout;
+
+class Car {
+public:
+void PrintCarData() 
+{
+    cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
+}
+
+void IncrementDistance() 
+{
+    distance++;
+}
+
+// Adding a constructor here:
+Car(string c, int n) 
+{
+    // Setting the class attributes with
+    // The values passed into the constructor.
+    color = c;
+    number = n;
+}
+
+string color;
+int distance = 0;
+int number;
+};
+
+int main() 
+{
+// Create class instances for each car.
+Car car_1 = Car("green", 1);
+Car car_2 = Car("red", 2);
+Car car_3 = Car("blue", 3);
+
+// Increment car_1's position by 1.
+car_1.IncrementDistance();
+
+// Print out the position and color of each car.
+car_1.PrintCarData();
+car_2.PrintCarData();
+car_3.PrintCarData();
+}
+```
 
 * This is now beginning to look better. The main is more organized than when we first started, although there is a little more code overall to accomodate the class definition. At this point, you might want to separate your class definition into it's own .h and .cpp files. We'll do that in the next concept!
 
@@ -1193,11 +1194,11 @@ To avoid a single file from becomming cluttered with declarations and definition
 
 * It is possible for a class to use methods and attributes from another class using class inheritance. For example, if you wanted to make a Sedan class with additional attributes or methods not found in the generic Car class, you could create a Sedan class that inherited from the Car by using the colon notation:
 
-* ```cpp
-    class Sedan : public Car {
-        // Sedan class declarations/definitions here.
-    };
-    ```
+```cpp
+class Sedan : public Car {
+// Sedan class declarations/definitions here.
+};
+```
 
 * By doing this, each Sedan class instance will have access to any of the public methods and attributes of Car. In the code above, these areIncrementDistance() and PrintCarData(). You can add additional features to the Sedan class as well. In the example above, Car is often referred to as the parent class, and Sedan as the child or derived class.
 
@@ -1207,55 +1208,55 @@ To avoid a single file from becomming cluttered with declarations and definition
 
 * In the previous concept, you saw how to create a `Car` classs and use a constructor. At the end of that concept, your code looked like this:
 
-* ```cpp
-    #include <iostream>
-    #include <string>
-    using std::string;
-    using std::cout;
-    
-    class Car {
-    public:
-        void PrintCarData() 
-        {
-            cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
-        }
-    
-        void IncrementDistance() 
-        {
-            distance++;
-        }
-        
-        // Adding a constructor here:
-        Car(string c, int n) 
-        {
-            // Setting the class attributes with
-            // The values passed into the constructor.
-            color = c;
-            number = n;
-        }
-        
-        string color;
-        int distance = 0;
-        int number;
-    };
-    
-    int main() 
-    {
-        // Create class instances for each car.
-        Car car_1 = Car("green", 1);
-        Car car_2 = Car("red", 2);
-        Car car_3 = Car("blue", 3);
-    
-        // Increment car_1's position by 1.
-        car_1.IncrementDistance();
-    
-        // Print out the position and color of each car.
-        car_1.PrintCarData();
-        car_2.PrintCarData();
-        car_3.PrintCarData();
-    
-    }
-    ```
+```cpp
+#include <iostream>
+#include <string>
+using std::string;
+using std::cout;
+
+class Car {
+public:
+void PrintCarData() 
+{
+    cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
+}
+
+void IncrementDistance() 
+{
+    distance++;
+}
+
+// Adding a constructor here:
+Car(string c, int n) 
+{
+    // Setting the class attributes with
+    // The values passed into the constructor.
+    color = c;
+    number = n;
+}
+
+string color;
+int distance = 0;
+int number;
+};
+
+int main() 
+{
+// Create class instances for each car.
+Car car_1 = Car("green", 1);
+Car car_2 = Car("red", 2);
+Car car_3 = Car("blue", 3);
+
+// Increment car_1's position by 1.
+car_1.IncrementDistance();
+
+// Print out the position and color of each car.
+car_1.PrintCarData();
+car_2.PrintCarData();
+car_3.PrintCarData();
+
+}
+```
 
 * If you were planning to build a larger program, at this point it might be good to put your class definition and function declarations into a separate file. Just as when we discussed header files before, putting the class definition into a separate header helps to organize your code, and prevents problems with trying to use class objects before the class is defined.
 
@@ -1263,22 +1264,23 @@ To avoid a single file from becomming cluttered with declarations and definition
 
 1. When the class methods are defined outside the class, the _scope resolution operator_ `::` must be used to indicate which class the method belongs to. For example, in the definition of the `PrintCarData` method you see:
 
-* ```cpp
-    void Car::PrintCarData()
-    ```
+```cpp
+void Car::PrintCarData()
+```
+
 * This prevents any compiler issues if there are are two classes with methods that have the same name.
 
 2. We have changed how the constructor initializes the variables. Instead of the previous constructor:
-    * ```cpp
-        Car(string c, int n) {
-            color = c; 
-            number = n;
-        }
-        ```
+```cpp
+Car(string c, int n) {
+    color = c; 
+    number = n;
+}
+```
 * the constructor now uses an [_initializer list_](https://en.cppreference.com/w/cpp/language/initializer_list):
-    * ```cpp
-        Car(string c, int n) : color(c), number(n) {}
-        ```
+```cpp
+Car(string c, int n) : color(c), number(n) {}
+```
 
 * Here, the class members are initialized before the body of the constructor (which is now empty). Initializer lists are a quick way to initialize many class attributes in the constructor. Additionally, the compiler treats attributes initialized in the list slightly differently than if they are initialized in the constructor body. For reasons beyond the scope of this course, if a class attribute is a reference, it must be initialized using an initializer list.
   
@@ -1287,75 +1289,75 @@ To avoid a single file from becomming cluttered with declarations and definition
 Check out the cells below to see this code in practice. In this code, we have separated the class into declarations and definitions, with declarations being in the `.h` file and definitions being in `.cpp`. Note that only the `.h` file needs to be included in any other file where the definitions are used.
 
 * `car.h`
-* ```cpp
-    #ifndef CAR_H
-    #define CAR_H
-    
-    #include <string>
-    using std::string;
-    using std::cout;
-    
-    class Car {
-    public:
-        void PrintCarData();
-        void IncrementDistance();
-        
-        // Using a constructor list in the constructor:
-        Car(string c, int n) : color(c), number(n) {}
-    
-    // The variables do not need to be accessed outside of
-    // functions from this class, so we can set them to private.
-    private:
-        string color;
-        int distance = 0;
-        int number;
-    };
-    
-    #endif
-    ```
+```cpp
+#ifndef CAR_H
+#define CAR_H
+
+#include <string>
+using std::string;
+using std::cout;
+
+class Car {
+public:
+void PrintCarData();
+void IncrementDistance();
+
+// Using a constructor list in the constructor:
+Car(string c, int n) : color(c), number(n) {}
+
+// The variables do not need to be accessed outside of
+// functions from this class, so we can set them to private.
+private:
+string color;
+int distance = 0;
+int number;
+};
+
+#endif
+```
 
 * `car.cpp`
-* ```cpp
-    #include <iostream>
-    #include "car.h"
-    
-    // Method definitions for the Car class.
-    void Car::PrintCarData() 
-    {
-        cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
-    }
-    
-    void Car::IncrementDistance() 
-    {
-        distance++;
-    }
-    ```
+```cpp
+#include <iostream>
+#include "car.h"
+
+// Method definitions for the Car class.
+void Car::PrintCarData() 
+{
+cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
+}
+
+void Car::IncrementDistance() 
+{
+distance++;
+}
+```
 
 * `main.cpp`
-* ```cpp
-    #include <iostream>
-    #include <string>
-    #include "car.h"
-    using std::string;
-    using std::cout;
-    
-    int main() 
-    {
-        // Create class instances for each car.
-        Car car_1 = Car("green", 1);
-        Car car_2 = Car("red", 2);
-        Car car_3 = Car("blue", 3);
-    
-        // Increment car_1's position by 1.
-        car_1.IncrementDistance();
-    
-        // Print out the position and color of each car.
-        car_1.PrintCarData();
-        car_2.PrintCarData();
-        car_3.PrintCarData();
-    
-    }
-    ```
+```cpp
+#include <iostream>
+#include <string>
+#include "car.h"
+using std::string;
+using std::cout;
+
+int main() 
+{
+// Create class instances for each car.
+Car car_1 = Car("green", 1);
+Car car_2 = Car("red", 2);
+Car car_3 = Car("blue", 3);
+
+// Increment car_1's position by 1.
+car_1.IncrementDistance();
+
+// Print out the position and color of each car.
+car_1.PrintCarData();
+car_2.PrintCarData();
+car_3.PrintCarData();
+
+}
+```
 
 * There is a lot going on in the code to unpack, including the `new` keyword and the `->` operator. The arrow operator `->` is used to simultaneously
 
@@ -1364,103 +1366,103 @@ Check out the cells below to see this code in practice. In this code, we have se
 
 * For example, in the code below, cp is a pointer to a Car object, and the following two are equivalent:
 
-* ```cpp
-        // Simultaneously dereference the pointer and 
-        // access IncrementDistance().
-        cp->IncrementDistance();
-    
-        // Dereference the pointer using *, then 
-        // access IncrementDistance() with traditional 
-        // dot notation.
-        (*cp).IncrementDistance();
-    ```
+```cpp
+// Simultaneously dereference the pointer and 
+// access IncrementDistance().
+cp->IncrementDistance();
+
+// Dereference the pointer using *, then 
+// access IncrementDistance() with traditional 
+// dot notation.
+(*cp).IncrementDistance();
+```
 
 * The new operator allocates memory on the "heap" for a new Car. In general, this memory must be manually managed (deallocated) to avoid memory leaks in your program. Memory management is the primary focus of one of the later courses in this Nanodegree program, so we won't go into greater depth about the difference between `stack` and `heap` in this lesson.
 
-* ```cpp
-    #include <iostream>
-    #include <string>
-    #include <vector>
-    #include "car.h"
-    using std::string;
-    using std::cout;
-    using std::vector;
-    
-    int main() {
-        // Create an empty vector of pointers to Cars 
-        // and a null pointer to a car.
-        vector<Car*> car_vect;
-        Car* cp = nullptr;
-        
-        // The vector of colors for the cars:
-        vector<string> colors {"red", "blue", "green"};
-    
-        // Create 100 cars with different colors and 
-        // push pointers to each of those cars into the vector.
-        for (int i=0; i < 100; i++) {;
-            cp = new Car(colors[i%3], i+1);
-            car_vect.push_back(cp);
-        }
-    
-        // Move each car forward by 1.
-        for (Car* cp: car_vect) {
-            cp->IncrementDistance();
-        }
-    
-        // Print data about each car.
-        for (Car* cp: car_vect) {
-            cp->PrintCarData();
-        }
-    }
-    ```
+```cpp
+#include <iostream>
+#include <string>
+#include <vector>
+#include "car.h"
+using std::string;
+using std::cout;
+using std::vector;
+
+int main() {
+// Create an empty vector of pointers to Cars 
+// and a null pointer to a car.
+vector<Car*> car_vect;
+Car* cp = nullptr;
+
+// The vector of colors for the cars:
+vector<string> colors {"red", "blue", "green"};
+
+// Create 100 cars with different colors and 
+// push pointers to each of those cars into the vector.
+for (int i=0; i < 100; i++) {;
+    cp = new Car(colors[i%3], i+1);
+    car_vect.push_back(cp);
+}
+
+// Move each car forward by 1.
+for (Car* cp: car_vect) {
+    cp->IncrementDistance();
+}
+
+// Print data about each car.
+for (Car* cp: car_vect) {
+    cp->PrintCarData();
+}
+}
+```
 
 ### This Pointer
 
 When working with classes it is often helpful to be able to refer to the current class instance or object. For example, given the following Car class from a previous lesson, the IncrementDistance() method implicitly refers to the current Car instance's distance attribute:
 
-* ```cpp
-    // The Car class
-    class Car {
-    public:
-        // Method to print data.
-        void PrintCarData() {
-            cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
-        }
-    
-        // Method to increment the distance travelled.
-        void IncrementDistance() {
-            distance++;
-        }
-    
-        // Class/object attributes
-        string color;
-        int distance = 0;
-        int number;
-    };
-    ```
+```cpp
+// The Car class
+class Car {
+public:
+// Method to print data.
+void PrintCarData() {
+    cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
+}
+
+// Method to increment the distance travelled.
+void IncrementDistance() {
+    distance++;
+}
+
+// Class/object attributes
+string color;
+int distance = 0;
+int number;
+};
+```
 
 * It is possible to make this explicit in C++ by using the this pointer, which points to the current class instance. Using this can sometimes be helpful to add clarity to more complicated code:
 
-* ```cpp
-    // The Car class
-    class Car {
-    public:
-        // Method to print data.
-        void PrintCarData() {
-            cout << "The distance that the " << this->color << " car " << this->number << " has traveled is: " << this->distance << "\n";
-        }
-    
-        // Method to increment the distance travelled.
-        void IncrementDistance() {
-            this->distance++;
-        }
-    
-        // Class/object attributes
-        string color;
-        int distance = 0;
-        int number;
-    };
-    ```
+```cpp
+// The Car class
+class Car {
+public:
+// Method to print data.
+void PrintCarData() {
+    cout << "The distance that the " << this->color << " car " << this->number << " has traveled is: " << this->distance << "\n";
+}
+
+// Method to increment the distance travelled.
+void IncrementDistance() {
+    this->distance++;
+}
+
+// Class/object attributes
+string color;
+int distance = 0;
+int number;
+};
+```
 
 * Note: you may see this used in some code in the remainder of the course.
 
@@ -1472,23 +1474,23 @@ When working with classes it is often helpful to be able to refer to the current
 
 * For example, a user might define a Rectangle structure to hold data about rectangles used in a program.
 
-* ```cpp
-    struct Rectangle {
-        float length;
-        float width;
-    };
-    ```
+```cpp
+struct Rectangle {
+float length;
+float width;
+};
+```
     * `length` and `width` are member variables
 
 * Types
 
     * Every C++ variable is defined with a type.
 
-    * ```cpp
-        int value;
-        Rectangle rectangle;
-        Sphere earth;
-        ```
+```cpp
+int value;
+Rectangle rectangle;
+Sphere earth;
+```
     
     * In this example, the "type" of `value` is `int`. Furthermore, `rectangle` is "of type" `Rectangle`, and `earth` has type `Sphere`.
 
@@ -1508,26 +1510,26 @@ When working with classes it is often helpful to be able to refer to the current
 
     * Consider the following example:
 
-    * ```cpp
-        struct Date {
-            int day;
-            int month;
-            int year;
-        };
-        ```
+```cpp
+struct Date {
+    int day;
+    int month;
+    int year;
+};
+```
 
     * The code above creates a structure containing three "member variables" of type int: day, month and year.
 
     * If you then create an "instance" of this structure, you can initialize these member variables:
 
-    * ```cpp
-        // Create an instance of the Date structure
-        Date date;
-        // Initialize the attributes of Date
-        date.day = 1;
-        date.month = 10;
-        date.year = 2019;
-        ```
+```cpp
+// Create an instance of the Date structure
+Date date;
+// Initialize the attributes of Date
+date.day = 1;
+date.month = 10;
+date.year = 2019;
+```
 
 ### Member Initializaiton
 
@@ -1535,13 +1537,13 @@ When working with classes it is often helpful to be able to refer to the current
 
 * In order to ensure that objects of our Date structure always start in a valid state, we can initialize the members from within the structure definition.
 
-* ```cpp
-    struct Date {
-        int day{1};
-        int month{1};
-        int year{0};    
-    };
-    ```
+```cpp
+struct Date {
+int day{1};
+int month{1};
+int year{0};    
+};
+```
 
 * There are also several other approaches to either initialize or assign member variables when the object is instantiated. For now, however, this approach ensures that every object of Date begins its life in a defined and valid state.
 
@@ -1557,14 +1559,14 @@ When working with classes it is often helpful to be able to refer to the current
 
     * This is an implementation of the `Date` structure, with all members marked as private.
 
-    * ```cpp
-        struct Date {
-            private:
-            int day{1};
-            int month{1};
-            int year{0};
-        };
-        ```
+```cpp
+struct Date {
+    private:
+    int day{1};
+    int month{1};
+    int year{0};
+};
+```
 
     * Private members of a class are accessible only from within other member functions of the same class (or from their "friends", which we’ll talk about later).
 
@@ -1581,49 +1583,49 @@ When working with classes it is often helpful to be able to refer to the current
 
     * To access private members, we typically define public "accessor" and "mutator" member functions (sometimes called "getter" and "setter" functions).
 
-    * ```cpp
-        struct Date {
-            public:
-                int Day() { return day; }
-                void Day(int day) { this.day = day; }
-                int Month() { return month; }
-                void Month(int month) { this.month = month; }
-                int Year() { return year; }
-                void Year(int year) { this.year = year; }
-        
-            private:
-                int day{1};
-                int month{1};
-                int year{0};
-        };
-        ```
+```cpp
+struct Date {
+    public:
+        int Day() { return day; }
+        void Day(int day) { this.day = day; }
+        int Month() { return month; }
+        void Month(int month) { this.month = month; }
+        int Year() { return year; }
+        void Year(int year) { this.year = year; }
+
+    private:
+        int day{1};
+        int month{1};
+        int year{0};
+};
+```
 
 * Avoid Trivial Getters And Setters
 
     * Sometimes accessors are not necessary, or even advisable. The C++ Core Guidelines recommend, "A trivial getter or setter adds no semantic value; the data item could just as well be public."
 
-    * ```cpp
-        class Point {
-                int x;
-                int y;
-            public:
-                Point(int xx, int yy) : x{xx}, y{yy} { }
-                int get_x() const { return x; }  // const here promises not to modify the object
-                void set_x(int xx) { x = xx; }
-                int get_y() const { return y; }  // const here promises not to modify the object
-                void set_y(int yy) { y = yy; }
-                // no behavioral member functions
-        };
-        ```
+```cpp
+class Point {
+        int x;
+        int y;
+    public:
+        Point(int xx, int yy) : x{xx}, y{yy} { }
+        int get_x() const { return x; }  // const here promises not to modify the object
+        void set_x(int xx) { x = xx; }
+        int get_y() const { return y; }  // const here promises not to modify the object
+        void set_y(int yy) { y = yy; }
+        // no behavioral member functions
+};
+```
 
     * This `class` could be made into a `struct`, with no logic or "invariants", just passive data. The member variables could both be public, with no accessor functions:
 
-    * ```cpp
-        struct Point {   // Good: concise
-            int x {0};   // public member variable with a default initializer of 0
-            int y {0};   // public member variable with a default initializer of 0
-        };
-        ```
+```cpp
+struct Point {   // Good: concise
+    int x {0};   // public member variable with a default initializer of 0
+    int y {0};   // public member variable with a default initializer of 0
+};
+```
 
 ### Classes
 
@@ -1639,14 +1641,14 @@ When working with classes it is often helpful to be able to refer to the current
 
     * Let's define a `Date` class:
 
-    * ```cpp
-        // Use the keyword “class” to define a Date class:
-        class Date {
-            int day{1};
-            int month{1};
-            int year{0};
-        };
-        ```
+```cpp
+// Use the keyword “class” to define a Date class:
+class Date {
+    int day{1};
+    int month{1};
+    int year{0};
+};
+```
     
     * So far, this class definition provides no invariants. The data members can vary independently of each other.
 
@@ -1656,37 +1658,37 @@ When working with classes it is often helpful to be able to refer to the current
 
     * As the first step to adding the appropriate invariants, let's specify that the member variable `day` is private. In order to access this member, we'll provide accessor and mutatot functions. Then we can add the appropriate invariants to the mutators.
 
-    * ```cpp
-        class Date {
-            public:
-                int Day() { return day_; }
-                void Day(int d) { day_ = d; }
-        
-            private:
-                int day_{1};
-                int month_{1};
-                int year_{0};
-            };
-        ```
+```cpp
+class Date {
+    public:
+        int Day() { return day_; }
+        void Day(int d) { day_ = d; }
+
+    private:
+        int day_{1};
+        int month_{1};
+        int year_{0};
+    };
+```
     
     * `Date` Invariants
 
     * Now we can add the invariants whitin the mutators
 
-    * ```cpp
-        class Date {
-            public:
-                int Day() { return day; }
-                void Day(int d) {
-                    if (d >= 1 && d <= 31) day_ = d;
-        }
-        
-        private:
-            int day_{1};
-            int month_{1};
-            int year_{0};
-        };
-        ```
+```cpp
+class Date {
+    public:
+        int Day() { return day; }
+        void Day(int d) {
+            if (d >= 1 && d <= 31) day_ = d;
+}
+
+private:
+    int day_{1};
+    int month_{1};
+    int year_{0};
+};
+```
 
     * Now we have a set of invariants for the the class members!
 
@@ -1700,29 +1702,29 @@ When working with classes it is often helpful to be able to refer to the current
 
 * A constructor can take arguments, which can be used to assign values to member variables.
 
-    * ```cpp
-        class Date {
-        public:
-            Date(int d, int m, int y) {  // This is a constructor.
-                Day(d);
-            }
-            int Day() { return day; }
-            void Day(int d) {
-                if (d >= 1 && d <= 31) day = d;
-            }
-            int Month() { return month; }
-            void Month(int m) {
-                if (m >= 1 && m <= 12) month = m;
-            }
-            int Year() { return year_; }
-            void Year(int y) { year = y; }
-        
-        private:
-            int day{1};
-            int month{1};
-            int year{0};
-        };
-        ```
+```cpp
+class Date {
+public:
+    Date(int d, int m, int y) {  // This is a constructor.
+        Day(d);
+    }
+    int Day() { return day; }
+    void Day(int d) {
+        if (d >= 1 && d <= 31) day = d;
+    }
+    int Month() { return month; }
+    void Month(int m) {
+        if (m >= 1 && m <= 12) month = m;
+    }
+    int Year() { return year_; }
+    void Year(int y) { year = y; }
+
+private:
+    int day{1};
+    int month{1};
+    int year{0};
+};
+```
     
     * As you can see, a constructor is also able to call other member functions of the object it is constructing. In the example above, `Date(int d, int m, int y)` assigns a member variable by calling `Day(int d)`.
 
@@ -1732,13 +1734,13 @@ When working with classes it is often helpful to be able to refer to the current
 
     * For example:
 
-        * ```cpp    
-            class Date { 
-                int day{1};
-                int month{1};
-                int year{0};
-            };
-            ```
+```cpp    
+class Date { 
+int day{1};
+int month{1};
+int year{0};
+};
+```
     
     * We can initialize an object of this class, even though this class does not explicitly define a constructor.
 
@@ -1754,116 +1756,116 @@ When working with classes it is often helpful to be able to refer to the current
 
     * `::` is the scope resolution operator. We can use this operator to specify which namespace or class to search in order to resolve an identifier.
 
-    * ```cpp
-        Person::move(); \\ Call the move the function that is a member of the Person class.
-        std::map m; \\ Initialize the map container from the C++ Standard Library.  
-        ```
+```cpp
+Person::move(); \\ Call the move the function that is a member of the Person class.
+std::map m; \\ Initialize the map container from the C++ Standard Library.  
+```
 
 * Class
     * Each class provides its own scope. We can use the scope resolution operator to specify identifiers from a class.
 
     * This becomes particularly useful if we want to separate class declaration from class definition.
 
-    * ```cpp
-        class Date {
-            public:
-                int Day() const { return day; }
-                void Day(int day);  // Declare member function Date::Day().
-                int Month() const { return month; }
-                void Month(int month) {
-                    if (month >= 1 && month <= 12) Date::month = month;
-                }
-                int Year() const { return year; }
-                void Year(int year) { Date::year = year; }
-        
-            private:
-                int day{1};
-                int month{1};
-                int year{0};
-        };
-        
-        // Define member function Date::Day().
-        void Date::Day(int day) {
-        if (day >= 1 && day <= 31) Date::day = day;
+```cpp
+class Date {
+    public:
+        int Day() const { return day; }
+        void Day(int day);  // Declare member function Date::Day().
+        int Month() const { return month; }
+        void Month(int month) {
+            if (month >= 1 && month <= 12) Date::month = month;
         }
-        ```
+        int Year() const { return year; }
+        void Year(int year) { Date::year = year; }
+
+    private:
+        int day{1};
+        int month{1};
+        int year{0};
+};
+
+// Define member function Date::Day().
+void Date::Day(int day) {
+if (day >= 1 && day <= 31) Date::day = day;
+}
+```
 
 * Namespaces
 
     * Namespaces allow programmers to group logically related variables and functions together. Namespaces also help to avoid conflicts between to variables that have the same name in different parts of a program.
 
-    * ```cpp
-        namespace English {
-            void Hello() { std::cout << "Hello, World!\n"; }
-        }  // namespace English
-        
-        namespace Spanish {
-            void Hello() { std::cout << "Hola, Mundo!\n"; }
-        }  // namespace Spanish
-        
-        int main() {
-        English::Hello();
-        Spanish::Hello();
-        }
-        ```
+```cpp
+namespace English {
+    void Hello() { std::cout << "Hello, World!\n"; }
+}  // namespace English
+
+namespace Spanish {
+    void Hello() { std::cout << "Hola, Mundo!\n"; }
+}  // namespace Spanish
+
+int main() {
+English::Hello();
+Spanish::Hello();
+}
+```
     
     * In this example, we have two different `void Hello()` functions. If we put both of these functions in the same namespace, they would conflict and the program would not compile. However, by declaring each of these functions in a separate namespace, they are able to co-exist. Furthermore, we can specify which function to call by prefixing Hello() with the appropriate namespace, followed by the :: operator.
 
-    * ```cpp
-        #include <cassert>
-        
-        class Date {
-            public:
-                int Day() { return day; }
-                void Day(int day);
-                int Month() { return month; }
-                void Month(int month);
-                int Year() { return year; }
-                void Year(int year);
-        
-            private:
-                int day{1};
-                int month{1};
-                int year{0};
-        };
-        
-        // TODO: Define Date::Day(int day)
-        void Date::Day(int day) {
-            if(day >= 1 && day <= 31)
-                Date::day = day;
-        }
-        
-        // TODO: Define Date::Month(int month)
-        void Date::Month(int month) {
-            if(month >= 1 && month <= 12)
-                Date::month = month;
-        }
-        
-        // TODO: Define Date::Year(int year)
-        void Date::Year(int year) { Date::year = year; }
-        
-        // Test in main
-        int main() {
-        Date date;
-        date.Day(29);
-        date.Month(8);
-        date.Year(1981);
-        assert(date.Day() == 29);
-        assert(date.Month() == 8);
-        assert(date.Year() == 1981);
-        }
-        ```
+```cpp
+#include <cassert>
+
+class Date {
+    public:
+        int Day() { return day; }
+        void Day(int day);
+        int Month() { return month; }
+        void Month(int month);
+        int Year() { return year; }
+        void Year(int year);
+
+    private:
+        int day{1};
+        int month{1};
+        int year{0};
+};
+
+// TODO: Define Date::Day(int day)
+void Date::Day(int day) {
+    if(day >= 1 && day <= 31)
+        Date::day = day;
+}
+
+// TODO: Define Date::Month(int month)
+void Date::Month(int month) {
+    if(month >= 1 && month <= 12)
+        Date::month = month;
+}
+
+// TODO: Define Date::Year(int year)
+void Date::Year(int year) { Date::year = year; }
+
+// Test in main
+int main() {
+Date date;
+date.Day(29);
+date.Month(8);
+date.Year(1981);
+assert(date.Day() == 29);
+assert(date.Month() == 8);
+assert(date.Year() == 1981);
+}
+```
 
 ### Initializer List
 
 * Initializer lists initialize member variables to specific values, just before the class constructor runs. This initialization ensures that class members are automatically initialized when an instance of the class is created.
 
-* ```cpp
-    Date::Date(int day, int month, int year) : year_(y) {
-        Day(day);
-        Month(month);
-    }
-    ```
+```cpp
+Date::Date(int day, int month, int year) : year_(y) {
+Day(day);
+Month(month);
+}
+```
 
 * In this example, the member value year is initialized through the initializer list, while day and month are assigned from within the constructor. Assigning day and month allows us to apply the invariants set in the mutator.
 
@@ -1873,25 +1875,25 @@ When working with classes it is often helpful to be able to refer to the current
 
 * In fact, initialization lists ensure that member variables are initialized before the object is created. **This is why class member variables can be declared const**, but only if the member variable is initialized through an initialization list. Trying to initialize a const class member within the body of the constructor will not work.
 
-* ```cpp
-    #include <assert.h>
-    #include <string>
-    
-    // TODO: Define class Person
-    struct Person {
-        // TODO: Define a public constructor with an initialization list
-        Person(std::string name) : name(name) {}
-        // TODO: Define a public member variable: name
-        std::string name;  
-    };
-    
-    // Test
-    int main() {
-        Person alice("Alice");
-        Person bob("Bob");
-        assert(alice.name != bob.name);
-    }
-    ```
+```cpp
+#include <assert.h>
+#include <string>
+
+// TODO: Define class Person
+struct Person {
+// TODO: Define a public constructor with an initialization list
+Person(std::string name) : name(name) {}
+// TODO: Define a public member variable: name
+std::string name;  
+};
+
+// Test
+int main() {
+Person alice("Alice");
+Person bob("Bob");
+assert(alice.name != bob.name);
+}
+```
 
 * Initializer lists exist for a number of reasons. First, the compiler can optimize initialization faster from an initialization list than from within the constructor.
 
@@ -1899,24 +1901,24 @@ When working with classes it is often helpful to be able to refer to the current
 
 * The third reason is that attributes defined as references must use initialization lists.
 
-* ```cpp
-    #include <assert.h>
-    #include <string>
-    
-    struct Person {
-        public:
-        // TODO: Add an initialization list
-        Person(std::string const & n) : name(n) {}
-        std::string const name;
-    };
-    
-    // Test
-    int main() {
-        Person alice("Alice");
-        Person bob("Bob");
-        assert(alice.name != bob.name);
-    }
-    ```
+```cpp
+#include <assert.h>
+#include <string>
+
+struct Person {
+public:
+// TODO: Add an initialization list
+Person(std::string const & n) : name(n) {}
+std::string const name;
+};
+
+// Test
+int main() {
+Person alice("Alice");
+Person bob("Bob");
+assert(alice.name != bob.name);
+}
+```
 
 ### Encapsulation
 
@@ -1928,78 +1930,78 @@ When working with classes it is often helpful to be able to refer to the current
 
 * However, a function that calculates the number of days in a month probably should be encapsulated with the class, because the class needs this function in order to operate correctly.
 
-* ```cpp
-    #include <cassert>
+```cpp
+#include <cassert>
+
+class Date {
+public:
+Date(int day, int month, int year);
+int Day() const { return day_; }
+void Day(int day);
+int Month() const { return month_; }
+void Month(int month);
+int Year() const { return year_; }
+void Year(int year);
+
+private:
+bool LeapYear(int year) const;
+int DaysInMonth(int month, int year) const;
+int day_{1};
+int month_{1};
+int year_{0};
+};
+
+Date::Date(int day, int month, int year) {
+Year(year);
+Month(month);
+Day(day);
+}
+
+bool Date::LeapYear(int year) const {
+if(year % 4 != 0)
+    return false;
+else if(year % 100 != 0)
+    return true;
+else if(year % 400 != 0)
+    return false;
+else
+    return true;
+}
+
+int Date::DaysInMonth(int month, int year) const {
+if(month == 2)
+    return LeapYear(year) ? 29 : 28;
+else if(month == 4 || month == 6 || month == 9 || month == 11)
+    return 30;
+else
+    return 31;
+}
+
+void Date::Day(int day) {
+if (day >= 1 && day <= DaysInMonth(Month(), Year()))
+    day_ = day;
+}
+
+void Date::Month(int month) {
+if (month >= 1 && month <= 12)
+    month_ = month; 
+}
+
+void Date::Year(int year) { year_ = year; }
+
+// Test
+int main() {
+Date date(29, 2, 2016);
+assert(date.Day() == 29);
+assert(date.Month() == 2);
+assert(date.Year() == 2016);
     
-    class Date {
-    public:
-        Date(int day, int month, int year);
-        int Day() const { return day_; }
-        void Day(int day);
-        int Month() const { return month_; }
-        void Month(int month);
-        int Year() const { return year_; }
-        void Year(int year);
-    
-    private:
-        bool LeapYear(int year) const;
-        int DaysInMonth(int month, int year) const;
-        int day_{1};
-        int month_{1};
-        int year_{0};
-    };
-    
-    Date::Date(int day, int month, int year) {
-        Year(year);
-        Month(month);
-        Day(day);
-    }
-    
-    bool Date::LeapYear(int year) const {
-        if(year % 4 != 0)
-            return false;
-        else if(year % 100 != 0)
-            return true;
-        else if(year % 400 != 0)
-            return false;
-        else
-            return true;
-    }
-    
-    int Date::DaysInMonth(int month, int year) const {
-        if(month == 2)
-            return LeapYear(year) ? 29 : 28;
-        else if(month == 4 || month == 6 || month == 9 || month == 11)
-            return 30;
-        else
-            return 31;
-    }
-    
-    void Date::Day(int day) {
-        if (day >= 1 && day <= DaysInMonth(Month(), Year()))
-            day_ = day;
-    }
-    
-    void Date::Month(int month) {
-        if (month >= 1 && month <= 12)
-            month_ = month; 
-    }
-    
-    void Date::Year(int year) { year_ = year; }
-    
-    // Test
-    int main() {
-        Date date(29, 2, 2016);
-        assert(date.Day() == 29);
-        assert(date.Month() == 2);
-        assert(date.Year() == 2016);
-            
-        Date date2(29, 2, 2019);
-        assert(date2.Day() != 29);
-        assert(date2.Month() == 2);
-        assert(date2.Year() == 2019);
-    }
-    ```
+Date date2(29, 2, 2019);
+assert(date2.Day() != 29);
+assert(date2.Month() == 2);
+assert(date2.Year() == 2019);
+}
+```
 
 ### Accessor Functions
 
@@ -2011,73 +2013,73 @@ When working with classes it is often helpful to be able to refer to the current
 
 * The main role of the const specifier in accessor methods is to protect member data. When you specify a member function as const, the compiler will prohibit that function from changing any of the object's member data.
 
-* ```cpp
-    #include <iostream>
-    #include <string>
+```cpp
+#include <iostream>
+#include <string>
+
+class BankAccount
+{
+public:
+int number;
+std::string owner;
+double funds;
+};
+
+int main(){
+// TODO: instantiate and output a bank account
+BankAccount account;
+account.number = 123456789;
+account.owner = "David Silver";
+account.funds   = 1,000,000.01
     
-    class BankAccount
-    {
-    public:
-        int number;
-        std::string owner;
-        double funds;
-    };
-    
-    int main(){
-        // TODO: instantiate and output a bank account
-        BankAccount account;
-        account.number = 123456789;
-        account.owner = "David Silver";
-        account.funds   = 1,000,000.01
-            
-        std::cout << "Account Information\n";
-        std::cout << "-------------------\n";
-        std::cout << "ID: " << account.number << "\n";
-        std::cout << "Owner: " << account.owner << "\n";
-        std::cout << "Funds: $" << account.funds << "\n";
-    }
-    ```
+std::cout << "Account Information\n";
+std::cout << "-------------------\n";
+std::cout << "ID: " << account.number << "\n";
+std::cout << "Owner: " << account.owner << "\n";
+std::cout << "Funds: $" << account.funds << "\n";
+}
+```
 
 ### Mutator Functions
 
-* ```cpp
-    #include <string>
-    #include <cstring>
-    #include <iostream>
+```cpp
+#include <string>
+#include <cstring>
+#include <iostream>
+
+class Car {
+// TODO: Declare private attributes
+private:
+    std::string _brand;
     
-    class Car {
-        // TODO: Declare private attributes
-        private:
-            std::string _brand;
-            
-        // TODO: Declare getter and setter for brand
-        public:
-            void brand(char*);
-            std::string brand() const;
-            
-    };
+// TODO: Declare getter and setter for brand
+public:
+    void brand(char*);
+    std::string brand() const;
     
-    // Define setters
-    void Car::brand(char* brand)
-    {
-        Car::_brand = brand;
-    }
-    
-    // Define getters
-    std::string Car::brand() const
-    {
-        return _brand;
-    }
-    
-    // Test in main()
-    int main() 
-    {
-        Car car;
-        char brand[] = "Peugeot";
-        car.brand(brand);
-        std::cout << car.brand() << "\n";   
-    }
-    ```
+};
+
+// Define setters
+void Car::brand(char* brand)
+{
+Car::_brand = brand;
+}
+
+// Define getters
+std::string Car::brand() const
+{
+return _brand;
+}
+
+// Test in main()
+int main() 
+{
+Car car;
+char brand[] = "Peugeot";
+car.brand(brand);
+std::cout << car.brand() << "\n";   
+}
+```
 
 ### Abstraction
 
@@ -2087,14 +2089,14 @@ When working with classes it is often helpful to be able to refer to the current
 
     * The String() function within this Date class is an example of abstraction.
 
-    * ```cpp
-        class Date {
-            public:
-            ...
-            std::string String() const;
-            ...
-        };
-        ```
+```cpp
+class Date {
+    public:
+    ...
+    std::string String() const;
+    ...
+};
+```
 
     * The user is able to interact with the Date class through the String() function, but the user does not need to know about the implementation of either Date or String().
 
@@ -2112,30 +2114,30 @@ When working with classes it is often helpful to be able to refer to the current
 
         * Here is an example:
 
-        * ```cpp
-            #include <cassert>
-            
-            class Foo {
-                public:
-                static int count;
-                Foo() { Foo::count += 1; }
-            };
-            
-            int Foo::count{0};
-            
-            int main() {
-                Foo f{};
-                assert(Foo::count == 1);
-            }
-            ```
+```cpp
+#include <cassert>
+
+class Foo {
+public:
+static int count;
+Foo() { Foo::count += 1; }
+};
+
+int Foo::count{0};
+
+int main() {
+Foo f{};
+assert(Foo::count == 1);
+}
+```
 
         * An exception to the global definition of `static` members is if such members can be marked as `constexpr`. In that case, the `static` member variable can be both declared and defined within the class definition:
 
-        * ```cpp
-            struct Kilometer {
-                static constexpr int meters{1000};
-            };
-            ```
+```cpp
+struct Kilometer {
+static constexpr int meters{1000};
+};
+```
 
 ## Object-Oriented Programming / Advanced OOP
 
@@ -2149,18 +2151,18 @@ the concept of **Inheritence** comes froom the idea that you build hierarchy of 
 
   * Object-oriented programming uses the same principles! For instance, imagine a Vehicle class:
 
-      * ```cpp
-          class Vehicle {
-          public:
-              int wheels = 0;
-              string color = "blue";
-          
-              void Print() const
-              {
-                  std::cout << "This " << color << " vehicle has " << wheels << " wheels!\n";
-              }
-          };
-          ```
+```cpp
+  class Vehicle {
+  public:
+      int wheels = 0;
+      string color = "blue";
+  
+      void Print() const
+      {
+          std::cout << "This " << color << " vehicle has " << wheels << " wheels!\n";
+      }
+  };
+  ```
     
 * We can derive other classes from Vehicle, such as Car or Bicycle. One advantage is that this saves us from having to re-define all of the common member variables - in this case, wheels and color - in each derived class.
 
@@ -2230,7 +2232,7 @@ public:
 
 * Private inheritance: the public and protected members of the base class listed after the specifier are private members of the derived class
 
-* ```cpp
+```cpp
 // This example demonstrates the privacy levels
 // between parent and child classes
 #include <iostream>
