@@ -2139,7 +2139,9 @@ When working with classes it is often helpful to be able to refer to the current
 
 ## Object-Oriented Programming / Advanced OOP
 
-* Inheritence
+the concept of **Inheritence** comes froom the idea that you build hierarchy of concepts starting from the most general and then more and more specialized.
+
+### Inheritence
 
     * In our everyday life, we tend to divide things into groups, based on their shared characteristics. Here are some groups that you have probably used yourself: electronics, tools, vehicles, or plants.
 
@@ -2218,7 +2220,7 @@ When working with classes it is often helpful to be able to refer to the current
             };
             ```
 
-* Inherited Access Specifiers
+### Inherited Access Specifiers
 
     * Just as access specifiers (i.e. public, protected, and private) define which class members users can access, the same access modifiers also define which class members users of a derived classes can access.
 
