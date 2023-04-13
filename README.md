@@ -846,9 +846,9 @@ int main()
 }
 ```
     
-    * As you can see from the code, the variable pointer_to_i is declared as a pointer to an int using the * symbol, and pointer_to_i is set to the address of i. From the printout, it can be seen that pointer_to_i holds the same value as the address of i.
+* As you can see from the code, the variable pointer_to_i is declared as a pointer to an int using the * symbol, and pointer_to_i is set to the address of i. From the printout, it can be seen that pointer_to_i holds the same value as the address of i.
 
-    * Once you have a pointer, you may want to retrieve the object it is pointing to. In this case, the * symbol can be used again. This time, however, it will appear on the right hand side of an equation or in front of an already-defined variable, so the meaning is different. In this case, it is called the "dereferencing operator", and it returns the object being pointed to. You can see how this works with the code below:
+* Once you have a pointer, you may want to retrieve the object it is pointing to. In this case, the * symbol can be used again. This time, however, it will appear on the right hand side of an equation or in front of an already-defined variable, so the meaning is different. In this case, it is called the "dereferencing operator", and it returns the object being pointed to. You can see how this works with the code below:
 
 ```cpp
 #include <iostream>
@@ -867,7 +867,7 @@ int main()
 }
 ```
     
-    * In the following example, the code is similar to above, except that the object that is being pointed to is changed before the pointer is dereferenced. Before executing the following code, guess what you think will happen to the value of the dereferenced pointer.
+* In the following example, the code is similar to above, except that the object that is being pointed to is changed before the pointer is dereferenced. Before executing the following code, guess what you think will happen to the value of the dereferenced pointer.
 
 ```cpp
 #include <iostream>
@@ -889,9 +889,9 @@ int main() {
 }
 ```
     
-    * In the previous concept, you were introduced to int pointers, and you learned the syntax for creating a pointer and retrieving an object from a pointer.
+* In the previous concept, you were introduced to int pointers, and you learned the syntax for creating a pointer and retrieving an object from a pointer.
 
-    * Although the type of object being pointed to must be included in a pointer declaration, pointers hold the same kind of value for every type of object: just a memory address to where the object is stored. In the following code, a vector is declared. Write your own code to create a pointer to the address of that vector. Then, dereference your pointer and print the value of the first item in the vector.
+* Although the type of object being pointed to must be included in a pointer declaration, pointers hold the same kind of value for every type of object: just a memory address to where the object is stored. In the following code, a vector is declared. Write your own code to create a pointer to the address of that vector. Then, dereference your pointer and print the value of the first item in the vector.
 
 ```cpp
     #include <iostream>
@@ -915,11 +915,11 @@ int main() {
         // Dereference your pointer to v and print the int at index 0 here (note: you should print 1):
         cout << "The first element of v is: " << (*pointer_to_v)[0] << "\n";
     }
-    ```
+```
     
-    * Pointers can be used in another form of pass-by-reference when working with functions. When used in this context, they work much like the references that you used for pass-by reference previously. If the pointer is pointing to a large object, it can be much more efficient to pass the pointer to a function than to pass a copy of the object as with pass-by-value.
+* Pointers can be used in another form of pass-by-reference when working with functions. When used in this context, they work much like the references that you used for pass-by reference previously. If the pointer is pointing to a large object, it can be much more efficient to pass the pointer to a function than to pass a copy of the object as with pass-by-value.
 
-        * In the following code, a pointer to an int is created, and that pointer is passed to a function. The object pointed to is then modified in the function.
+* In the following code, a pointer to an int is created, and that pointer is passed to a function. The object pointed to is then modified in the function.
 
 ```cpp
 #include <iostream>
@@ -943,9 +943,9 @@ int main()
 }
 ```
 
-    * You can also return a pointer from a function. As mentioned just above, if you do this, you must be careful that the object being pointed to doesn't go out of scope when the function finishes executing. If the object goes out of scope, the memory address being pointed to might then be used for something else.
+* You can also return a pointer from a function. As mentioned just above, if you do this, you must be careful that the object being pointed to doesn't go out of scope when the function finishes executing. If the object goes out of scope, the memory address being pointed to might then be used for something else.
 
-    * In the example below, a reference is passed into a function and a pointer is returned. This is safe since the pointer being returned points to a reference - a variable that exists outside of the function and will not go out of scope in the function.
+* In the example below, a reference is passed into a function and a pointer is returned. This is safe since the pointer being returned points to a reference - a variable that exists outside of the function and will not go out of scope in the function.
 
 ```cpp
 #include <iostream>
@@ -1493,7 +1493,7 @@ struct Rectangle {
     Sphere earth;
 ```
     
-    * In this example, the "type" of `value` is `int`. Furthermore, `rectangle` is "of type" `Rectangle`, and `earth` has type `Sphere`.
+* In this example, the "type" of `value` is `int`. Furthermore, `rectangle` is "of type" `Rectangle`, and `earth` has type `Sphere`.
 
 * Fundamental Types
   
@@ -1569,20 +1569,20 @@ struct Date {
 };
 ```
 
-    * Private members of a class are accessible only from within other member functions of the same class (or from their "friends", which we’ll talk about later).
+* Private members of a class are accessible only from within other member functions of the same class (or from their "friends", which we’ll talk about later).
 
-    * There is a third access modifier called `protected`, which implies that members are accessible from other member functions of the same class (or from their "friends"), and also from members of their derived classes. We'll also discuss about derived classes later, when we learn about inheritance.
+* There is a third access modifier called `protected`, which implies that members are accessible from other member functions of the same class (or from their "friends"), and also from members of their derived classes. We'll also discuss about derived classes later, when we learn about inheritance.
 
-    * The differences between a class and a struct in C++ is:
+* The differences between a class and a struct in C++ is:
 
-        * `struct` members and base classes/structs are `public` by default.
-        * `class` members and base classes/struts are `private` by default.
+    * `struct` members and base classes/structs are `public` by default.
+    * `class` members and base classes/struts are `private` by default.
 
-    * Both classes and structs can have a mixture of `public, protected and private` members, can use inheritance and can have member functions.
+* Both classes and structs can have a mixture of `public, protected and private` members, can use inheritance and can have member functions.
 
 * Accessors And Mutators
 
-    * To access private members, we typically define public "accessor" and "mutator" member functions (sometimes called "getter" and "setter" functions).
+* To access private members, we typically define public "accessor" and "mutator" member functions (sometimes called "getter" and "setter" functions).
 
 ```cpp
 struct Date {
@@ -1619,7 +1619,7 @@ class Point {
 };
 ```
 
-    * This `class` could be made into a `struct`, with no logic or "invariants", just passive data. The member variables could both be public, with no accessor functions:
+* This `class` could be made into a `struct`, with no logic or "invariants", just passive data. The member variables could both be public, with no accessor functions:
 
 ```cpp
 struct Point {   // Good: concise
@@ -1651,28 +1651,28 @@ class Date {
 };
 ```
     
-    * So far, this class definition provides no invariants. The data members can vary independently of each other.
+* So far, this class definition provides no invariants. The data members can vary independently of each other.
 
-    * There is one subtle but important change that takes place when we change `struct` Date to `class` Date. By default, **all members of a struct default to public, whereas all members of a class default to private**. Since we have not specified access for the members of class Date, all of the members are private. In fact, we are not able to assign value to them at all!
+* There is one subtle but important change that takes place when we change `struct` Date to `class` Date. By default, **all members of a struct default to public, whereas all members of a class default to private**. Since we have not specified access for the members of class Date, all of the members are private. In fact, we are not able to assign value to them at all!
 
-    * `Date` Accessors And Mutators
+* `Date` Accessors And Mutators
 
     * As the first step to adding the appropriate invariants, let's specify that the member variable `day` is private. In order to access this member, we'll provide accessor and mutatot functions. Then we can add the appropriate invariants to the mutators.
 
 ```cpp
 class Date {
-    public:
-        int Day() { return day_; }
-        void Day(int d) { day_ = d; }
+public:
+    int Day() { return day_; }
+    void Day(int d) { day_ = d; }
 
-    private:
-        int day_{1};
-        int month_{1};
-        int year_{0};
-    };
+private:
+    int day_{1};
+    int month_{1};
+    int year_{0};
+};
 ```
     
-    * `Date` Invariants
+* `Date` Invariants
 
     * Now we can add the invariants whitin the mutators
 
@@ -1691,9 +1691,9 @@ private:
 };
 ```
 
-    * Now we have a set of invariants for the the class members!
+* Now we have a set of invariants for the the class members!
 
-    * As a general rule, member data subject to an invariant should be specified **private**, in order to enforce the invariant before updating the member's value.
+* As a general rule, member data subject to an invariant should be specified **private**, in order to enforce the invariant before updating the member's value.
 
 ### Constructors
 
@@ -1727,7 +1727,7 @@ private:
 };
 ```
     
-    * As you can see, a constructor is also able to call other member functions of the object it is constructing. In the example above, `Date(int d, int m, int y)` assigns a member variable by calling `Day(int d)`.
+* As you can see, a constructor is also able to call other member functions of the object it is constructing. In the example above, `Date(int d, int m, int y)` assigns a member variable by calling `Day(int d)`.
 
 * Default Constructor
 
@@ -1743,9 +1743,9 @@ class Date {
 };
 ```
     
-    * We can initialize an object of this class, even though this class does not explicitly define a constructor.
+* We can initialize an object of this class, even though this class does not explicitly define a constructor.
 
-    * This is possible because of the default constructor. The compiler will define a default constructor, which accepts no arguments, for any class or structure that does not contain an explicitly-defined constructor.
+* This is possible because of the default constructor. The compiler will define a default constructor, which accepts no arguments, for any class or structure that does not contain an explicitly-defined constructor.
 
 ### Scope Resolution
 
@@ -1810,7 +1810,7 @@ int main() {
 }
 ```
     
-    * In this example, we have two different `void Hello()` functions. If we put both of these functions in the same namespace, they would conflict and the program would not compile. However, by declaring each of these functions in a separate namespace, they are able to co-exist. Furthermore, we can specify which function to call by prefixing Hello() with the appropriate namespace, followed by the :: operator.
+* In this example, we have two different `void Hello()` functions. If we put both of these functions in the same namespace, they would conflict and the program would not compile. However, by declaring each of these functions in a separate namespace, they are able to co-exist. Furthermore, we can specify which function to call by prefixing Hello() with the appropriate namespace, followed by the :: operator.
 
 ```cpp
 #include <cassert>
@@ -2099,11 +2099,11 @@ class Date {
 };
 ```
 
-    * The user is able to interact with the Date class through the String() function, but the user does not need to know about the implementation of either Date or String().
+* The user is able to interact with the Date class through the String() function, but the user does not need to know about the implementation of either Date or String().
 
-    * For example, the user does not know, or need to know, that this object internally contains three int member variables. The user can just call the String() method to get data.
+* For example, the user does not know, or need to know, that this object internally contains three int member variables. The user can just call the String() method to get data.
 
-    * If the designer of this class ever decides to change how the data is stored internally -- using a vector of ints instead of three separate ints, for example -- the user of the Date class will not need to know.
+* If the designer of this class ever decides to change how the data is stored internally -- using a vector of ints instead of three separate ints, for example -- the user of the Date class will not need to know.
     
 * Static Members
 
@@ -2132,7 +2132,7 @@ int main() {
 }
 ```
 
-        * An exception to the global definition of `static` members is if such members can be marked as `constexpr`. In that case, the `static` member variable can be both declared and defined within the class definition:
+* An exception to the global definition of `static` members is if such members can be marked as `constexpr`. In that case, the `static` member variable can be both declared and defined within the class definition:
 
 ```cpp
 struct Kilometer {
