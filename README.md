@@ -173,8 +173,8 @@ C++ has several "primitive" variable types, which are things like `int`s (intege
 // You can use two forward slashes for single line comments.
 
 /*
-For longer comments, you can enclose the text with an opening
-slash-star and closing star-slash.
+    For longer comments, you can enclose the text with an opening
+    slash-star and closing star-slash.
 */ 
 ```
     
@@ -221,11 +221,11 @@ using std::cout;
 using std::vector;
 
 int main() {
-// Add your code here.
-vector<int> a {1, 2, 3, 4, 5};
-for (int i: a) {
-    cout << i << "\n";
-}
+    // Add your code here.
+    vector<int> a {1, 2, 3, 4, 5};
+    for (int i: a) {
+        cout << i << "\n";
+    }
 }
 ```
 
@@ -240,14 +240,14 @@ using std::cout;
 // Function declared and defined here.
 int AdditionFunction(int i, int j) 
 {
-return i + j;
+    return i + j;
 }
 
 int main() 
 {
-auto d = 3;
-auto f = 7;
-cout << AdditionFunction(d, f) << "\n";
+    auto d = 3;
+    auto f = 7;
+    cout << AdditionFunction(d, f) << "\n";
 }
 ```
 
@@ -278,11 +278,11 @@ my_file.open(path);
 
 int main()
 {
-std::ifstream my_file;
-my_file.open("files/1.board");
-if (my_file) {
-std::cout << "The file stream has been created!" << "\n";
-}    
+    std::ifstream my_file;
+    my_file.open("files/1.board");
+    if (my_file) {
+    std::cout << "The file stream has been created!" << "\n";
+    }    
 }
 ```
 
@@ -296,15 +296,15 @@ std::cout << "The file stream has been created!" << "\n";
 #include <string>
 
 int main() {
-std::ifstream my_file;
-my_file.open("files/1.board");
-if (my_file) {
-    std::cout << "The file stream has been created!" << "\n";
-    std::string line;
-    while (getline(my_file, line)) {
-        std::cout << line << "\n";
+    std::ifstream my_file;
+    my_file.open("files/1.board");
+    if (my_file) {
+        std::cout << "The file stream has been created!" << "\n";
+        std::string line;
+        while (getline(my_file, line)) {
+            std::cout << line << "\n";
+        }
     }
-}
 }
 ```
 
@@ -417,20 +417,20 @@ using std::cout;
 
 int main()
 {
-enum class Direction {kUp, kDown, kLeft, kRight};
+    enum class Direction {kUp, kDown, kLeft, kRight};
 
-Direction a = Direction::kUp;
+    Direction a = Direction::kUp;
 
-switch (a) {
-case Direction::kUp : cout << "Going up!" << "\n";
-    break;
-case Direction::kDown : cout << "Going down!" << "\n";
-    break;
-case Direction::kLeft : cout << "Going left!" << "\n";
-    break;
-case Direction::kRight : cout << "Going right!" << "\n";
-    break;
-}
+    switch (a) {
+    case Direction::kUp : cout << "Going up!" << "\n";
+        break;
+    case Direction::kDown : cout << "Going down!" << "\n";
+        break;
+    case Direction::kLeft : cout << "Going left!" << "\n";
+        break;
+    case Direction::kRight : cout << "Going right!" << "\n";
+        break;
+    }
 }
 ```
 
@@ -525,16 +525,16 @@ int main() {
 
 int main()
 {
-int i;
-std::cout << "Enter an integer value for i: ";
-std::cin >> i;
-const int j = i * 2;  // "j can only be evaluated at run time."
-                    // "But I promise not to change it after it is initialized."
+    int i;
+    std::cout << "Enter an integer value for i: ";
+    std::cin >> i;
+    const int j = i * 2;  // "j can only be evaluated at run time."
+                        // "But I promise not to change it after it is initialized."
 
-constexpr int k = 3;  // "k, in contrast, can be evaluated at compile time."
+    constexpr int k = 3;  // "k, in contrast, can be evaluated at compile time."
 
-std::cout << "j = " << j << "\n";
-std::cout << "k = " << k << "\n";
+    std::cout << "j = " << j << "\n";
+    std::cout << "k = " << k << "\n";
 }
 ```
 
@@ -547,12 +547,12 @@ std::cout << "k = " << k << "\n";
 
 int main()
 {
-int i;
-std::cout << "Enter an integer value for i: ";
-std::cin >> i;
-constexpr int j = i * 2;  // "j can only be evaluated at run time."
-                        // "constexpr must be evaluated at compile time."
-                        // "So this code will produce a compilation error."
+    int i;
+    std::cout << "Enter an integer value for i: ";
+    std::cin >> i;
+    constexpr int j = i * 2;  // "j can only be evaluated at run time."
+                            // "constexpr must be evaluated at compile time."
+                            // "So this code will produce a compilation error."
 }
 ```
 
@@ -564,16 +564,16 @@ constexpr int j = i * 2;  // "j can only be evaluated at run time."
 
 int sum(const std::vector<int> &v)
 {
-int sum = 0;
-for(int i : v)
-    sum += i;
-return sum;
+    int sum = 0;
+    for(int i : v)
+        sum += i;
+    return sum;
 }
 
 int main()
 {
-std::vector<int> v {0, 1, 2, 3, 4};
-std::cout << sum(v) << "\n";
+    std::vector<int> v {0, 1, 2, 3, 4};
+    std::cout << sum(v) << "\n";
 }
 ```
 
@@ -601,18 +601,18 @@ using std::cout;
 
 void OuterFunction(int i) 
 {
-InnerFunction(i);
+    InnerFunction(i);
 }
 
 void InnerFunction(int i) 
 {
-cout << "The value of the integer is: " << i << "\n";
+    cout << "The value of the integer is: " << i << "\n";
 }
 
 int main() 
 {
-int a = 5;
-OuterFunction(a);
+    int a = 5;
+    OuterFunction(a);
 }
 ```
 
@@ -647,18 +647,18 @@ using std::cout;
 
 void OuterFunction(int i) 
 {
-InnerFunction(i);
+    InnerFunction(i);
 }
 
 void InnerFunction(int i) 
 {
-cout << "The value of the integer is: " << i << "\n";
+    cout << "The value of the integer is: " << i << "\n";
 }
 
 int main() 
 {
-int a = 5;
-OuterFunction(a);
+    int a = 5;
+    OuterFunction(a);
 }
 ```
 
@@ -776,23 +776,23 @@ using std::cout;
 
 int main() 
 {
-int i = 1;
+    int i = 1;
 
-// Declare a reference to i.
-int& j = i;
-cout << "The value of j is: " << j << "\n";
+    // Declare a reference to i.
+    int& j = i;
+    cout << "The value of j is: " << j << "\n";
 
-// Change the value of i.
-i = 5;
-cout << "The value of i is changed to: " << i << "\n";
-cout << "The value of j is now: " << j << "\n";
+    // Change the value of i.
+    i = 5;
+    cout << "The value of i is changed to: " << i << "\n";
+    cout << "The value of j is now: " << j << "\n";
 
-// Change the value of the reference.
-// Since reference is just another name for the variable,
-// th
-j = 7;
-cout << "The value of j is now: " << j << "\n";
-cout << "The value of i is changed to: " << i << "\n";
+    // Change the value of the reference.
+    // Since reference is just another name for the variable,
+    // th
+    j = 7;
+    cout << "The value of j is now: " << j << "\n";
+    cout << "The value of i is changed to: " << i << "\n";
 }
 ```
 
@@ -873,18 +873,18 @@ int main()
 using std::cout;
 
 int main() {
-int i = 5;
-// A pointer pointer_to_i is declared and initialized to the address of i.
-int* pointer_to_i = &i;
+    int i = 5;
+    // A pointer pointer_to_i is declared and initialized to the address of i.
+    int* pointer_to_i = &i;
 
-// Print the memory addresses of i and j
-cout << "The address of i is:          " << &i << "\n";
-cout << "The variable pointer_to_i is: " << pointer_to_i << "\n";
+    // Print the memory addresses of i and j
+    cout << "The address of i is:          " << &i << "\n";
+    cout << "The variable pointer_to_i is: " << pointer_to_i << "\n";
 
-// The value of i is changed.
-i = 7;
-cout << "The new value of the variable i is                     : " << i << "\n";
-cout << "The value of the variable pointed to by pointer_to_i is: " << *pointer_to_i << "\n";
+    // The value of i is changed.
+    i = 7;
+    cout << "The new value of the variable i is                     : " << i << "\n";
+    cout << "The value of the variable pointed to by pointer_to_i is: " << *pointer_to_i << "\n";
 }
 ```
     
@@ -926,19 +926,19 @@ using std::cout;
 
 void AddOne(int* j)
 {
-// Dereference the pointer and increment the int being pointed to.
-(*j)++;
+    // Dereference the pointer and increment the int being pointed to.
+    (*j)++;
 }
 
 int main() 
 {
-int i = 1;
-cout << "The value of i is: " << i << "\n";
+    int i = 1;
+    cout << "The value of i is: " << i << "\n";
 
-// Declare a pointer to i:
-int* pi = &i;
-AddOne(pi);
-cout << "The value of i is now: " << i << "\n";
+    // Declare a pointer to i:
+    int* pi = &i;
+    AddOne(pi);
+    cout << "The value of i is now: " << i << "\n";
 }
 ```
 
@@ -1020,31 +1020,31 @@ using std::string;
 
 
 int main() {
-// Create strings to use in the hash table.
-string key = "word";
-string def_1 = "a unit of language, consisting of one or more spoken sounds or their written representation, that functions as a principal carrier of meaning";
-string def_2 = "speech or talk: to express one's emotion in words";
-string def_3 = "a short talk or conversation: 'Marston, I'd like a word with you.'";
-string def_4 = "an expression or utterance: a word of warning";
-unordered_map <string, vector<string>> my_dictionary;
+    // Create strings to use in the hash table.
+    string key = "word";
+    string def_1 = "a unit of language, consisting of one or more spoken sounds or their written representation, that functions as a principal carrier of meaning";
+    string def_2 = "speech or talk: to express one's emotion in words";
+    string def_3 = "a short talk or conversation: 'Marston, I'd like a word with you.'";
+    string def_4 = "an expression or utterance: a word of warning";
+    unordered_map <string, vector<string>> my_dictionary;
 
-// Check if key is in the hash table.
-if (my_dictionary.find(key) == my_dictionary.end()) {
-    cout << "The key 'word' is not in the dictionary." << "\n";
-    cout << "Inserting a key-value pair into the dictionary." << "\n\n";
-    // Set the value for the key.
-    my_dictionary[key] = vector<string> {def_1, def_2, def_3, def_4};
-}
+    // Check if key is in the hash table.
+    if (my_dictionary.find(key) == my_dictionary.end()) {
+        cout << "The key 'word' is not in the dictionary." << "\n";
+        cout << "Inserting a key-value pair into the dictionary." << "\n\n";
+        // Set the value for the key.
+        my_dictionary[key] = vector<string> {def_1, def_2, def_3, def_4};
+    }
 
-// The key should now be in the hash table. You can access the
-// value corresponding to the key with square brackets [].
-// Here, the value my_dictionary[key] is a vector of strings.
-// We iterate over the vector and print the strings.
-cout << key << ": \n";
-auto definitions = my_dictionary[key];
-for (string definition : definitions) {
-    cout << definition << "\n";
-}
+    // The key should now be in the hash table. You can access the
+    // value corresponding to the key with square brackets [].
+    // Here, the value my_dictionary[key] is a vector of strings.
+    // We iterate over the vector and print the strings.
+    cout << key << ": \n";
+    auto definitions = my_dictionary[key];
+    for (string definition : definitions) {
+        cout << definition << "\n";
+    }
 }
 ```
     
@@ -1092,47 +1092,46 @@ using std::cout;
 // The Car class
 class Car {
 public:
-// Method to print data.
-void PrintCarData() 
-{
-    cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
-}
+    // Method to print data.
+    void PrintCarData() 
+    {
+        cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
+    }
 
-// Method to increment the distance travelled.
-void IncrementDistance() 
-{
-    distance++;
-}
+    // Method to increment the distance travelled.
+    void IncrementDistance() 
+    {
+        distance++;
+    }
 
-// Class/object attributes
-string color;
-int distance = 0;
-int number;
+    // Class/object attributes
+    string color;
+    int distance = 0;
+    int number;
 };
 
 int main() 
 {
-// Create class instances for each car.
-Car car_1, car_2, car_3;
+    // Create class instances for each car.
+    Car car_1, car_2, car_3;
 
-// Set each instance's color.
-car_1.color = "green";
-car_2.color = "red";
-car_3.color = "blue";
+    // Set each instance's color.
+    car_1.color = "green";
+    car_2.color = "red";
+    car_3.color = "blue";
 
-// Set each instance's number.
-car_1.number = 1;
-car_2.number = 2;
-car_3.number = 3;
+    // Set each instance's number.
+    car_1.number = 1;
+    car_2.number = 2;
+    car_3.number = 3;
 
-// Increment car_1's position by 1.
-car_1.IncrementDistance();
+    // Increment car_1's position by 1.
+    car_1.IncrementDistance();
 
-// Print out the position and color of each car.
-car_1.PrintCarData();
-car_2.PrintCarData();
-car_3.PrintCarData();
-
+    // Print out the position and color of each car.
+    car_1.PrintCarData();
+    car_2.PrintCarData();
+    car_3.PrintCarData();
 }
 ```
 
@@ -1148,44 +1147,44 @@ using std::cout;
 
 class Car {
 public:
-void PrintCarData() 
-{
-    cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
-}
+    void PrintCarData() 
+    {
+        cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
+    }
 
-void IncrementDistance() 
-{
-    distance++;
-}
+    void IncrementDistance() 
+    {
+        distance++;
+    }
 
-// Adding a constructor here:
-Car(string c, int n) 
-{
-    // Setting the class attributes with
-    // The values passed into the constructor.
-    color = c;
-    number = n;
-}
+    // Adding a constructor here:
+    Car(string c, int n) 
+    {
+        // Setting the class attributes with
+        // The values passed into the constructor.
+        color = c;
+        number = n;
+    }
 
-string color;
-int distance = 0;
-int number;
+    string color;
+    int distance = 0;
+    int number;
 };
 
 int main() 
 {
-// Create class instances for each car.
-Car car_1 = Car("green", 1);
-Car car_2 = Car("red", 2);
-Car car_3 = Car("blue", 3);
+    // Create class instances for each car.
+    Car car_1 = Car("green", 1);
+    Car car_2 = Car("red", 2);
+    Car car_3 = Car("blue", 3);
 
-// Increment car_1's position by 1.
-car_1.IncrementDistance();
+    // Increment car_1's position by 1.
+    car_1.IncrementDistance();
 
-// Print out the position and color of each car.
-car_1.PrintCarData();
-car_2.PrintCarData();
-car_3.PrintCarData();
+    // Print out the position and color of each car.
+    car_1.PrintCarData();
+    car_2.PrintCarData();
+    car_3.PrintCarData();
 }
 ```
 
@@ -1197,7 +1196,7 @@ car_3.PrintCarData();
 
 ```cpp
 class Sedan : public Car {
-// Sedan class declarations/definitions here.
+    // Sedan class declarations/definitions here.
 };
 ```
 
@@ -1217,44 +1216,44 @@ using std::cout;
 
 class Car {
 public:
-void PrintCarData() 
-{
-    cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
-}
+    void PrintCarData() 
+    {
+        cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
+    }
 
-void IncrementDistance() 
-{
-    distance++;
-}
+    void IncrementDistance() 
+    {
+        distance++;
+    }
 
-// Adding a constructor here:
-Car(string c, int n) 
-{
-    // Setting the class attributes with
-    // The values passed into the constructor.
-    color = c;
-    number = n;
-}
+    // Adding a constructor here:
+    Car(string c, int n) 
+    {
+        // Setting the class attributes with
+        // The values passed into the constructor.
+        color = c;
+        number = n;
+    }
 
-string color;
-int distance = 0;
-int number;
+    string color;
+    int distance = 0;
+    int number;
 };
 
 int main() 
 {
-// Create class instances for each car.
-Car car_1 = Car("green", 1);
-Car car_2 = Car("red", 2);
-Car car_3 = Car("blue", 3);
+    // Create class instances for each car.
+    Car car_1 = Car("green", 1);
+    Car car_2 = Car("red", 2);
+    Car car_3 = Car("blue", 3);
 
-// Increment car_1's position by 1.
-car_1.IncrementDistance();
+    // Increment car_1's position by 1.
+    car_1.IncrementDistance();
 
-// Print out the position and color of each car.
-car_1.PrintCarData();
-car_2.PrintCarData();
-car_3.PrintCarData();
+    // Print out the position and color of each car.
+    car_1.PrintCarData();
+    car_2.PrintCarData();
+    car_3.PrintCarData();
 
 }
 ```
@@ -1300,18 +1299,18 @@ using std::cout;
 
 class Car {
 public:
-void PrintCarData();
-void IncrementDistance();
+    void PrintCarData();
+    void IncrementDistance();
 
-// Using a constructor list in the constructor:
-Car(string c, int n) : color(c), number(n) {}
+    // Using a constructor list in the constructor:
+    Car(string c, int n) : color(c), number(n) {}
 
-// The variables do not need to be accessed outside of
-// functions from this class, so we can set them to private.
-private:
-string color;
-int distance = 0;
-int number;
+    // The variables do not need to be accessed outside of
+    // functions from this class, so we can set them to private.
+    private:
+    string color;
+    int distance = 0;
+    int number;
 };
 
 #endif
@@ -1325,12 +1324,12 @@ int number;
 // Method definitions for the Car class.
 void Car::PrintCarData() 
 {
-cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
+    cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
 }
 
 void Car::IncrementDistance() 
 {
-distance++;
+    distance++;
 }
 ```
 
@@ -1344,18 +1343,18 @@ using std::cout;
 
 int main() 
 {
-// Create class instances for each car.
-Car car_1 = Car("green", 1);
-Car car_2 = Car("red", 2);
-Car car_3 = Car("blue", 3);
+    // Create class instances for each car.
+    Car car_1 = Car("green", 1);
+    Car car_2 = Car("red", 2);
+    Car car_3 = Car("blue", 3);
 
-// Increment car_1's position by 1.
-car_1.IncrementDistance();
+    // Increment car_1's position by 1.
+    car_1.IncrementDistance();
 
-// Print out the position and color of each car.
-car_1.PrintCarData();
-car_2.PrintCarData();
-car_3.PrintCarData();
+    // Print out the position and color of each car.
+    car_1.PrintCarData();
+    car_2.PrintCarData();
+    car_3.PrintCarData();
 
 }
 ```
@@ -1368,14 +1367,14 @@ car_3.PrintCarData();
 * For example, in the code below, cp is a pointer to a Car object, and the following two are equivalent:
 
 ```cpp
-// Simultaneously dereference the pointer and 
-// access IncrementDistance().
-cp->IncrementDistance();
+    // Simultaneously dereference the pointer and 
+    // access IncrementDistance().
+    cp->IncrementDistance();
 
-// Dereference the pointer using *, then 
-// access IncrementDistance() with traditional 
-// dot notation.
-(*cp).IncrementDistance();
+    // Dereference the pointer using *, then 
+    // access IncrementDistance() with traditional 
+    // dot notation.
+    (*cp).IncrementDistance();
 ```
 
 * The new operator allocates memory on the "heap" for a new Car. In general, this memory must be manually managed (deallocated) to avoid memory leaks in your program. Memory management is the primary focus of one of the later courses in this Nanodegree program, so we won't go into greater depth about the difference between `stack` and `heap` in this lesson.
@@ -1390,30 +1389,30 @@ using std::cout;
 using std::vector;
 
 int main() {
-// Create an empty vector of pointers to Cars 
-// and a null pointer to a car.
-vector<Car*> car_vect;
-Car* cp = nullptr;
+    // Create an empty vector of pointers to Cars 
+    // and a null pointer to a car.
+    vector<Car*> car_vect;
+    Car* cp = nullptr;
 
-// The vector of colors for the cars:
-vector<string> colors {"red", "blue", "green"};
+    // The vector of colors for the cars:
+    vector<string> colors {"red", "blue", "green"};
 
-// Create 100 cars with different colors and 
-// push pointers to each of those cars into the vector.
-for (int i=0; i < 100; i++) {;
-    cp = new Car(colors[i%3], i+1);
-    car_vect.push_back(cp);
-}
+    // Create 100 cars with different colors and 
+    // push pointers to each of those cars into the vector.
+    for (int i=0; i < 100; i++) {;
+        cp = new Car(colors[i%3], i+1);
+        car_vect.push_back(cp);
+    }
 
-// Move each car forward by 1.
-for (Car* cp: car_vect) {
-    cp->IncrementDistance();
-}
+    // Move each car forward by 1.
+    for (Car* cp: car_vect) {
+        cp->IncrementDistance();
+    }
 
-// Print data about each car.
-for (Car* cp: car_vect) {
-    cp->PrintCarData();
-}
+    // Print data about each car.
+    for (Car* cp: car_vect) {
+        cp->PrintCarData();
+    }
 }
 ```
 
@@ -1425,20 +1424,20 @@ When working with classes it is often helpful to be able to refer to the current
 // The Car class
 class Car {
 public:
-// Method to print data.
-void PrintCarData() {
-    cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
-}
+    // Method to print data.
+    void PrintCarData() {
+        cout << "The distance that the " << color << " car " << number << " has traveled is: " << distance << "\n";
+    }
 
-// Method to increment the distance travelled.
-void IncrementDistance() {
-    distance++;
-}
+    // Method to increment the distance travelled.
+    void IncrementDistance() {
+        distance++;
+    }
 
-// Class/object attributes
-string color;
-int distance = 0;
-int number;
+    // Class/object attributes
+    string color;
+    int distance = 0;
+    int number;
 };
 ```
 
@@ -1448,20 +1447,20 @@ int number;
 // The Car class
 class Car {
 public:
-// Method to print data.
-void PrintCarData() {
-    cout << "The distance that the " << this->color << " car " << this->number << " has traveled is: " << this->distance << "\n";
-}
+    // Method to print data.
+    void PrintCarData() {
+        cout << "The distance that the " << this->color << " car " << this->number << " has traveled is: " << this->distance << "\n";
+    }
 
-// Method to increment the distance travelled.
-void IncrementDistance() {
-    this->distance++;
-}
+    // Method to increment the distance travelled.
+    void IncrementDistance() {
+        this->distance++;
+    }
 
-// Class/object attributes
-string color;
-int distance = 0;
-int number;
+    // Class/object attributes
+    string color;
+    int distance = 0;
+    int number;
 };
 ```
 
@@ -1477,8 +1476,8 @@ int number;
 
 ```cpp
 struct Rectangle {
-float length;
-float width;
+    float length;
+    float width;
 };
 ```
     * `length` and `width` are member variables
@@ -1488,9 +1487,9 @@ float width;
     * Every C++ variable is defined with a type.
 
 ```cpp
-int value;
-Rectangle rectangle;
-Sphere earth;
+    int value;
+    Rectangle rectangle;
+    Sphere earth;
 ```
     
     * In this example, the "type" of `value` is `int`. Furthermore, `rectangle` is "of type" `Rectangle`, and `earth` has type `Sphere`.
@@ -1524,12 +1523,12 @@ struct Date {
     * If you then create an "instance" of this structure, you can initialize these member variables:
 
 ```cpp
-// Create an instance of the Date structure
-Date date;
-// Initialize the attributes of Date
-date.day = 1;
-date.month = 10;
-date.year = 2019;
+    // Create an instance of the Date structure
+    Date date;
+    // Initialize the attributes of Date
+    date.day = 1;
+    date.month = 10;
+    date.year = 2019;
 ```
 
 ### Member Initializaiton
@@ -1540,9 +1539,9 @@ date.year = 2019;
 
 ```cpp
 struct Date {
-int day{1};
-int month{1};
-int year{0};    
+    int day{1};
+    int month{1};
+    int year{0};    
 };
 ```
 
@@ -1737,9 +1736,9 @@ private:
 
 ```cpp    
 class Date { 
-int day{1};
-int month{1};
-int year{0};
+    int day{1};
+    int month{1};
+    int year{0};
 };
 ```
     
@@ -1805,8 +1804,8 @@ namespace Spanish {
 }  // namespace Spanish
 
 int main() {
-English::Hello();
-Spanish::Hello();
+    English::Hello();
+    Spanish::Hello();
 }
 ```
     
@@ -1847,13 +1846,13 @@ void Date::Year(int year) { Date::year = year; }
 
 // Test in main
 int main() {
-Date date;
-date.Day(29);
-date.Month(8);
-date.Year(1981);
-assert(date.Day() == 29);
-assert(date.Month() == 8);
-assert(date.Year() == 1981);
+    Date date;
+    date.Day(29);
+    date.Month(8);
+    date.Year(1981);
+    assert(date.Day() == 29);
+    assert(date.Month() == 8);
+    assert(date.Year() == 1981);
 }
 ```
 
@@ -1863,8 +1862,8 @@ assert(date.Year() == 1981);
 
 ```cpp
 Date::Date(int day, int month, int year) : year_(y) {
-Day(day);
-Month(month);
+    Day(day);
+    Month(month);
 }
 ```
 
@@ -1882,17 +1881,17 @@ Month(month);
 
 // TODO: Define class Person
 struct Person {
-// TODO: Define a public constructor with an initialization list
-Person(std::string name) : name(name) {}
-// TODO: Define a public member variable: name
-std::string name;  
+    // TODO: Define a public constructor with an initialization list
+    Person(std::string name) : name(name) {}
+    // TODO: Define a public member variable: name
+    std::string name;  
 };
 
 // Test
 int main() {
-Person alice("Alice");
-Person bob("Bob");
-assert(alice.name != bob.name);
+    Person alice("Alice");
+    Person bob("Bob");
+    assert(alice.name != bob.name);
 }
 ```
 
@@ -1908,16 +1907,16 @@ assert(alice.name != bob.name);
 
 struct Person {
 public:
-// TODO: Add an initialization list
-Person(std::string const & n) : name(n) {}
-std::string const name;
+    // TODO: Add an initialization list
+    Person(std::string const & n) : name(n) {}
+    std::string const name;
 };
 
 // Test
 int main() {
-Person alice("Alice");
-Person bob("Bob");
-assert(alice.name != bob.name);
+    Person alice("Alice");
+    Person bob("Bob");
+    assert(alice.name != bob.name);
 }
 ```
 
@@ -1936,71 +1935,71 @@ assert(alice.name != bob.name);
 
 class Date {
 public:
-Date(int day, int month, int year);
-int Day() const { return day_; }
-void Day(int day);
-int Month() const { return month_; }
-void Month(int month);
-int Year() const { return year_; }
-void Year(int year);
+    Date(int day, int month, int year);
+    int Day() const { return day_; }
+    void Day(int day);
+    int Month() const { return month_; }
+    void Month(int month);
+    int Year() const { return year_; }
+    void Year(int year);
 
 private:
-bool LeapYear(int year) const;
-int DaysInMonth(int month, int year) const;
-int day_{1};
-int month_{1};
-int year_{0};
-};
+    bool LeapYear(int year) const;
+    int DaysInMonth(int month, int year) const;
+    int day_{1};
+    int month_{1};
+    int year_{0};
+    };
 
-Date::Date(int day, int month, int year) {
-Year(year);
-Month(month);
-Day(day);
+    Date::Date(int day, int month, int year) {
+    Year(year);
+    Month(month);
+    Day(day);
 }
 
 bool Date::LeapYear(int year) const {
-if(year % 4 != 0)
-    return false;
-else if(year % 100 != 0)
-    return true;
-else if(year % 400 != 0)
-    return false;
-else
-    return true;
+    if(year % 4 != 0)
+        return false;
+    else if(year % 100 != 0)
+        return true;
+    else if(year % 400 != 0)
+        return false;
+    else
+        return true;
 }
 
 int Date::DaysInMonth(int month, int year) const {
-if(month == 2)
-    return LeapYear(year) ? 29 : 28;
-else if(month == 4 || month == 6 || month == 9 || month == 11)
-    return 30;
-else
-    return 31;
+    if(month == 2)
+        return LeapYear(year) ? 29 : 28;
+    else if(month == 4 || month == 6 || month == 9 || month == 11)
+        return 30;
+    else
+        return 31;
 }
 
 void Date::Day(int day) {
-if (day >= 1 && day <= DaysInMonth(Month(), Year()))
-    day_ = day;
+    if (day >= 1 && day <= DaysInMonth(Month(), Year()))
+        day_ = day;
 }
 
 void Date::Month(int month) {
-if (month >= 1 && month <= 12)
-    month_ = month; 
+    if (month >= 1 && month <= 12)
+        month_ = month; 
 }
 
 void Date::Year(int year) { year_ = year; }
 
 // Test
 int main() {
-Date date(29, 2, 2016);
-assert(date.Day() == 29);
-assert(date.Month() == 2);
-assert(date.Year() == 2016);
-    
-Date date2(29, 2, 2019);
-assert(date2.Day() != 29);
-assert(date2.Month() == 2);
-assert(date2.Year() == 2019);
+    Date date(29, 2, 2016);
+    assert(date.Day() == 29);
+    assert(date.Month() == 2);
+    assert(date.Year() == 2016);
+        
+    Date date2(29, 2, 2019);
+    assert(date2.Day() != 29);
+    assert(date2.Month() == 2);
+    assert(date2.Year() == 2019);
 }
 ```
 
@@ -2021,23 +2020,23 @@ assert(date2.Year() == 2019);
 class BankAccount
 {
 public:
-int number;
-std::string owner;
-double funds;
+    int number;
+    std::string owner;
+    double funds;
 };
 
 int main(){
-// TODO: instantiate and output a bank account
-BankAccount account;
-account.number = 123456789;
-account.owner = "David Silver";
-account.funds   = 1,000,000.01
-    
-std::cout << "Account Information\n";
-std::cout << "-------------------\n";
-std::cout << "ID: " << account.number << "\n";
-std::cout << "Owner: " << account.owner << "\n";
-std::cout << "Funds: $" << account.funds << "\n";
+    // TODO: instantiate and output a bank account
+    BankAccount account;
+    account.number = 123456789;
+    account.owner = "David Silver";
+    account.funds   = 1,000,000.01
+        
+    std::cout << "Account Information\n";
+    std::cout << "-------------------\n";
+    std::cout << "ID: " << account.number << "\n";
+    std::cout << "Owner: " << account.owner << "\n";
+    std::cout << "Funds: $" << account.funds << "\n";
 }
 ```
 
@@ -2063,22 +2062,22 @@ public:
 // Define setters
 void Car::brand(char* brand)
 {
-Car::_brand = brand;
+    Car::_brand = brand;
 }
 
 // Define getters
 std::string Car::brand() const
 {
-return _brand;
+    return _brand;
 }
 
 // Test in main()
 int main() 
 {
-Car car;
-char brand[] = "Peugeot";
-car.brand(brand);
-std::cout << car.brand() << "\n";   
+    Car car;
+    char brand[] = "Peugeot";
+    car.brand(brand);
+    std::cout << car.brand() << "\n";   
 }
 ```
 
@@ -2120,15 +2119,15 @@ class Date {
 
 class Foo {
 public:
-static int count;
-Foo() { Foo::count += 1; }
+    static int count;
+    Foo() { Foo::count += 1; }
 };
 
 int Foo::count{0};
 
 int main() {
-Foo f{};
-assert(Foo::count == 1);
+    Foo f{};
+    assert(Foo::count == 1);
 }
 ```
 
@@ -2136,7 +2135,7 @@ assert(Foo::count == 1);
 
 ```cpp
 struct Kilometer {
-static constexpr int meters{1000};
+    static constexpr int meters{1000};
 };
 ```
 
