@@ -2143,196 +2143,196 @@ the concept of **Inheritence** comes froom the idea that you build hierarchy of 
 
 ### Inheritence  
 
-    * In our everyday life, we tend to divide things into groups, based on their shared characteristics. Here are some groups that you have probably used yourself: electronics, tools, vehicles, or plants.
+  * In our everyday life, we tend to divide things into groups, based on their shared characteristics. Here are some groups that you have probably used yourself: electronics, tools, vehicles, or plants.
 
-    * Sometimes these groups have hierarchies. For example, computers and smartphones are both types of electronics, but computers and smartphones are also groups in and of themselves. You can imagine a tree with "electronics" at the top, and "computers" and "smartphones" each as children of the "electronics" node.
+  * Sometimes these groups have hierarchies. For example, computers and smartphones are both types of electronics, but computers and smartphones are also groups in and of themselves. You can imagine a tree with "electronics" at the top, and "computers" and "smartphones" each as children of the "electronics" node.
 
-    * Object-oriented programming uses the same principles! For instance, imagine a Vehicle class:
+  * Object-oriented programming uses the same principles! For instance, imagine a Vehicle class:
 
-        * ```cpp
-            class Vehicle {
-            public:
-                int wheels = 0;
-                string color = "blue";
-            
-                void Print() const
-                {
-                    std::cout << "This " << color << " vehicle has " << wheels << " wheels!\n";
-                }
-            };
-            ```
+      * ```cpp
+          class Vehicle {
+          public:
+              int wheels = 0;
+              string color = "blue";
+          
+              void Print() const
+              {
+                  std::cout << "This " << color << " vehicle has " << wheels << " wheels!\n";
+              }
+          };
+          ```
     
-    * We can derive other classes from Vehicle, such as Car or Bicycle. One advantage is that this saves us from having to re-define all of the common member variables - in this case, wheels and color - in each derived class.
+* We can derive other classes from Vehicle, such as Car or Bicycle. One advantage is that this saves us from having to re-define all of the common member variables - in this case, wheels and color - in each derived class.
 
-    * Another benefit is that derived classes, for example Car and Bicycle, can have distinct member variables, such as sunroof or kickstand. Different derived classes will have different member variables:
+* Another benefit is that derived classes, for example Car and Bicycle, can have distinct member variables, such as sunroof or kickstand. Different derived classes will have different member variables:
 
-        * ```cpp
-            class Car : public Vehicle {
-                public:
-                    bool sunroof = false;
-            };
-            
-            class Bicycle : public Vehicle {
-                public:
-                    bool kickstand = true;
-            };
-            ```
-    
-    * Another example:
+```cpp
+class Car : public Vehicle {
+public:
+  bool sunroof = false;
+};
 
-        * ```cpp
-            #include <iostream>
-            #include <string>
-            using std::string;
-            
-            class Vehicle {
-            public:
-                int wheels = 0;
-                string color = "blue";
-                string make  = "generic";
-                
-                void Print() const
-                {
-                    std::cout << "This " << color << " " << make << " vehicle has " << wheels << " wheels!\n";
-                }
-            };
-            
-            class Car : public Vehicle {
-                public:
-                    bool sunroof = false;
-            };
-            
-            class Bicycle : public Vehicle {
-                public:
-                    bool kickstand = true;
-            };
-            
-            class Scooter : public Vehicle {
-                public:
-                    bool electric = false;
-            };
-            
-            int main() 
-            {
-                Scooter scooter;
-                scooter.wheels = 2;
-                scooter.Print();
-            };
-            ```
+class Bicycle : public Vehicle {
+public:
+  bool kickstand = true;
+};
+```
+
+* Another example:
+
+```cpp
+  #include <iostream>
+  #include <string>
+  using std::string;
+  
+  class Vehicle {
+  public:
+      int wheels = 0;
+      string color = "blue";
+      string make  = "generic";
+      
+      void Print() const
+      {
+          std::cout << "This " << color << " " << make << " vehicle has " << wheels << " wheels!\n";
+      }
+  };
+  
+  class Car : public Vehicle {
+      public:
+          bool sunroof = false;
+  };
+  
+  class Bicycle : public Vehicle {
+      public:
+          bool kickstand = true;
+  };
+  
+  class Scooter : public Vehicle {
+      public:
+          bool electric = false;
+  };
+  
+  int main() 
+  {
+      Scooter scooter;
+      scooter.wheels = 2;
+      scooter.Print();
+  };
+```
 
 ### Inherited Access Specifiers  
 
-    * Just as access specifiers (i.e. public, protected, and private) define which class members users can access, the same access modifiers also define which class members users of a derived classes can access.
+* Just as access specifiers (i.e. public, protected, and private) define which class members users can access, the same access modifiers also define which class members users of a derived classes can access.
 
-    * Public inheritance: the public and protected members of the base class listed after the specifier keep their member access in the derived class
+* Public inheritance: the public and protected members of the base class listed after the specifier keep their member access in the derived class
 
-    * Protected inheritance: the public and protected members of the base class listed after the specifier are protected members of the derived class
+* Protected inheritance: the public and protected members of the base class listed after the specifier are protected members of the derived class
 
-    * Private inheritance: the public and protected members of the base class listed after the specifier are private members of the derived class
+* Private inheritance: the public and protected members of the base class listed after the specifier are private members of the derived class
 
-    * ```cpp
-        // This example demonstrates the privacy levels
-        // between parent and child classes
-        #include <iostream>
-        #include <string>
-        using std::string;
+* ```cpp
+// This example demonstrates the privacy levels
+// between parent and child classes
+#include <iostream>
+#include <string>
+using std::string;
+
+class Vehicle {
+    public:
+        int wheels = 0;
+        string color = "blue";
         
-        class Vehicle {
-            public:
-                int wheels = 0;
-                string color = "blue";
-                
-                void Print() const
-                {
-                    std::cout << "This " << color << " vehicle has " << wheels << " wheels!\n";
-                }
-        };
-        
-        class Car : public Vehicle {
-            public:
-                bool sunroof = false;
-        };
-        
-        class Bicycle : protected Vehicle {
-            public:
-                bool kickstand = true;
-                void Wheels(int w)
-                {
-                    wheels = w;
-                }
-        };
-        
-        class Scooter : private Vehicle {
-            public:
-                bool electric = false;
-                void Wheels(int w)
-                {
-                    wheels = w;
-                }
-        };
-        
-        int main() 
+        void Print() const
         {
-            Car car;
-            car.wheels = 4;
-            Bicycle bicycle;
-            bicycle.Wheels(2);
-            Scooter scooter;
-            scooter.Wheels(1);
-        };
-        ```
+            std::cout << "This " << color << " vehicle has " << wheels << " wheels!\n";
+        }
+};
 
-    * Another example
+class Car : public Vehicle {
+    public:
+        bool sunroof = false;
+};
 
-        * ```cpp
-            // Example solution for Animal class
-            #include <iostream>
-            #include <string>
-            
-            // Define base class Animal
-            class Animal {
-            public:
-                std::string color;
-                std::string name;
-                int age;
-            };
-            
-            // Declare derived class Snake
-            class Snake : public Animal {
-            public:
-                int length;
-                
-                void MakeSound() const
-                {
-                    std::cout << "Hiss\n";
-                }
-            };
-            
-            // Declare derived class Cat
-            class Cat : public Animal {
-            public:
-                int height;
-            
-                void MakeSound() const
-                {
-                    std::cout << "Meow\n";
-                }
-            };
-            
-            // Test in main()
-            int main() {
-            
-                Cat cat;
-                Snake snake;
-            
-                cat.age = 10;
-                cat.name = "Lucy";
-                cat.MakeSound();
-                snake.MakeSound();
-            
-                std::cout << cat.age << " " << cat.name << "\n";
-            }
-            ```
+class Bicycle : protected Vehicle {
+    public:
+        bool kickstand = true;
+        void Wheels(int w)
+        {
+            wheels = w;
+        }
+};
+
+class Scooter : private Vehicle {
+    public:
+        bool electric = false;
+        void Wheels(int w)
+        {
+            wheels = w;
+        }
+};
+
+int main() 
+{
+    Car car;
+    car.wheels = 4;
+    Bicycle bicycle;
+    bicycle.Wheels(2);
+    Scooter scooter;
+    scooter.Wheels(1);
+};
+```
+
+* Another example
+
+```cpp
+    // Example solution for Animal class
+    #include <iostream>
+    #include <string>
+    
+    // Define base class Animal
+    class Animal {
+    public:
+        std::string color;
+        std::string name;
+        int age;
+    };
+    
+    // Declare derived class Snake
+    class Snake : public Animal {
+    public:
+        int length;
+        
+        void MakeSound() const
+        {
+            std::cout << "Hiss\n";
+        }
+    };
+    
+    // Declare derived class Cat
+    class Cat : public Animal {
+    public:
+        int height;
+    
+        void MakeSound() const
+        {
+            std::cout << "Meow\n";
+        }
+    };
+    
+    // Test in main()
+    int main() {
+    
+        Cat cat;
+        Snake snake;
+    
+        cat.age = 10;
+        cat.name = "Lucy";
+        cat.MakeSound();
+        snake.MakeSound();
+    
+        std::cout << cat.age << " " << cat.name << "\n";
+    }
+```
 
 * Composition
 
