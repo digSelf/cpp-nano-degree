@@ -28,8 +28,12 @@ private:
 int main()
 {
     LineSegment radius {3};
-    Circle circle {radius};
-    assert(std::fabs(28.28 - circle.area()) < 1.0);
+    try {
+        Circle circle {radius};
+        assert(std::fabs(28.28 - circle.area()) < 1.0);
+    } catch (...) {
+        std::cout << "radius is negative\n";
+    }
 
     std::cout << "Hello world" << std::endl;
     return 0;
