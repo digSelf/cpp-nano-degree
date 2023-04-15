@@ -2478,110 +2478,115 @@ int main()
 }
 ```
 
-* Polymorphism
+### Polymorphism
 
-    * Polymorphism is means "assuming many forms".
+* Polymorphism is means "assuming many forms".
 
-    * In the context of object-oriented programming, polymorphism) describes a paradigm in which a function may behave differently depending on how it is called. In particular, the function will perform differently based on its inputs.
+* In the context of object-oriented programming, polymorphism) describes a paradigm in which a function may behave differently depending on how it is called. In particular, the function will perform differently based on its inputs.
 
-    * Polymorphism can be achieved in two ways in C++: overloading and overriding. In this exercise we will focus on overloading.
+* Polymorphism can be achieved in two ways in C++: overloading and overriding. In this exercise we will focus on overloading.
 
-    * Overloading
+#### Overloading
 
-        * In C++, you can write two (or more) versions of a function with the same name. This is called "overloading". Overloading requires that we leave the function name the same, but we modify the function signature. For example, we might define the same function name with multiple different configurations of input arguments.
+* In C++, you can write two (or more) versions of a function with the same name. This is called "overloading". Overloading requires that we leave the function name the same, but we modify the function signature. For example, we might define the same function name with multiple different configurations of input arguments.
 
-        * This example of class Date overloads:
+* The defintion of function signature in cpp is: 
 
-            * ```cpp
-                #include <ctime>
-                
-                class Date {
-                public:
-                    Date(int day, int month, int year) : day_(day), month_(month), year_(year) {}
-                    Date(int day, int month) : day_(day), month_(month)  // automatically sets the Date to the current year
-                    {
-                        time_t t = time(NULL);
-                        tm* timePtr = localtime(&t);
-                        year_ = timePtr->tm_year;
-                    }
-                
-                private:
-                    int day_;
-                    int month_;
-                    int year_;
-                };
-                ```
+    * the **information** about a function that participates in overload resolution: the types of its parameters and, if the function is a class member, the cv-qualifiers (if any) on the function itself and the class in which the member function is declared.
+    * Note that **the return type is not part of the function signature**. As the standard says in a footnote, "Function signatures do not include return type, because that does not participate in overload resolution".
+
+* This example of class Date overloads:
+
+```cpp
+#include <ctime>
+
+class Date {
+public:
+    Date(int day, int month, int year) : day_(day), month_(month), year_(year) {}
+    Date(int day, int month) : day_(day), month_(month)  // automatically sets the Date to the current year
+    {
+        time_t t = time(NULL);
+        tm* timePtr = localtime(&t);
+        year_ = timePtr->tm_year;
+    }
+
+private:
+    int day_;
+    int month_;
+    int year_;
+};
+```
         
-        * ```cpp
-            #include <iostream>
-            
-            class Human {};
-            class Dog {};
-            class Cat {};
-            
-            // TODO: Write hello() function
-            void hello() { std::cout << "Hello, World!\n"; }
-            
-            // TODO: Overload hello() three times
-            void hello(Human human) { std::cout << "Hello, Human!\n"; }
-            void hello(Dog dog) { std::cout << "Hello, Dog!\n"; }
-            void hello(Cat cat) { std::cout << "Hello, Cat!\n"; }
-            
-            // TODO: Call hello() from main()
-            int main()
-            {
-                hello();
-                hello(Human());
-                hello(Dog());
-                hello(Cat());
-            }
-            ```
+```cpp
+#include <iostream>
 
-* Operator Overloading
+class Human {};
+class Dog {};
+class Cat {};
 
-    * n this exercise you'll see how to achieve polymorphism with operator overloading. You can choose any operator from the ASCII table and give it your own set of rules!
+// TODO: Write hello() function
+void hello() { std::cout << "Hello, World!\n"; }
 
-    * Operator overloading can be useful for many things. Consider the + operator. We can use it to add ints, doubles, floats, or even std::strings.
+// TODO: Overload hello() three times
+void hello(Human human) { std::cout << "Hello, Human!\n"; }
+void hello(Dog dog) { std::cout << "Hello, Dog!\n"; }
+void hello(Cat cat) { std::cout << "Hello, Cat!\n"; }
 
-    * In order to overload an operator, use the operator keyword in the function signature:   
+// TODO: Call hello() from main()
+int main()
+{
+    hello();
+    hello(Human());
+    hello(Dog());
+    hello(Cat());
+}
+```
 
-        * ```cpp
-            Complex operator+(const Complex& addend) {
-                //...logic to add complex numbers
-            }
-            ```
-    
-    * Imagine vector addition. You might want to perform vector addition on a pair of points to add their x and y components. The compiler won't recognize this type of operation on its own, because this data is user defined. However, you can overload the + operator so it performs the action that you want to implement.
+#### Operator Overloading
 
-        * ```cpp
-            #include <assert.h>
-            
-            // TODO: Define Point class
-            class Point {
-                public:
-                    // TODO: Define public constructor
-                    Point(int x = 0, int y = 0) : x(x), y(y) {}
-            
-                    // TODO: Define + operator overload
-                    Point operator+(const Point& addend) {
-                        Point sum;
-                        sum.x = x + addend.x;
-                        sum.y = y + addend.y;
-                        return sum;
-                    }
-            
-                    // TODO: Declare attributes x and y
-                    int x, y;
-            };
-            
-            // Test in main()
-            int main() {
-                Point p1(10, 5), p2(2, 4);
-                Point p3 = p1 + p2; // An example call to "operator +";
-                assert(p3.x == p1.x + p2.x);
-                assert(p3.y == p1.y + p2.y);
-            }
-            ```
+* In this exercise you'll see how to achieve polymorphism with operator overloading. You can choose any operator from the ASCII table and give it your own set of rules!
+
+* Operator overloading can be useful for many things. Consider the + operator. We can use it to add ints, doubles, floats, or even std::strings.
+
+* In order to overload an operator, use the operator keyword in the function signature:   
+
+```cpp
+Complex operator+(const Complex& addend) {
+    //...logic to add complex numbers
+}
+```
+
+* Imagine vector addition. You might want to perform vector addition on a pair of points to add their x and y components. The compiler won't recognize this type of operation on its own, because this data is user defined. However, you can overload the + operator so it performs the action that you want to implement.
+
+```cpp
+#include <assert.h>
+
+// TODO: Define Point class
+class Point {
+    public:
+        // TODO: Define public constructor
+        Point(int x = 0, int y = 0) : x(x), y(y) {}
+
+        // TODO: Define + operator overload
+        Point operator+(const Point& addend) {
+            Point sum;
+            sum.x = x + addend.x;
+            sum.y = y + addend.y;
+            return sum;
+        }
+
+        // TODO: Declare attributes x and y
+        int x, y;
+};
+
+// Test in main()
+int main() {
+    Point p1(10, 5), p2(2, 4);
+    Point p3 = p1 + p2; // An example call to "operator +";
+    assert(p3.x == p1.x + p2.x);
+    assert(p3.y == p1.y + p2.y);
+}
+```
 
 * Virtual Functions
 
