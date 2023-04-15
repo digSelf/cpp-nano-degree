@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cassert>
 
+// the friend keyword grants access to the private membors of a class.
+
 class Rectangle;
 
 class Square {
