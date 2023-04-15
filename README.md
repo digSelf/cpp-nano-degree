@@ -2337,146 +2337,146 @@ int main()
     }
 ```
 
-* Composition
+### Composition
 
-    * Composition is a closely related alternative to inheritance. Composition involves constructing ("composing") classes from other classes, instead of inheriting traits from a parent class.
+* Composition is a closely related alternative to inheritance. Composition involves constructing ("composing") classes from other classes, instead of inheriting traits from a parent class.
 
-    * A common way to distinguish "composition" from "inheritance" is to think about what an object can do, rather than what it is. This is often expressed as "has a" versus "is a".
+* A common way to distinguish "composition" from "inheritance" is to think about what an object can do, rather than what it is. This is often expressed as "has a" versus "is a".
 
-    * From the standpoint of composition, a cat "has a" head and "has a" set of paws and "has a" tail.
+* From the standpoint of composition, a cat "has a" head and "has a" set of paws and "has a" tail.
 
-    * From the standpoint of inheritance, a cat "is a" mammal.
+* From the standpoint of inheritance, a cat "is a" mammal.
 
-    * There is no hard and fast rule about when to prefer composition over inheritance. In general, if a class needs only extend a small amount of functionality beyond what is already offered by another class, it makes sense to inherit from that other class. However, if a class needs to contain functionality from a variety of otherwise unrelated classes, it makes sense to compose the class from those other classes.
+* There is no hard and fast rule about when to prefer composition over inheritance. In general, if a class needs only extend a small amount of functionality beyond what is already offered by another class, it makes sense to inherit from that other class. However, if a class needs to contain functionality from a variety of otherwise unrelated classes, it makes sense to compose the class from those other classes.
 
-    * In this example, you'll practice working with composition in C++.
+* In this example, you'll practice working with composition in C++.
       
-        * ```cpp
-            // Example solution for Circle class
-            #include <iostream>
-            #include <cmath>
-            #include <assert.h>
-            // Define PI
-            #define PI 3.14159;
-            
-            // Define LineSegment struct
-            struct LineSegment {
-                // Define protected attribute length
-                public:
-                    double length;
-            };
-            
-            // Define Circle class
-            class Circle {
-                public:
-                    Circle(LineSegment& radius);
-                    double Area();
-            
-                private:
-                    LineSegment& radius_;
-            };
-            
-            // Declare Circle class
-            Circle::Circle(LineSegment& radius) : radius_(radius) {}
-            
-            double Circle::Area() 
-            {
-                return pow(Circle::radius_.length, 2) * PI;
-            }
-            
-            // Test in main()
-            int main() 
-            {
-                LineSegment radius {3};
-                Circle circle(radius);
-                assert(int(circle.Area()) == 28);
-            }
-            ```
+```cpp
+    // Example solution for Circle class
+    #include <iostream>
+    #include <cmath>
+    #include <assert.h>
+    // Define PI
+    #define PI 3.14159;
     
-    * Class Hierarchy
-
-        * ```cpp
-            #include <cassert>
-            
-            // TODO: Declare Vehicle as the base class
-            class Vehicle {};
-            
-            // TODO: Derive Car from Vehicle
-            class Car : public Vehicle {
-                public:
-                    int wheels{4};
-            };
-            
-            // TODO: Derive Sedan from Car
-            class Sedan : public Car {
-                public:
-                    bool trunk{true};
-                    int seats{4};
-            };
-            
-            // TODO: Update main to pass the tests
-            int main() {
-                Sedan sedan;
-                assert(sedan.trunk == true);
-                assert(sedan.seats == 4);
-                assert(sedan.wheels == 4);
-            }
-            ```
-
-* Friends
-
-    * In C++, `friend` classes provide an alternative inheritance mechanism to derived classes. The main difference between classical inheritance and friend inheritance is that a `friend` class **can access private members of the base class**, which isn't the case for classical inheritance. In classical inheritance, a derived class can only access public and protected members of the base class.
-
-    * ```cpp
-        // Example solution for Rectangle and Square friend classes
-        #include <assert.h>
-        
-        // Declare class Rectangle
-        class Rectangle;
-        
-        // Define class Square as friend of Rectangle
-        class Square {
-        // Add public constructor to Square, initialize side
+    // Define LineSegment struct
+    struct LineSegment {
+        // Define protected attribute length
         public:
-            Square(int s) : side(s) {}
-        
-        private:
-            // Add friend class Rectangle
-            friend class Rectangle;
-            // Add private attribute side to Square
-            int side;
-        };
-        
-        // Define class Rectangle
-        class Rectangle {
-        // Add public functions to Rectangle: area() and convert()
+            double length;
+    };
+    
+    // Define Circle class
+    class Circle {
         public:
-            Rectangle(const Square& a);
-            int Area() const;
-        
+            Circle(LineSegment& radius);
+            double Area();
+    
         private:
-            // Add private attributes width, height
-            int width {0};
-            int height {0};
-        };
-        
-        // Define a Rectangle constructor that takes a Square
-        Rectangle::Rectangle(const Square& a) : width(a.side), height(a.side) {}
-        
-        // Define Area() to compute area of Rectangle
-        int Rectangle::Area() const
-        {
-            return width * height;
-        }
-        
-        // Update main() to pass the tests
-        int main()
-        {
-            Square square(4);
-            Rectangle rectangle(square);
-            assert(rectangle.Area() == 16); 
-        }
-        ```
+            LineSegment& radius_;
+    };
+    
+    // Declare Circle class
+    Circle::Circle(LineSegment& radius) : radius_(radius) {}
+    
+    double Circle::Area() 
+    {
+        return pow(Circle::radius_.length, 2) * PI;
+    }
+    
+    // Test in main()
+    int main() 
+    {
+        LineSegment radius {3};
+        Circle circle(radius);
+        assert(int(circle.Area()) == 28);
+    }
+```
+    
+### Class Hierarchy
+
+```cpp
+    #include <cassert>
+    
+    // TODO: Declare Vehicle as the base class
+    class Vehicle {};
+    
+    // TODO: Derive Car from Vehicle
+    class Car : public Vehicle {
+        public:
+            int wheels{4};
+    };
+    
+    // TODO: Derive Sedan from Car
+    class Sedan : public Car {
+        public:
+            bool trunk{true};
+            int seats{4};
+    };
+    
+    // TODO: Update main to pass the tests
+    int main() {
+        Sedan sedan;
+        assert(sedan.trunk == true);
+        assert(sedan.seats == 4);
+        assert(sedan.wheels == 4);
+    }
+```
+
+### Friends
+
+* In C++, `friend` classes provide an alternative inheritance mechanism to derived classes. The main difference between classical inheritance and friend inheritance is that a `friend` class **can access private members of the base class**, which isn't the case for classical inheritance. In classical inheritance, a derived class can only access public and protected members of the base class.
+
+```cpp
+// Example solution for Rectangle and Square friend classes
+#include <assert.h>
+
+// Declare class Rectangle
+class Rectangle;
+
+// Define class Square as friend of Rectangle
+class Square {
+// Add public constructor to Square, initialize side
+public:
+    Square(int s) : side(s) {}
+
+private:
+    // Add friend class Rectangle
+    friend class Rectangle;
+    // Add private attribute side to Square
+    int side;
+};
+
+// Define class Rectangle
+class Rectangle {
+// Add public functions to Rectangle: area() and convert()
+public:
+    Rectangle(const Square& a);
+    int Area() const;
+
+private:
+    // Add private attributes width, height
+    int width {0};
+    int height {0};
+};
+
+// Define a Rectangle constructor that takes a Square
+Rectangle::Rectangle(const Square& a) : width(a.side), height(a.side) {}
+
+// Define Area() to compute area of Rectangle
+int Rectangle::Area() const
+{
+    return width * height;
+}
+
+// Update main() to pass the tests
+int main()
+{
+    Square square(4);
+    Rectangle rectangle(square);
+    assert(rectangle.Area() == 16); 
+}
+```
 
 * Polymorphism
 
