@@ -2588,264 +2588,266 @@ int main() {
 }
 ```
 
-* Virtual Functions
+#### Virtual Functions
 
-    * Virtual functions are a polymorphic feature. These functions are declared (and possibly defined) in a base class, and can be overridden by derived classes.
+* [glossary](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#S-glossary)
+* Virtual functions are a polymorphic feature. These functions are declared (and possibly defined) in a base class, and can be overridden by derived classes.
 
-    * This approach declares an interface at the base level, but delegates the implementation of the interface to the derived classes.
+* This approach declares an interface at the base level, but delegates the implementation of the interface to the derived classes.
 
-    * In this exercise, class Shape is the base class. Geometrical shapes possess both an area and a perimeter. Area() and Perimeter() should be virtual functions of the base class interface. Append `= 0` to each of these functions in order to declare them to be "pure" virtual functions.
+* In this exercise, class Shape is the base class. Geometrical shapes possess both an area and a perimeter. Area() and Perimeter() should be virtual functions of the base class interface. Append `= 0` to each of these functions in order to declare them to be "pure" virtual functions.
 
-    * **A pure virtual function is a virtual function that the base class declares but does not define.**
+* **A pure virtual function is a virtual function that the base class declares but does not define.**
 
-    * A pure virtual function has the side effect of **making its class abstract**. This means that the class cannot be instantiated. Instead, only classes that derive from the abstract class and override the pure virtual function can be instantiated.
+* A pure virtual function has the side effect of **making its class abstract**. This means that the class cannot be instantiated. Instead, only classes that derive from the abstract class and override the pure virtual function can be instantiated.
 
-    * ```cpp
-        class Shape {
-            public:
-                Shape() {}
-                virtual double Area() const = 0;
-                virtual double Perimeter() const = 0;
-        };
-        ```
+* ```cpp
+class Shape {
+    public:
+        Shape() {}
+        virtual double Area() const = 0;
+        virtual double Perimeter() const = 0;
+};
+```
+
+* **Virtual functions can be defined by derived classes, but this is not required**. However, if we mark the virtual function with `= 0` in the base class, then we are declaring the function to be a pure virtual function. This means that the **base class does not define this function. A derived class must define this function, or else the derived class will be abstract**.
+
+```cpp
+// Example solution for Shape inheritance
+#include <assert.h>
+#include <cmath>
+
+// TODO: Define pi
+#define PI 3.14159;
+
+// TODO: Define the abstract class Shape
+class Shape {
+    public:
+    // TODO: Define public virtual functions Area() and Perimeter()
+    // TODO: Append the declarations with = 0 to specify pure virtual functions
+    virtual double Area() const = 0;
+    virtual double Perimeter() const = 0;
+};
+
+// TODO: Define Rectangle to inherit publicly from Shape
+class Rectangle : public Shape {
+    public:
+        // TODO: Declare public constructor
+        Rectangle(double width, double height) : width_(width), height_(height) {}
+        // TODO: Override virtual base class functions Area() and Perimeter()
+        double Area() const override { return width_ * height_; }
+        double Perimeter() const override { return 2 * (width_ + height_); }
+
+    private:
+        // TODO: Declare private attributes width and height
+        double width_;
+        double height_;
+};
+
+// TODO: Define Circle to inherit from Shape
+class Circle : public Shape {
+    public:
+        // TODO: Declare public constructor
+        Circle(double radius) : radius_(radius) {}
+        // TODO: Override virtual base class functions Area() and Perimeter()
+        double Area() const override { return pow(radius_, 2) * PI; }
+        double Perimeter() const override { return 2 * radius_ * PI; }
+
+    private:
+        // TODO: Declare private member variable radius
+        double radius_;
+};
+
+// Test in main()
+int main() {
+    double epsilon = 0.1; // useful for floating point equality
+
+    // Test circle
+    Circle circle(12.31);
+    assert(abs(circle.Perimeter() - 77.35) < epsilon);
+    assert(abs(circle.Area() - 476.06) < epsilon);
+
+    // Test rectangle
+    Rectangle rectangle(10, 6);
+    assert(rectangle.Perimeter() == 32);
+    assert(rectangle.Area() == 60);
+}
+```
+
+#### Polymorphism: Overriding
+
+* "Overriding" a function occurs when:
+
+    * A base class declares a virtual function.
     
-    * **Virtual functions can be defined by derived classes, but this is not required**. However, if we mark the virtual function with `= 0` in the base class, then we are declaring the function to be a pure virtual function. This means that the **base class does not define this function. A derived class must define this function, or else the derived class will be abstract**.
+    * A derived class overrides that virtual function by defining its own implementation with an identical function signature (i.e. the same function name and argument types).
 
-    * ```cpp
-        // Example solution for Shape inheritance
-        #include <assert.h>
-        #include <cmath>
-        
-        // TODO: Define pi
-        #define PI 3.14159;
-        
-        // TODO: Define the abstract class Shape
-        class Shape {
-            public:
-            // TODO: Define public virtual functions Area() and Perimeter()
-            // TODO: Append the declarations with = 0 to specify pure virtual functions
-            virtual double Area() const = 0;
-            virtual double Perimeter() const = 0;
-        };
-        
-        // TODO: Define Rectangle to inherit publicly from Shape
-        class Rectangle : public Shape {
-            public:
-                // TODO: Declare public constructor
-                Rectangle(double width, double height) : width_(width), height_(height) {}
-                // TODO: Override virtual base class functions Area() and Perimeter()
-                double Area() const override { return width_ * height_; }
-                double Perimeter() const override { return 2 * (width_ + height_); }
-        
-            private:
-                // TODO: Declare private attributes width and height
-                double width_;
-                double height_;
-        };
-        
-        // TODO: Define Circle to inherit from Shape
-        class Circle : public Shape {
-            public:
-                // TODO: Declare public constructor
-                Circle(double radius) : radius_(radius) {}
-                // TODO: Override virtual base class functions Area() and Perimeter()
-                double Area() const override { return pow(radius_, 2) * PI; }
-                double Perimeter() const override { return 2 * radius_ * PI; }
-        
-            private:
-                // TODO: Declare private member variable radius
-                double radius_;
-        };
-        
-        // Test in main()
-        int main() {
-            double epsilon = 0.1; // useful for floating point equality
-        
-            // Test circle
-            Circle circle(12.31);
-            assert(abs(circle.Perimeter() - 77.35) < epsilon);
-            assert(abs(circle.Area() - 476.06) < epsilon);
-        
-            // Test rectangle
-            Rectangle rectangle(10, 6);
-            assert(rectangle.Perimeter() == 32);
-            assert(rectangle.Area() == 60);
+```cpp
+class Animal {
+    public:
+        virtual std::string Talk() const = 0;
+};
+
+class Cat {
+    public:
+        std::string Talk() const { return std::string("Meow"); }
+};
+```
+
+```cpp
+#include <assert.h>
+#include <string>
+
+class Animal {
+    public:
+        virtual std::string Talk() const = 0;
+};
+
+// TODO: Declare a class Dog that inherits from Animal
+class Dog : Animal {
+    public:  
+        std::string Talk() const;
+};
+
+std::string Dog::Talk() const {
+    return "Woof";
+}
+
+int main() {
+    Dog dog;
+    assert(dog.Talk() == "Woof");
+}
+```
+
+* Override  
+
+    * "Overriding" a function occurs when a derived class defines the implementation of a `virtual` function that it inherits from a base class.
+
+    * It is possible, but not required, to specify a function declaration as `override`.
+
+```cpp
+class Shape {
+    public:
+        virtual double Area() const = 0;
+        virtual double Perimeter() const = 0;
+};
+
+class Circle : public Shape {
+    public:
+        Circle(double radius) : radius_(radius) {}
+        double Area() const override { return pow(radius_, 2) * PI; } // specified as an override function
+        double Perimeter() const override { return 2 * radius_ * PI; } // specified as an override function
+
+    private:
+        double radius_;
+};
+```
+
+* This specification tells both the compiler and the human programmer that the purpose of this function is to override a virtual function. The compiler will verify that a function specified as `override` does indeed override some other virtual function, or otherwise the compiler will generate an error.
+
+* Specifying a function as `override` is good practice, as it empowers the compiler to verify the code, and communicates the intention of the code to future users.
+
+```cpp
+#include <assert.h>
+#include <cmath>
+
+// TODO: Define PI
+#define PI 3.14159
+
+// TODO: Declare abstract class VehicleModel
+class VehicleModel {
+    // TODO: Declare virtual function Move()
+    virtual void Move(double v, double phi) = 0;
+};
+
+// TODO: Derive class ParticleModel from VehicleModel
+class ParticleModel : public VehicleModel {
+    public:
+        // TODO: Override the Move() function
+        void Move(double v, double phi) override {
+            theta += phi;
+            x += v * cos(theta);
+            y += v * sin(theta);
         }
-        ```
-    * Polymorphism: Overriding
+        // TODO: Define x, y, and theta
+        double x = 0;
+        double y = 0;
+        double theta = 0;
+};
 
-        * "Overriding" a function occurs when:
+// TODO: Derive class BicycleModel from ParticleModel
+class BicycleModel : public ParticleModel {
+    public:
+        // TODO: Override the Move() function
+        void Move(double v, double phi) override {
+            theta += v / L * tan(phi);
+            x += v * cos(theta);
+            y += v * sin(theta);
+        }
+        // TODO: Define L
+        double L = 1;
+};
 
-            * A base class declares a virtual function.
-            
-            * A derived class overrides that virtual function by defining its own implementation with an identical function signature (i.e. the same function name and argument types).
-        
-        * ```cpp
-            class Animal {
-                public:
-                    virtual std::string Talk() const = 0;
-            };
-            
-            class Cat {
-                public:
-                    std::string Talk() const { return std::string("Meow"); }
-            };
-            ```
-        
-        * ```cpp
-            #include <assert.h>
-            #include <string>
-            
-            class Animal {
-                public:
-                    virtual std::string Talk() const = 0;
-            };
-            
-            // TODO: Declare a class Dog that inherits from Animal
-            class Dog : Animal {
-                public:  
-                    std::string Talk() const;
-            };
-            
-            std::string Dog::Talk() const {
-                return "Woof";
-            }
-            
-            int main() {
-                Dog dog;
-                assert(dog.Talk() == "Woof");
-            }
-            ```
+// TODO: Pass the tests
+int main() {
+    // Test function overriding
+    ParticleModel particle;
+    BicycleModel bicycle;
+    particle.Move(10, PI / 9);
+    bicycle.Move(10, PI / 9);
+    assert(particle.x != bicycle.x);
+    assert(particle.y != bicycle.y);
+    assert(particle.theta != bicycle.theta);
+}
+```
 
-    * Override  
+### Multiple Inheritance
 
-        * "Overriding" a function occurs when a derived class defines the implementation of a `virtual` function that it inherits from a base class.
+* In this exercise, you'll get some practical experience with multiple inheritance. If you have class Animal and another class Pet, then you can construct a class Dog, which inherits from both of these base classes. In doing this, you are able to incorporate attributes of multiple base classes.
 
-        * It is possible, but not required, to specify a function declaration as `override`.
+* The Core Guidelines have some worthwhile recommendations about how and when to use multiple inheritance:
+* ["Use multiple inheritance to represent multiple distinct interfaces"](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#c135-use-multiple-inheritance-to-represent-multiple-distinct-interfaces)
+* ["Use multiple inheritance to represent the union of implementation attributes"](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#c136-use-multiple-inheritance-to-represent-the-union-of-implementation-attributes)
 
-        * ```cpp
-            class Shape {
-                public:
-                    virtual double Area() const = 0;
-                    virtual double Perimeter() const = 0;
-            };
-            
-            class Circle : public Shape {
-                public:
-                    Circle(double radius) : radius_(radius) {}
-                    double Area() const override { return pow(radius_, 2) * PI; } // specified as an override function
-                    double Perimeter() const override { return 2 * radius_ * PI; } // specified as an override function
-            
-                private:
-                    double radius_;
-            };
-            ```
+* ```cpp
+#include <iostream>
+#include <string>
+#include <assert.h>
 
-        * This specification tells both the compiler and the human programmer that the purpose of this function is to override a virtual function. The compiler will verify that a function specified as `override` does indeed override some other virtual function, or otherwise the compiler will generate an error.
+class Animal {
+    public:
+        double age;
+};
 
-        * Specifying a function as `override` is good practice, as it empowers the compiler to verify the code, and communicates the intention of the code to future users.
+class Pet {
+    public:
+        std::string name;
+};
 
-        * ```cpp
-            #include <assert.h>
-            #include <cmath>
-            
-            // TODO: Define PI
-            #define PI 3.14159
-            
-            // TODO: Declare abstract class VehicleModel
-            class VehicleModel {
-                // TODO: Declare virtual function Move()
-                virtual void Move(double v, double phi) = 0;
-            };
-            
-            // TODO: Derive class ParticleModel from VehicleModel
-            class ParticleModel : public VehicleModel {
-                public:
-                    // TODO: Override the Move() function
-                    void Move(double v, double phi) override {
-                        theta += phi;
-                        x += v * cos(theta);
-                        y += v * sin(theta);
-                    }
-                    // TODO: Define x, y, and theta
-                    double x = 0;
-                    double y = 0;
-                    double theta = 0;
-            };
-            
-            // TODO: Derive class BicycleModel from ParticleModel
-            class BicycleModel : public ParticleModel {
-                public:
-                    // TODO: Override the Move() function
-                    void Move(double v, double phi) override {
-                        theta += v / L * tan(phi);
-                        x += v * cos(theta);
-                        y += v * sin(theta);
-                    }
-                    // TODO: Define L
-                    double L = 1;
-            };
-            
-            // TODO: Pass the tests
-            int main() {
-                // Test function overriding
-                ParticleModel particle;
-                BicycleModel bicycle;
-                particle.Move(10, PI / 9);
-                bicycle.Move(10, PI / 9);
-                assert(particle.x != bicycle.x);
-                assert(particle.y != bicycle.y);
-                assert(particle.theta != bicycle.theta);
-            }
-            ```
+// Dog derives from *both* Animal and Pet
+class Dog : public Animal, public Pet {
+    public:
+        std::string breed;
+};
 
-    * Multiple Inheritance
+class Cat : public Animal, public Pet {
+    public:
+        std::string color;
+};
 
-        * In this exercise, you'll get some practical experience with multiple inheritance. If you have class Animal and another class Pet, then you can construct a class Dog, which inherits from both of these base classes. In doing this, you are able to incorporate attributes of multiple base classes.
-
-        * The Core Guidelines have some worthwhile recommendations about how and when to use multiple inheritance:
-            * ["Use multiple inheritance to represent multiple distinct interfaces"](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#c135-use-multiple-inheritance-to-represent-multiple-distinct-interfaces)
-            * ["Use multiple inheritance to represent the union of implementation attributes"](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#c136-use-multiple-inheritance-to-represent-the-union-of-implementation-attributes)
-        
-        * ```cpp
-            #include <iostream>
-            #include <string>
-            #include <assert.h>
-            
-            class Animal {
-                public:
-                    double age;
-            };
-            
-            class Pet {
-                public:
-                    std::string name;
-            };
-            
-            // Dog derives from *both* Animal and Pet
-            class Dog : public Animal, public Pet {
-                public:
-                    std::string breed;
-            };
-            
-            class Cat : public Animal, public Pet {
-                public:
-                    std::string color;
-            };
-            
-            int main()
-            {
-                /*
-                Cat cat;
-                cat.color = "black";
-                cat.age = 10;
-                cat.name = "Max";
-                */
-                assert(cat.color == "black");
-                assert(cat.age == 10);
-                assert(cat.name == "Max");
-            }
-            ```
+int main()
+{
+    /*
+    Cat cat;
+    cat.color = "black";
+    cat.age = 10;
+    cat.name = "Max";
+    */
+    assert(cat.color == "black");
+    assert(cat.age == 10);
+    assert(cat.name == "Max");
+}
+```
 
 * Generic Programming / Templates
 
