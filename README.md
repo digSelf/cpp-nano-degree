@@ -2849,157 +2849,157 @@ int main()
 }
 ```
 
-* Generic Programming / Templates
+### Generic Programming / Templates
 
-    * Templates
+#### Templates
 
-        * Templates enable generic programming by generalizing a function to apply to any class. Specifically, templates use types as parameters so that the same implementation can operate on different data types.
+* Templates enable generic programming by generalizing a function to apply to any class. Specifically, templates use types as parameters so that the same implementation can operate on different data types.
 
-        * For example, you might need a function to accept many different data types. The function acts on those arguments, perhaps dividing them or sorting them or something else. Rather than writing and maintaining the multiple function declarations, each accepting slightly different arguments, you can write one function and pass the argument types as parameters. At compile time, the compiler then expands the code using the types that are passed as parameters.
+* For example, you might need a function to accept many different data types. The function acts on those arguments, perhaps dividing them or sorting them or something else. Rather than writing and maintaining the multiple function declarations, each accepting slightly different arguments, you can write one function and pass the argument types as parameters. At compile time, the compiler then expands the code using the types that are passed as parameters.
 
-        * ```cpp
-            template <typename Type> Type Sum(Type a, Type b) { return a + b; }
-            
-            int main() { std::cout << Sum<double>(20.0, 13.7) << "\n"; }    
-            ```
-        
-        * Because Sum() is defined with a template, when the program calls Sum() with doubles as parameters, the function expands to become:
-          
-            * ```cpp
-                double Sum(double a, double b) {
-                    return a+b;
-                }
-                ```
-        
-        * Or in this case:
+```cpp
+template <typename Type> Type Sum(Type a, Type b) { return a + b; }
 
-            * ```cpp
-                std::cout << Sum<char>(‘Z’, ’j’) << "\n";
-                ```
-        
-        * The program expands to become:
+int main() { std::cout << Sum<double>(20.0, 13.7) << "\n"; }    
+```
 
-            * ```cpp
-                char Sum(char a, char b) {
-                    return a+b;
-                }
-                ```
-    
-    * We use the keyword `template` to specify which function is generic. Generic code is the term for code that is independent of types. It is mandatory to put the `template<>` tag before the function signature, to specify and mark that the declaration is generic.
+* Because Sum() is defined with a template, when the program calls Sum() with doubles as parameters, the function expands to become:
+  
+```cpp
+double Sum(double a, double b) {
+    return a+b;
+}
+```
 
-    * Besides `template`, the keyword `typename` (or, alternatively, `class`) specifies the generic type in the function prototype. The parameters that follow typename (or class) represent generic types in the function declaration.
+* Or in this case:
 
-    * In order to instantiate a templatized class, use a templatized constructor, for example: ```Sum<double>(20.0, 13.7)```. You might recognize this form as the same form used to construct a vector. That's because vectors are indeed a generic class!
+```cpp
+std::cout << Sum<char>(‘Z’, ’j’) << "\n";
+```
 
-    * ```cpp
-        #include <assert.h>
-        
-        // TODO: Create a generic function Product that multiplies two parameters
-        template <typename T>
-        T Product(T a, T b) {
-            return a * b;
-        }
-        
-        int main() { 
-            assert(Product<int>(10, 2) == 20); 
-        }
-        ```
-    
-    * C++ 20 has a new feature for generic programming called `concept`. Class templates, function templates, and non-template functions (typically members of class templates) may be associated with a constraint, which specifies the requirements on template arguments, which can be used to select the most appropriate function overloads and template specializations.
+* The program expands to become:
 
-    * Named sets of such requirements are called concepts. Each concept is a predicate, evaluated at compile time, and becomes a part of the interface of a template where it is used as a constraint:
+```cpp
+char Sum(char a, char b) {
+    return a+b;
+}
+```
 
-    * ```cpp
-        #include <string>
-        #include <cstddef>
-        #include <concepts>
-        
-        // Declaration of the concept "Hashable", which is satisfied by any type 'T'
-        // such that for values 'a' of type 'T', the expression std::hash<T>{}(a)
-        // compiles and its result is convertible to std::size_t
-        template<typename T>
-        concept Hashable = requires(T a) {
-            { std::hash<T>{}(a) } -> std::convertible_to<std::size_t>;
-        };
-        
-        struct meow {};
-        
-        // Constrained C++20 function template:
-        template<Hashable T>
-        void f(T) {}
-        //
-        // Alternative ways to apply the same constraint:
-        // template<typename T>
-        //    requires Hashable<T>
-        // void f(T) {}
-        //
-        // template<typename T>
-        // void f(T) requires Hashable<T> {}
-        
-        int main() {
-        using std::operator""s;
-        f("abc"s); // OK, std::string satisfies Hashable
-        //f(meow{}); // Error: meow does not satisfy Hashable
-        }
-        
-        ```
-    
-    * ```cpp
-        #include <assert.h>
-        
-        // TODO: Declare a generic, templatized function Max()
-        template <typename T> T Max(T a, T b) {
-            return a > b ? a : b;
-        }
-        
-        int main() { 
-            assert(Max(10, 50) == 50);
-            assert(Max(5.7, 1.436246) == 5.7);
-        }
-        ```
+* We use the keyword `template` to specify which function is generic. Generic code is the term for code that is independent of types. It is mandatory to put the `template<>` tag before the function signature, to specify and mark that the declaration is generic.
 
-* Deduction
+* Besides `template`, the keyword `typename` (or, alternatively, `class`) specifies the generic type in the function prototype. The parameters that follow typename (or class) represent generic types in the function declaration.
 
-    * In this example, you will see the difference between total and partial deduction.
+* In order to instantiate a templatized class, use a templatized constructor, for example: ```Sum<double>(20.0, 13.7)```. You might recognize this form as the same form used to construct a vector. That's because vectors are indeed a generic class!
 
-    * Deduction occurs when you instantiate an object without explicitly identifying the types. Instead, the compiler "deduces" the types. This can be helpful for writing code that is generic and can handle a variety of inputs.
+```cpp
+#include <assert.h>
 
-    * ```cpp
-        #include <assert.h>
-        
-        // TODO: Declare a generic, templatized average function
-        template <typename T> T average(T a, T b) { return (a+b)/2; }
-        
-        int main() { assert(average(2.0,5.0) == 3.5); }
-        ```
-    
+// TODO: Create a generic function Product that multiplies two parameters
+template <typename T>
+T Product(T a, T b) {
+    return a * b;
+}
+
+int main() { 
+    assert(Product<int>(10, 2) == 20); 
+}
+```
+
+* C++ 20 has a new feature for generic programming called `concept`. Class templates, function templates, and non-template functions (typically members of class templates) may be associated with a constraint, which specifies the requirements on template arguments, which can be used to select the most appropriate function overloads and template specializations.
+
+* Named sets of such requirements are called concepts. Each concept is a predicate, evaluated at compile time, and becomes a part of the interface of a template where it is used as a constraint:
+
+```cpp
+#include <string>
+#include <cstddef>
+#include <concepts>
+
+// Declaration of the concept "Hashable", which is satisfied by any type 'T'
+// such that for values 'a' of type 'T', the expression std::hash<T>{}(a)
+// compiles and its result is convertible to std::size_t
+template<typename T>
+concept Hashable = requires(T a) {
+    { std::hash<T>{}(a) } -> std::convertible_to<std::size_t>;
+};
+
+struct meow {};
+
+// Constrained C++20 function template:
+template<Hashable T>
+void f(T) {}
+//
+// Alternative ways to apply the same constraint:
+// template<typename T>
+//    requires Hashable<T>
+// void f(T) {}
+//
+// template<typename T>
+// void f(T) requires Hashable<T> {}
+
+int main() {
+using std::operator""s;
+f("abc"s); // OK, std::string satisfies Hashable
+//f(meow{}); // Error: meow does not satisfy Hashable
+}
+
+```
+
+```cpp
+#include <assert.h>
+
+// TODO: Declare a generic, templatized function Max()
+template <typename T> T Max(T a, T b) {
+    return a > b ? a : b;
+}
+
+int main() { 
+    assert(Max(10, 50) == 50);
+    assert(Max(5.7, 1.436246) == 5.7);
+}
+```
+
+#### Deduction
+
+* In this example, you will see the difference between total and partial deduction.
+
+* Deduction occurs when you instantiate an object without explicitly identifying the types. Instead, the compiler "deduces" the types. This can be helpful for writing code that is generic and can handle a variety of inputs.
+
+```cpp
+#include <assert.h>
+
+// TODO: Declare a generic, templatized average function
+template <typename T> T average(T a, T b) { return (a+b)/2; }
+
+int main() { assert(average(2.0,5.0) == 3.5); }
+```
+
 * Exercise
 
-    * ```cpp
-        #include <assert.h>
-        #include <string>
-        #include <sstream>
-        
-        // TODO: Add the correct template specification
-        template <typename KeyType, typename ValueType>
-        class Mapping {
-            public:
-                Mapping(KeyType key, ValueType value) : key(key), value(value) {}
-                std::string Print() const {
-                    std::ostringstream stream;
-                    stream << key << ": " << value;
-                    return stream.str();
-                }
-                KeyType key;
-                ValueType value;
-        };
-        
-        // Test
-        int main() {
-            Mapping<std::string, int> mapping("age", 20);
-            assert(mapping.Print() == "age: 20");
+```cpp
+#include <assert.h>
+#include <string>
+#include <sstream>
+
+// TODO: Add the correct template specification
+template <typename KeyType, typename ValueType>
+class Mapping {
+    public:
+        Mapping(KeyType key, ValueType value) : key(key), value(value) {}
+        std::string Print() const {
+            std::ostringstream stream;
+            stream << key << ": " << value;
+            return stream.str();
         }
-        ```
+        KeyType key;
+        ValueType value;
+};
+
+// Test
+int main() {
+    Mapping<std::string, int> mapping("age", 20);
+    assert(mapping.Print() == "age: 20");
+}
+```
 
 ## Memory management 
 
