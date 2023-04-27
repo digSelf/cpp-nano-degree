@@ -3254,36 +3254,36 @@ int main()
         ```
 * When we interchange the indices i and j when accessing the array as
 
-    * ```cpp
-        x[j][i] = i + j;
-        std::cout << &x[j][i] << ": i=" << j << ", j=" << i << std::endl;
-        ```
+```cpp
+    x[j][i] = i + j;
+    std::cout << &x[j][i] << ": i=" << j << ", j=" << i << std::endl;
+```
     
 * we get the following output:
 
-    * ```bash
-        0x6021e0: i=0, j=0
-        0x6021f0: i=1, j=0
-        0x602200: i=2, j=0
-        0x602210: i=3, j=0
+```bash
+    0x6021e0: i=0, j=0
+    0x6021f0: i=1, j=0
+    0x602200: i=2, j=0
+    0x602210: i=3, j=0
 
-        0x6021e4: i=0, j=1
-        0x6021f4: i=1, j=1
-        0x602204: i=2, j=1
-        0x602214: i=3, j=1
+    0x6021e4: i=0, j=1
+    0x6021f4: i=1, j=1
+    0x602204: i=2, j=1
+    0x602214: i=3, j=1
 
-        0x6021e8: i=0, j=2
-        0x6021f8: i=1, j=2
-        0x602208: i=2, j=2
-        0x602218: i=3, j=2
+    0x6021e8: i=0, j=2
+    0x6021f8: i=1, j=2
+    0x602208: i=2, j=2
+    0x602218: i=3, j=2
 
-        0x6021ec: i=0, j=3
-        0x6021fc: i=1, j=3
-        0x60220c: i=2, j=3
-        0x60221c: i=3, j=3
+    0x6021ec: i=0, j=3
+    0x6021fc: i=1, j=3
+    0x60220c: i=2, j=3
+    0x60221c: i=3, j=3
 
-        Execution time: 115 microseconds
-        ```
+    Execution time: 115 microseconds
+```
 
 * As can be see, the difference between two rows is now 0x10, which is 16 in the decimal system. This means that with each access to the matrix, four memory cells are skipped and the principle of spatial locality is violated. As a result, the wrong data is loaded into the L1 cache, leading to cache misses and costly reload operations - hence the significantly increased execution time between the two code samples. The difference in execution time of both code samples shows that cache-aware programming can increase
 
