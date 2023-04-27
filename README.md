@@ -3226,8 +3226,8 @@ int main()
 
 * **As we have created an array of integers, the difference between two adjacent memory cells will be sizeof(int), which is 4 bytes. Let us verify this by changing the size of the array to 4x4 and by plotting both the address and the index numbers to the console. Be sure to revert the array access back to `x[i][j] = i + j`.**
 
-​    
-​    * You can plot by uncommenting the printout line in the inner for loop:
+
+* You can plot by uncommenting the printout line in the inner for loop:
 
 ```bash
     0x6021e0: i=0, j=0
