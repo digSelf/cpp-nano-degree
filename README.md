@@ -3228,30 +3228,30 @@ int main()
 
 ​    
 ​    * You can plot by uncommenting the printout line in the inner for loop:
-​    
-​        * ```bash
-​            0x6021e0: i=0, j=0
-​            0x6021e4: i=0, j=1
-​            0x6021e8: i=0, j=2
-​            0x6021ec: i=0, j=3
-​    
-​            0x6021f0: i=1, j=0
-​            0x6021f4: i=1, j=1
-​            0x6021f8: i=1, j=2
-​            0x6021fc: i=1, j=3
-​    
-​            0x602200: i=2, j=0
-​            0x602204: i=2, j=1
-​            0x602208: i=2, j=2
-​            0x60220c: i=2, j=3
-​    
-        0x602210: i=3, j=0
-        0x602214: i=3, j=1
-        0x602218: i=3, j=2
-        0x60221c: i=3, j=3
 
-        Execution time: 83 microseconds
-        ```
+```bash
+    0x6021e0: i=0, j=0
+    ​0x6021e4: i=0, j=1
+    0x6021e8: i=0, j=2
+    ​0x6021ec: i=0, j=3
+    ​    
+    0x6021f0: i=1, j=0
+    0x6021f4: i=1, j=1
+    0x6021f8: i=1, j=2
+    0x6021fc: i=1, j=3
+    ​    
+    0x602200: i=2, j=0
+    0x602204: i=2, j=1
+    0x602208: i=2, j=2
+    0x60220c: i=2, j=3​    
+    0x602210: i=3, j=0
+    0x602214: i=3, j=1
+    0x602218: i=3, j=2
+    0x60221c: i=3, j=3
+
+    Execution time: 83 microseconds
+```
+
 * When we interchange the indices i and j when accessing the array as
 
 ```cpp
