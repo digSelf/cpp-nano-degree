@@ -3003,7 +3003,7 @@ int main() {
 
 ## Memory management 
 
-In cpp, memory refers to the storage space where your program's variables and data are stored while you program is running.
+In cpp, memory refers to the storage space where your program's variables and data are stored while you program is running. **Pointer** is a machine address with a type associated with it at compile time.
 
 ### Memory Addresses and Hexadecimal Numbers
 
@@ -3031,103 +3031,103 @@ In cpp, memory refers to the storage space where your program's variables and da
 
 * The reason why early computer scientists have decided to not use decimal numbers can also be seen in the figure below. In these days (before pocket calculators were widely available), programers had to interpret computer output in their head on a regular basis. For them, it was much easier and quicker to look at and interpret `7E` instead of `0111 1110`. Ideally, they would have used the decimal system, but the conversion between base 2 and base 10 is much harder than between base 2 and base 16. Note in the figure that the decimal system's digit transitions never match those of the binary system. With the hexadecimal system, which is based on a multiple of 2, digit transitions match up each time, thus making it much easier to convert quickly between these numbering systems.
 
-* Using the Debugger to Analyze Memory
+### Using the Debugger to Analyze Memory
 
-    * As you have seen in the last section, binary numbers and hex numbers can be used to represent information. A coding scheme such as an ASCII table makes it possible to convert text into binary form. In the following, we will try to look at computer memory and locate information there.
+* As you have seen in the last section, binary numbers and hex numbers can be used to represent information. A coding scheme such as an ASCII table makes it possible to convert text into binary form. In the following, we will try to look at computer memory and locate information there.
 
-    * In the following example, we will use the debugger to look for a particular string in computer memory. Depending on your computer operating system and on the compiler you have installed, there might be several debugging tools available to you. In the following video, we will use the `gdb` debugger to locate the character sequence "UDACITY" in computer memory. The code below creates an array of characters in computer memory (on the stack, which we will learn more about shortly) and prints it to the console:
+* In the following example, we will use the debugger to look for a particular string in computer memory. Depending on your computer operating system and on the compiler you have installed, there might be several debugging tools available to you. In the following video, we will use the `gdb` debugger to locate the character sequence "UDACITY" in computer memory. The code below creates an array of characters in computer memory (on the stack, which we will learn more about shortly) and prints it to the console:
 
-        * For `clang` user you can use `lldb`
+    * For `clang` user you can use `lldb`
 
-    * Start the binary by running `lldb a.out`.
-        * Make sure to compile with symbols enbaled `clang++ --std=c++14 -g main.cpp`
+* Start the binary by running `lldb a.out`.
+    * Make sure to compile with symbols enbaled `clang++ --std=c++14 -g main.cpp`
 
-    * `b main`/`break main` to mark a breakpoint at the `main` function
+* `b main`/`break main` to mark a breakpoint at the `main` function
 
-    * `r main`/`run main` to run the `main` function.
+* `r main`/`run main` to run the `main` function.
 
-    * `s`/`step` to move inside the code
+* `s`/`step` to move inside the code
 
-    * `c`/`continue` to continue the process 
+* `c`/`continue` to continue the process 
 
-    * More commands can be found [here](https://lldb.llvm.org/use/map.html)
+* More commands can be found [here](https://lldb.llvm.org/use/map.html)
 
-    * `bt` / `backtrace` to print the stack
+* `bt` / `backtrace` to print the stack
 
-    * `p var`/ `print var` to print a variable
-        * * `expr --raw -- &var` to get a variable address in `lldb`
+* `p var`/ `print var` to print a variable
+    * * `expr --raw -- &var` to get a variable address in `lldb`
 
-    * `x/nfu memory_address`:
-        * `x` helps access memory
-        * `n` how many units to print
-        * `f` the format we want to print on
-            * `a`: pointer
-            * `c`: read as integer print as character 
-            * `d`: integer, signed decimal
-            * `x`: hexadecimal 
-        * `u` the unit
-            * `b` byte
-            * `h` half-word (two bytes)
-            * `w` four bytes
-            * `g` giant word (eight bytes)
-    
-    * Example: `x/7xb`
-        * 7 units = how many units
-        * hexadecimal = format
-        * byte = unit
-    
-    * Computer memory is treated as a sequence of cells. This means that we can use the starting address to retrieve the byte of information stored there. The following figure illustrates the principle:
-        * ![memory](./images/memory.png)
-        * Computer memory represented as a sequence of data cells (e.g. 01010101) with their respective memory addresses shown on top.
+* `x/nfu memory_address`:
+    * `x` helps access memory
+    * `n` how many units to print
+    * `f` the format we want to print on
+        * `a`: pointer
+        * `c`: read as integer print as character 
+        * `d`: integer, signed decimal
+        * `x`: hexadecimal 
+    * `u` the unit
+        * `b` byte
+        * `h` half-word (two bytes)
+        * `w` four bytes
+        * `g` giant word (eight bytes)
 
-    * Let us perform a short experiment using gdb again: By adding 1, 2, 3, … to the address of the string variable str1, we can proceed to the next cell until we reach the end of the memory we want to look at.
+* Example: `x/7xb`
+    * 7 units = how many units
+    * hexadecimal = format
+    * byte = unit
 
-        * ![memory_1](./images/memory_1.png) 
-    
-    * Note that the numbers above represent the string "UDACITY" again. Also note that once we exceed the end of the string, the memory cell has the value 0x00. This means that the experiment has shown that an offset of 1 in a hexadecimal address corresponds to an offset of 8 bits (or 1 byte) in computer memory.
+* Computer memory is treated as a sequence of cells. This means that we can use the starting address to retrieve the byte of information stored there. The following figure illustrates the principle:
+    * ![memory](./images/memory.png)
+    * Computer memory represented as a sequence of data cells (e.g. 01010101) with their respective memory addresses shown on top.
 
-* Types of Computer Memory
+* Let us perform a short experiment using gdb again: By adding 1, 2, 3, … to the address of the string variable str1, we can proceed to the next cell until we reach the end of the memory we want to look at.
 
-    * In a course on memory management we obviously need to take a look at the available memory types in computer systems. Below you will find a small list of some common memory types that you will surely have heard of:
+    * ![memory_1](./images/memory_1.png) 
 
-        * RAM / ROM
-        * Cache (L1, L2)
-        * Registers
-        * Virtual Memory
-        * Hard Disks, USB drives
-    
-    * Let us look into these types more deeply: When the CPU of a computer needs to access memory, it wants to do this with minimal latency. Also, as large amounts of information need to be processed, the available memory should be sufficiently large with regard to the tasks we want to accomplish.
+* Note that the numbers above represent the string "UDACITY" again. Also note that once we exceed the end of the string, the memory cell has the value 0x00. This means that the experiment has shown that an offset of 1 in a hexadecimal address corresponds to an offset of 8 bits (or 1 byte) in computer memory.
 
-    * Regrettably though, low latency and large memory are not compatible with each other (at least not at a reasonable price). In practice, the decision for low latency usually results in a reduction of the available storage capacity (and vice versa). This is the reason why a computer has multiple memory types that are arranged hierarchically. The following pyramid illustrates the principle:
+### Types of Computer Memory
 
-        * ![computer_memory](./images/computer_memory.png)
-        * Computer memory latency and size hierarchy.
+* In a course on memory management we obviously need to take a look at the available memory types in computer systems. Below you will find a small list of some common memory types that you will surely have heard of:
 
-    * As you can see, the CPU and its ultra-fast (but small) registers used for short-term data storage reside at the top of the pyramid. Below are Cache and RAM, which belong to the category of temporary memory which quickly looses its content once power is cut off. Finally, there are permanent storage devices such as the ROM, hard drives as well as removable drives such as USB sticks.
+    * RAM / ROM
+    * Cache (L1, L2)
+    * Registers
+    * Virtual Memory
+    * Hard Disks, USB drives
 
-    * Let us take a look at a typical computer usage scenario to see how the different types of memory are used:
+* Let us look into these types more deeply: When the CPU of a computer needs to access memory, it wants to do this with minimal latency. Also, as large amounts of information need to be processed, the available memory should be sufficiently large with regard to the tasks we want to accomplish.
 
-        * After switching on the computer, it loads data from its read-only memory (ROM) and performs a power-on self-test (POST) to ensure that all major components are working properly. Additionally, the computer memory controller checks all of the memory addresses with a simple read/write operation to ensure that memory is functioning correctly.
+* Regrettably though, low latency and large memory are not compatible with each other (at least not at a reasonable price). In practice, the decision for low latency usually results in a reduction of the available storage capacity (and vice versa). This is the reason why a computer has multiple memory types that are arranged hierarchically. The following pyramid illustrates the principle:
 
-        * After performing the self-test, the computer loads the basic input/output system (BIOS) from ROM. The major task of the BIOS is to make the computer functional by providing basic information about such things as storage devices, boot sequence, security or auto device recognition capability.
+    * ![computer_memory](./images/computer_memory.png)
+    * Computer memory latency and size hierarchy.
 
-        * The process of activating a more complex system on a simple system is called "bootstrapping": It is a solution for the chicken-egg-problem of starting a software-driven system by itself using software. During bootstrapping, the computer loads the operating system (OS) from the hard drive into random access memory (RAM). RAM is considered "random access" because any memory cell can be accessed directly by intersecting the respective row and column in the matrix-like memory layout. For performance reasons, many parts of the OS are kept in RAM as long as the computer is powered on.
+* As you can see, the CPU and its ultra-fast (but small) registers used for short-term data storage reside at the top of the pyramid. Below are Cache and RAM, which belong to the category of temporary memory which quickly looses its content once power is cut off. Finally, there are permanent storage devices such as the ROM, hard drives as well as removable drives such as USB sticks.
 
-        * When an application is started, it is loaded into RAM. However, several application components are only loaded into RAM on demand to preserve memory. Files that are opened during runtime are also loaded into RAM. When a file is saved, it is written to the specified storage device. After closing the application, it is deleted from RAM.
+* Let us take a look at a typical computer usage scenario to see how the different types of memory are used:
 
-    * This simple usage scenario shows the central importance of the RAM. Every time data is loaded or a file is opened, it is placed into this temporary storage area - but what about the other memory types above the RAM layer in the pyramid?
+    * After switching on the computer, it loads data from its read-only memory (ROM) and performs a power-on self-test (POST) to ensure that all major components are working properly. Additionally, the computer memory controller checks all of the memory addresses with a simple read/write operation to ensure that memory is functioning correctly.
 
-    * To maximize CPU performance, fast access to large amounts of data is critical. If the CPU cannot get the data it needs, it stops and waits for data availability. Thus, when designing new memory chips, engineers must adapt to the speed of the available CPUs. The problem they are facing is that memory which is able to keep up with modern CPUs running at several GHz is extremely expensive. To combat this, computer designers have created the memory tier system which has already been shown in the pyramid diagram above. The solution is to use expensive memory in small quantities and then back it up using larger quantities of less expensive memory.
+    * After performing the self-test, the computer loads the basic input/output system (BIOS) from ROM. The major task of the BIOS is to make the computer functional by providing basic information about such things as storage devices, boot sequence, security or auto device recognition capability.
 
-    * The cheapest form of memory available today is the hard disk. It provides large quantities of inexpensive and permanent storage. The problem of a hard disk is its comparatively low speed - even though access times with modern solid state disks (SSD) have decreased significantly compared to older magnetic-disc models.
+    * The process of activating a more complex system on a simple system is called "bootstrapping": It is a solution for the chicken-egg-problem of starting a software-driven system by itself using software. During bootstrapping, the computer loads the operating system (OS) from the hard drive into random access memory (RAM). RAM is considered "random access" because any memory cell can be accessed directly by intersecting the respective row and column in the matrix-like memory layout. For performance reasons, many parts of the OS are kept in RAM as long as the computer is powered on.
 
-    * The next hierarchical level above hard disks or other external storage devices is the RAM. We will not discuss in detail how it works but only take a look at some key performance metrics of the CPU at this point, which place certain performance expectations on the RAM and its designers:
+    * When an application is started, it is loaded into RAM. However, several application components are only loaded into RAM on demand to preserve memory. Files that are opened during runtime are also loaded into RAM. When a file is saved, it is written to the specified storage device. After closing the application, it is deleted from RAM.
 
-        * The **bit size** of the CPU decides how many bytes of data it can access in RAM memory at the same time. A 16-bit CPU can access 2 bytes (with each byte consisting of 8 bit) while a 64-bit CPU can access 8 bytes at a time.
+* This simple usage scenario shows the central importance of the RAM. Every time data is loaded or a file is opened, it is placed into this temporary storage area - but what about the other memory types above the RAM layer in the pyramid?
 
-        * The **processing speed** of the CPU is measured in Gigahertz or Megahertz and denotes the number of operations it can perform in one second.
-    
-    * From processing speed and bit size, the data rate required to keep the CPU busy can easily be computed by multiplying bit size with processing speed. With modern CPUs and ever-increasing speeds, the available RAM in the market will not be fast enough to match the CPU data rate requirements.
+* To maximize CPU performance, fast access to large amounts of data is critical. If the CPU cannot get the data it needs, it stops and waits for data availability. Thus, when designing new memory chips, engineers must adapt to the speed of the available CPUs. The problem they are facing is that memory which is able to keep up with modern CPUs running at several GHz is extremely expensive. To combat this, computer designers have created the memory tier system which has already been shown in the pyramid diagram above. The solution is to use expensive memory in small quantities and then back it up using larger quantities of less expensive memory.
+
+* The cheapest form of memory available today is the hard disk. It provides large quantities of inexpensive and permanent storage. The problem of a hard disk is its comparatively low speed - even though access times with modern solid state disks (SSD) have decreased significantly compared to older magnetic-disc models.
+
+* The next hierarchical level above hard disks or other external storage devices is the RAM. We will not discuss in detail how it works but only take a look at some key performance metrics of the CPU at this point, which place certain performance expectations on the RAM and its designers:
+
+    * The **bit size** of the CPU decides how many bytes of data it can access in RAM memory at the same time. A 16-bit CPU can access 2 bytes (with each byte consisting of 8 bit) while a 64-bit CPU can access 8 bytes at a time.
+
+    * The **processing speed** of the CPU is measured in Gigahertz or Megahertz and denotes the number of operations it can perform in one second.
+
+* From processing speed and bit size, the data rate required to keep the CPU busy can easily be computed by multiplying bit size with processing speed. With modern CPUs and ever-increasing speeds, the available RAM in the market will not be fast enough to match the CPU data rate requirements.
 
     * Cache Levels
 
@@ -3184,48 +3184,47 @@ In cpp, memory refers to the storage space where your program's variables and da
 
     * Let us consider the following code example:
 
-    * ```cpp
-        #include <chrono>
-        #include <iostream>
-        
-        int main()
+```cpp
+#include <chrono>
+#include <iostream>
+
+int main()
+{
+    // create array 
+    const int size = 4;
+    // static means the variable is not allocated in the stack (stored in data segment or in BSS segment).
+    // What it is useful for however is if you have some large structure used in main that would be too big for the stack. Then, declaring the variable as static means it lives in the data segment.
+    // Being static also means that, if uninitialized, the variable will be initialized with all 0's, just like globals.
+
+
+    static int x[size][size];
+
+    auto t1 = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size; j++)
         {
-            // create array 
-            const int size = 4;
-            // static means the variable is not allocated in the stack (stored in data segment or in BSS segment).
-            // What it is useful for however is if you have some large structure used in main that would be too big for the stack. Then, declaring the variable as static means it lives in the data segment.
-            // Being static also means that, if uninitialized, the variable will be initialized with all 0's, just like globals.
-
-
-            static int x[size][size];
-    
-            auto t1 = std::chrono::high_resolution_clock::now();
-            for (int i = 0; i < size; i++)
-            {
-                for (int j = 0; j < size; j++)
-                {
-                    x[j][i] = i + j;
-                    // std::cout << &x[j][i] << ": i=" << i << ", j=" << j << std::endl;
-                }
-            }
-    
-            // print execution time to console
-            auto t2 = std::chrono::high_resolution_clock::now(); // stop time measurement
-            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
-            std::cout << "Execution time: " << duration << " microseconds" << std::endl;
-    
-            return 0;
+            x[j][i] = i + j;
+            // std::cout << &x[j][i] << ": i=" << i << ", j=" << j << std::endl;
         }
-        ```
-        
-        * The order we access our array impacts speed in this example. Having said that, accessing "line" neighbour addesses by using `x[i][j]` is faster compared to accessing "column" neighbour addresses with `x[j][i]`. Remember, a matrix is stored in a single line in memory, just like an array.
-    
-        * As can be seen, the rows of the two-dimensional matrix are copied one after the other. This format is called "row major" and is the default for both C and C++. Some other languages such as Fortran are "column major" and a memory-aware programmer should always know the memory layout of the language he or she is using.
-    
-        * Note that even though the row major memory layout is used in C++, this doesn't mean that all C++ libraries have the same default; for example, the popular Eigen library used for.
-    
-     * **As we have created an array of integers, the difference between two adjacent memory cells will be sizeof(int), which is 4 bytes. Let us verify this by changing the size of the array to 4x4 and by plotting both the address and the index numbers to the console. Be sure to revert the array access back to `x[i][j] = i + j`.**
+    }
 
+    // print execution time to console
+    auto t2 = std::chrono::high_resolution_clock::now(); // stop time measurement
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1).count();
+    std::cout << "Execution time: " << duration << " microseconds" << std::endl;
+
+    return 0;
+}
+```
+        
+    * The order we access our array impacts speed in this example. Having said that, accessing "line" neighbour addesses by using `x[i][j]` is faster compared to accessing "column" neighbour addresses with `x[j][i]`. Remember, a matrix is stored in a single line in memory, just like an array.
+
+    * As can be seen, the rows of the two-dimensional matrix are copied one after the other. This format is called "row major" and is the default for both C and C++. Some other languages such as Fortran are "column major" and a memory-aware programmer should always know the memory layout of the language he or she is using.
+
+    * Note that even though the row major memory layout is used in C++, this doesn't mean that all C++ libraries have the same default; for example, the popular Eigen library used for.
+
+    * **As we have created an array of integers, the difference between two adjacent memory cells will be sizeof(int), which is 4 bytes. Let us verify this by changing the size of the array to 4x4 and by plotting both the address and the index numbers to the console. Be sure to revert the array access back to `x[i][j] = i + j`.**
 
 ​    
 ​    * You can plot by uncommenting the printout line in the inner for loop:
