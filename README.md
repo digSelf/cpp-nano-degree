@@ -3381,139 +3381,139 @@ int main()
 
         * **Dynamic memory allocation** is a possibility for programs to request memory from the operating system at runtime when needed. This is the major difference between automatic and static allocation, where the size of the variable must be known at compile time. Dynamic memory allocation is not performed on the limited stack but on the heap and is thus (almost) only limited by the size of the address space.
 
-    * Properties of Stack Memory
+### Properties of Stack Memory
 
-        * In the available literature on C++, the terms stack and heap are used regularly, even though this is not formally correct: C++ has the free space, storage classes and the storage duration of objects. However, since stack and heap are widely used in the C++ community, we will also use it throughout this course. Should you come across the above-mentioned terms in a book or tutorial on the subject, you now know that they refer to the same concepts as stack and heap do.
+* In the available literature on C++, the terms stack and heap are used regularly, even though this is not formally correct: C++ has the free space, storage classes and the storage duration of objects. However, since stack and heap are widely used in the C++ community, we will also use it throughout this course. Should you come across the above-mentioned terms in a book or tutorial on the subject, you now know that they refer to the same concepts as stack and heap do.
 
-        * As mentioned in the last section, the stack is the place in virtual memory where the local variables reside, including arguments to functions. Each time a function is called, the stack grows (from top to bottom) and each time a function returns, the stack contracts. When using multiple threads (as in concurrent programming), it is important to know that each thread has its own stack memory - which can be considered thread-safe.
+* As mentioned in the last section, the stack is the place in virtual memory where the local variables reside, including arguments to functions. Each time a function is called, the stack grows (from top to bottom) and each time a function returns, the stack contracts. When using multiple threads (as in concurrent programming), it is important to know that each thread has its own stack memory - which can be considered thread-safe.
 
-        * In the following, a short list of key properties of the stack is listed:
+* In the following, a short list of key properties of the stack is listed:
 
-            * The stack is a contiguous block of memory. It will not become fragmented (as opposed to the heap) and it has a fixed maximum size.
+    * The stack is a contiguous block of memory. It will not become fragmented (as opposed to the heap) and it has a fixed maximum size.
 
-            * When the maximum size of the stack memory is exceeded, a program will crash.
+    * When the maximum size of the stack memory is exceeded, a program will crash.
 
-            * Allocating and deallocating memory is fast on the stack. It only involves moving the stack pointer to a new position.
+    * Allocating and deallocating memory is fast on the stack. It only involves moving the stack pointer to a new position.
 
-        * The following diagram shows the stack memory during a function call:
+* The following diagram shows the stack memory during a function call:
 
-        * ![stack_example](./images/stack_example.png) 
+* ![stack_example](./images/stack_example.png) 
 
-        * In the example, the variable `x` is created on the stack within the scope of `main`. Then, a stack frame which represents the function `Add` and its variables is pushed to the stack, moving the stack pointer further downwards. It can be seen that this includes the local variables `a` and `b`, as well as the return address, a base pointer and finally the return value `s`.
+* In the example, the variable `x` is created on the stack within the scope of `main`. Then, a stack frame which represents the function `Add` and its variables is pushed to the stack, moving the stack pointer further downwards. It can be seen that this includes the local variables `a` and `b`, as well as the return address, a base pointer and finally the return value `s`.
 
-    * When a thread is created, stack memory is allocated by the operating system as a contiguous block. With each new function call or local variable allocation, the stack pointer is moved until eventually it will reach the bottom of said memory block. Once it exceeds this limit (which is called "stack overflow"), the program will crash. We will try to find out the limit of your computer’s stack memory in the following exercise.
+* When a thread is created, stack memory is allocated by the operating system as a contiguous block. With each new function call or local variable allocation, the stack pointer is moved until eventually it will reach the bottom of said memory block. Once it exceeds this limit (which is called "stack overflow"), the program will crash. We will try to find out the limit of your computer’s stack memory in the following exercise.
 
-    * Before we take a look at the heap memory in the next lesson, let us briefly revisit the principles of call-by-value and call-by-reference with regard to stack usage.
+* Before we take a look at the heap memory in the next lesson, let us briefly revisit the principles of call-by-value and call-by-reference with regard to stack usage.
 
-* Call-by-Value vs Call-by-Reference
+### Call-by-Value vs Call-by-Reference
 
-    * When passing parameters to a function in C++, there is a variety of strategies a programmer can choose from. In this section, we will take a look at these in turn from the perspective of stack usage. First, we will briefly revisit the definition of scope, as well as the strategies call-by-value and call-by-reference. Then, we will look at the amount of stack memory used by these methods.
+* When passing parameters to a function in C++, there is a variety of strategies a programmer can choose from. In this section, we will take a look at these in turn from the perspective of stack usage. First, we will briefly revisit the definition of scope, as well as the strategies call-by-value and call-by-reference. Then, we will look at the amount of stack memory used by these methods.
 
 
-    * The time between allocation and deallocation is called the lifetime of a variable. Using a variable after its lifetime has ended is a common programming error, against which most modern languages try to protect: Local variables are only available within their respective scope (e.g. inside a function) and are simply not available outside - so using them inappropriately will result in a compile-time error. When using pointer variables however, programmers must make sure that allocation is handled correctly and that no invalid memory addresses are accessed.
-    
-    * ```cpp
-        bool MyLocalFunction(int myInt)
-        {
-            bool isBelowThreshold = myInt < 42 ? true : false;
-            return isBelowThreshold;
-        }
-    
-        int main()
-        {
-            bool res = MyLocalFunction(23);
-            return 0; 
-        }
-        ```
-    
-    * When calling a function as in the previous code example, its parameters (in this case myInt) are used to create local copies of the information provided by the caller. The caller is not sharing the parameter with the function but instead a proprietary copy is created using the assignment operator = (more about that later). When passing parameters in such a way, it is ensured that changes made to the local copy will not affect the original on the caller side. The upside to this is that inner workings of the function and the data owned by the caller are kept neatly separate.
-    
-    * However, with a slight modification, we can easily create a backchannel to the caller side. Consider the code bellow.
-    
-    * ```cpp
-        #include <iostream>
-    
-        void AddThree(int *val)
-        {
-            *val += 3;
-        }
-    
-        int main()
-        {
-            int val = 0;
-            AddThree(&val);
-            val += 2;
-    
-            std::cout << "val = " << val << std::endl;
-        
-            return 0;
-        }
-        ```
-    
-    * Pointers vs. References
-    
-        * As we have seen in the examples above, the use of pointers and references to directly manipulate function arguments in a memory-effective way is very similar. Let us compare the two methods in the code on the right.
-    
-        * Pointers can be declared without initialization. This means we can pass an uninitialized pointer to a function who then internally performs the initialization for us.
-    
-        * Pointers can be reassigned to another memory block on the heap.
-    
-        * References are usually easier to use (depending on the expertise level of the programmer). Sometimes however, if a third-party function is used without properly looking at the parameter definition, it might go unnoticed that a value has been modified.
-    
-        * Remember, passing a pointer may be expensive:
-            * ```cpp
-                printf("size of int: %lu\n", sizeof(int));
-                printf("size of *int: %lu\n", sizeof(int *));       
-                // size of int: 4
-                // size of *int: 8
-                ```
-            * Obviously, the size of the pointer variable is larger than the actual data type. As my machine has a 64 bit architecture, an address requires 8 byte.
-    
-            * In order to benefit from call-by-reference, the size of the data type passed to the function has to surpass the size of the pointer on the respective architecture (i.e. 32 bit or 64 bit).
-    
-        * ```cpp
-    
-            #include <stdio.h>
-                
-            void CallByValue(int i)
-            {
-                int j = 1; 
-                printf ("call-by-value: %p\n",&j);
-            }
-    
-            void CallByPointer(int *i)
-            {
-                int j = 1; 
-                printf ("call-by-pointer: %p\n",&j);
-            }
-    
-            void CallByReference(int &i)
-            {
-                int j = 1; 
-                printf ("call-by-reference: %p\n",&j);
-            }
-    
-            int main()
-            {
-                int i = 0;
-                printf ("stack bottom: %p\n",&i);
-                
-                CallByValue(i);
-    
-                CallByPointer(&i);
-    
-                CallByReference(i);
-    
-                return 0;
-            }
-            ```
-        *  CallByValue requires 32 bytes of memory. As discussed before, this is reserved for e.g. the function return address and for the local variables within the function (including the copy of i).
-    
-        * CallByPointer on the other hand requires - perhaps surprisingly - 36 bytes of memory. Let us complete the examination before going into more details on this result.
-    
-        * CallByReference finally has the same memory requirements as CallByPointer.
+* The time between allocation and deallocation is called the lifetime of a variable. Using a variable after its lifetime has ended is a common programming error, against which most modern languages try to protect: Local variables are only available within their respective scope (e.g. inside a function) and are simply not available outside - so using them inappropriately will result in a compile-time error. When using pointer variables however, programmers must make sure that allocation is handled correctly and that no invalid memory addresses are accessed.
 
-* Dynamic Memory Allocation
+* ```cpp
+    bool MyLocalFunction(int myInt)
+    {
+        bool isBelowThreshold = myInt < 42 ? true : false;
+        return isBelowThreshold;
+    }
+
+    int main()
+    {
+        bool res = MyLocalFunction(23);
+        return 0; 
+    }
+    ```
+
+* When calling a function as in the previous code example, its parameters (in this case myInt) are used to create local copies of the information provided by the caller. The caller is not sharing the parameter with the function but instead a proprietary copy is created using the assignment operator = (more about that later). When passing parameters in such a way, it is ensured that changes made to the local copy will not affect the original on the caller side. The upside to this is that inner workings of the function and the data owned by the caller are kept neatly separate.
+
+* However, with a slight modification, we can easily create a backchannel to the caller side. Consider the code bellow.
+
+```cpp
+#include <iostream>
+
+void AddThree(int *val)
+{
+    *val += 3;
+}
+
+int main()
+{
+    int val = 0;
+    AddThree(&val);
+    val += 2;
+
+    std::cout << "val = " << val << std::endl;
+
+    return 0;
+}
+```
+    
+* Pointers vs. References
+
+* As we have seen in the examples above, the use of pointers and references to directly manipulate function arguments in a memory-effective way is very similar. Let us compare the two methods in the code on the right.
+
+* Pointers can be declared without initialization. This means we can pass an uninitialized pointer to a function who then internally performs the initialization for us.
+
+* Pointers can be reassigned to another memory block on the heap.
+
+* References are usually easier to use (depending on the expertise level of the programmer). Sometimes however, if a third-party function is used without properly looking at the parameter definition, it might go unnoticed that a value has been modified.
+
+* Remember, passing a pointer may be expensive:
+```cpp
+printf("size of int: %lu\n", sizeof(int));
+printf("size of *int: %lu\n", sizeof(int *));       
+// size of int: 4
+// size of *int: 8
+```
+* Obviously, the size of the pointer variable is larger than the actual data type. As my machine has a 64 bit architecture, an address requires 8 byte.
+
+* In order to benefit from call-by-reference, the size of the data type passed to the function has to surpass the size of the pointer on the respective architecture (i.e. 32 bit or 64 bit).
+
+```cpp
+
+#include <stdio.h>
+    
+void CallByValue(int i)
+{
+    int j = 1; 
+    printf ("call-by-value: %p\n",&j);
+}
+
+void CallByPointer(int *i)
+{
+    int j = 1; 
+    printf ("call-by-pointer: %p\n",&j);
+}
+
+void CallByReference(int &i)
+{
+    int j = 1; 
+    printf ("call-by-reference: %p\n",&j);
+}
+
+int main()
+{
+    int i = 0;
+    printf ("stack bottom: %p\n",&i);
+    
+    CallByValue(i);
+
+    CallByPointer(&i);
+
+    CallByReference(i);
+
+    return 0;
+}
+```
+*  CallByValue requires 32 bytes of memory. As discussed before, this is reserved for e.g. the function return address and for the local variables within the function (including the copy of i).
+
+* CallByPointer on the other hand requires - perhaps surprisingly - 36 bytes of memory. Let us complete the examination before going into more details on this result.
+
+* CallByReference finally has the same memory requirements as CallByPointer.
+
+### Dynamic Memory Allocation
 
     * Heap memory, also know as dynamic memory , is an important resource available to programs (and programmers) to store data. The following diagram again shows the layout of virtual memory with the heap being right above the BSS and Data segment.
 
