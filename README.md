@@ -4013,11 +4013,11 @@ delete: Memory is freed again
 
     * In this example, the allocated stack memory is too small to hold the entire string, which results in a segmentation fault:
 
-    * ```cpp
-        char str[5];
-        strcpy(str,"BufferOverrun");
-        printf("%s",str);
-        ```
+        * ```cpp
+            char str[5];
+            strcpy(str,"BufferOverrun");
+            printf("%s",str);
+            ```
 
     * **Uninitialized Memory** Depending on the C++ compiler, data structures are sometimes initialized (most often to zero) and sometimes not. So when allocating memory on the heap without proper initialization, it might sometimes contain garbage that can cause problems.
 
@@ -4056,11 +4056,11 @@ delete: Memory is freed again
 
     * In this example, the heap memory has already been deallocated at the time when `strcpy()` tries to access it:
 
-    * ```cpp
-        char *pStr=new char[25];
-        delete[] pStr;
-        strcpy(pStr, "Invalid Access");
-        ```
+        * ```cpp
+            char *pStr=new char[25];
+            delete[] pStr;
+            strcpy(pStr, "Invalid Access");
+            ```
 
 * [Valgrind](https://valgrind.org/) for debugging memory leaks
 
@@ -4128,81 +4128,81 @@ delete: Memory is freed again
 
 ### Resources Copying Polices
 
-    * Default copying
+#### Default copying
 
-    * Resource management is one of the primary responsibilities of a C++ programmer. Among resources such as multi-threaded locks, files, network and database connections this also includes memory. The common denominator in all of these examples is that access to the resource is often managed through a handle such as a pointer. Also, after the resource has been used and is no longer, it must be released again so that it available for re-use by someone else.
+* Resource management is one of the primary responsibilities of a C++ programmer. Among resources such as multi-threaded locks, files, network and database connections this also includes memory. The common denominator in all of these examples is that access to the resource is often managed through a handle such as a pointer. Also, after the resource has been used and is no longer, it must be released again so that it available for re-use by someone else.
 
-    * In C++, a common way of safely accessing resources is by wrapping a manager class around the handle, which is initialized when the resource is acquired (in the class constructor) and released when it is deleted (in the class destructor). This concept is often referred to as Resource Acquisition is Initialization (RAII), which we will discuss in greater depth in the next concept. One problem with this approach though is that copying the manager object will also copy the handle of the resource. This allows two objects access to the same resource - and this can mean trouble.
+* In C++, a common way of safely accessing resources is by wrapping a manager class around the handle, which is initialized when the resource is acquired (in the class constructor) and released when it is deleted (in the class destructor). This concept is often referred to as Resource Acquisition is Initialization (RAII), which we will discuss in greater depth in the next concept. One problem with this approach though is that copying the manager object will also copy the handle of the resource. This allows two objects access to the same resource - and this can mean trouble.
 
-    * Are member variables of an object that is on the heap also automatically on the heap?
-        * Yes. It's on the heap. Basically, the space allocated to an object on the heap is big enough to hold all its member variables. More [here](https://stackoverflow.com/questions/1461064/are-member-variables-of-an-object-that-is-on-the-heap-also-automatically-on-the)
-    
-    * Consider the example on the right of managing access to a block of heap memory.
+* Are member variables of an object that is on the heap also automatically on the heap?
+    * Yes. It's on the heap. Basically, the space allocated to an object on the heap is big enough to hold all its member variables. More [here](https://stackoverflow.com/questions/1461064/are-member-variables-of-an-object-that-is-on-the-heap-also-automatically-on-the)
 
-        * ```cpp
-            #include <iostream>
-            
-            class MyClass
+* Consider the example on the right of managing access to a block of heap memory.
+
+    * ```cpp
+        #include <iostream>
+        
+        class MyClass
+        {
+        private:
+            int *_myInt;
+        
+        public:
+            MyClass()
             {
-            private:
-                int *_myInt;
-            
-            public:
-                MyClass()
-                {
-                    _myInt = (int *)malloc(sizeof(int));
-                };
-                ~MyClass()
-                {
-                    free(_myInt);
-                };
-                void printOwnAddress() { std::cout << "Own address on the stack is " << this << std::endl; }
-                void printMemberAddress() { std::cout << "Managing memory block on the heap at " << _myInt << std::endl; }
+                _myInt = (int *)malloc(sizeof(int));
             };
-            
-            int main()
+            ~MyClass()
             {
-                // instantiate object 1
-                MyClass myClass1;
-                myClass1.printOwnAddress();
-                myClass1.printMemberAddress();
-            
-                // copy object 1 into object 2
-                MyClass myClass2(myClass1); // copy constructor
-                myClass2.printOwnAddress();
-                myClass2.printMemberAddress();
-            
-                return 0;
-            }
-            ```
+                free(_myInt);
+            };
+            void printOwnAddress() { std::cout << "Own address on the stack is " << this << std::endl; }
+            void printMemberAddress() { std::cout << "Managing memory block on the heap at " << _myInt << std::endl; }
+        };
         
-        * The class `MyClass` has a private member, which is a pointer to a heap-allocated integer. Allocation is performed in the constructor, deallocation is done in the destructor. This means that the memory block of size `sizeof(int)` is allocated when the objects `myClass1` and `myClass2` are created on the stack and deallocated when their scope is left, which happens at the end of the main. The difference between `myClass1` and `myClass2` is that the latter is instantiated using the copy constructor, which duplicates the members in myClass1 - including the pointer to the heap memory where `_myInt` resides.
-
-        * The output of the program looks like the following:
-
-        * ```bash
-            Own address on the stack is 0x7ffeefbff670
-            Managing memory block on the heap at 0x100300060
-            Own address on the stack is 0x7ffeefbff658
-            Managing memory block on the heap at 0x100300060
-            copy_constructor_1(87582,0x1000a95c0) malloc: *** error for object 0x100300060: pointer being freed was not allocated
-            ```
-
-        * Note that in the workspace, the error will read:
-
-        * ```bash
-            *** Error in './a.out': double free or corruption (fasttop): 0x0000000001133c20 ***
-            ```
+        int main()
+        {
+            // instantiate object 1
+            MyClass myClass1;
+            myClass1.printOwnAddress();
+            myClass1.printMemberAddress();
         
-        * From the output we can see that the stack address is different for `myClass1` and `myClass2` - as was expected. The address of the managed memory block on the heap however is identical. This means that when the first object goes out of scope, it releases the memory resource by calling free in its destructor. The second object does the same - which causes the program to crash as the pointer is now referencing an invalid area of memory, which has already been freed.
+            // copy object 1 into object 2
+            MyClass myClass2(myClass1); // copy constructor
+            myClass2.printOwnAddress();
+            myClass2.printMemberAddress();
+        
+            return 0;
+        }
+        ```
+    
+    * The class `MyClass` has a private member, which is a pointer to a heap-allocated integer. Allocation is performed in the constructor, deallocation is done in the destructor. This means that the memory block of size `sizeof(int)` is allocated when the objects `myClass1` and `myClass2` are created on the stack and deallocated when their scope is left, which happens at the end of the main. The difference between `myClass1` and `myClass2` is that the latter is instantiated using the copy constructor, which duplicates the members in myClass1 - including the pointer to the heap memory where `_myInt` resides.
 
-        * The default behavior of both copy constructor and assignment operator is to perform a shallow copy as with the example above. The following figure illustrates the concept:
+    * The output of the program looks like the following:
 
-            * ![copy_constructor](./images/copy_constructor.png)
+    * ```bash
+        Own address on the stack is 0x7ffeefbff670
+        Managing memory block on the heap at 0x100300060
+        Own address on the stack is 0x7ffeefbff658
+        Managing memory block on the heap at 0x100300060
+        copy_constructor_1(87582,0x1000a95c0) malloc: *** error for object 0x100300060: pointer being freed was not allocated
+        ```
 
-        * Fortunately, in C++, the copying process can be controlled by defining a tailored copy constructor as well as a copy assignment operator. The copying process must be closely linked to the respective resource release mechanism and is often referred to as `copy-ownership` policy. Tailoring the copy constructor according to your memory management policy is an important choice you often need to make when designing a class. In the following, we will closely examine several well-known copy-ownership policies.
+    * Note that in the workspace, the error will read:
 
-        * It is important to point out that the `assignment operator` aka the `=` sign will not always invoke the copy constructor. the `assignment operator` only calls the copy constructor when you use it during initialization of an unexisting object: `MyMovableClass obj2 = obj1`. However, if you use the `=` operator after an object was initialized, then it will call the `assignment operator` overloaded method: `obj2 = obj3`. 
+    * ```bash
+        *** Error in './a.out': double free or corruption (fasttop): 0x0000000001133c20 ***
+        ```
+    
+    * From the output we can see that the stack address is different for `myClass1` and `myClass2` - as was expected. The address of the managed memory block on the heap however is identical. This means that when the first object goes out of scope, it releases the memory resource by calling free in its destructor. The second object does the same - which causes the program to crash as the pointer is now referencing an invalid area of memory, which has already been freed.
+
+    * The default behavior of both copy constructor and assignment operator is to perform a shallow copy as with the example above. The following figure illustrates the concept:
+
+        * ![copy_constructor](./images/copy_constructor.png)
+
+    * Fortunately, in C++, the copying process can be controlled by defining a tailored copy constructor as well as a copy assignment operator. The copying process must be closely linked to the respective resource release mechanism and is often referred to as `copy-ownership` policy. Tailoring the copy constructor according to your memory management policy is an important choice you often need to make when designing a class. In the following, we will closely examine several well-known copy-ownership policies.
+
+    * It is important to point out that the `assignment operator` aka the `=` sign will not always invoke the copy constructor. the `assignment operator` only calls the copy constructor when you use it during initialization of an unexisting object: `MyMovableClass obj2 = obj1`. However, if you use the `=` operator after an object was initialized, then it will call the `assignment operator` overloaded method: `obj2 = obj3`. 
 
     * No copying policy
 
