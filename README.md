@@ -4467,55 +4467,55 @@ delete: Memory is freed again
 
 * As can be seen, the memory is released only once as soon as the reference counter reaches zero.
 
-    * The Rule of Three
-    
-        * In the previous examples we have taken a first look at several copying policies:
-    
-            * Default copying
-            * No copying
-            * Exclusive ownership
-            * Deep copying
-            * Shared ownership
+#### The Rule of Three
+
+* In the previous examples we have taken a first look at several copying policies:
+
+    * Default copying
+    * No copying
+    * Exclusive ownership
+    * Deep copying
+    * Shared ownership
+
+* In the first example we have seen that the default implementation of the copy constructor does not consider the "special" needs of a class which allocates and deallocates a shared resource on the heap. The problem with implicitly using the default copy constructor or assignment operator is that programmers are not forced to consider the implications for the memory management policy of their program. In the case of the first example, this leads to a segmentation fault and thus a program crash.
+
+* In order to properly manage memory allocation, deallocation and copying behavior, we have seen that there is an intricate relationship between destructor, copy constructor and copy assignment operator. To this end, the **Rule of Three** states that if a class needs to have an overloaded copy constructor, copy assignment operator, ~or~ destructor, then it must also implement the other two as well to ensure that memory is managed consistently. As we have seen, the copy constructor and copy assignment operator (which are often almost identical) control how the resource gets copied between objects while the destructor manages the resource deletion.
+
+* You may have noted that in the previous code example, the class `SharedCopy` does not implement the assignment operator. This is a violation of the **Rule of Three** and thus, if we were to use something like `destination3 = source` instead of `SharedCopy destination3(source)`, the counter variable would not be properly decremented.
+
+* The copying policies discussed in this chapter are the basis for a powerful concept in C++11 - smart pointers. But before we discuss these, we need to go into further detail on move semantics, which is a prerequisite you need to learn more about so you can properly understand the exclusive ownership policy as well as the **Rule of Five**, both of which we will discuss very soon. But before we discuss move semantics, we need to look into the concept of `lvalues` and `rvalues` in the next section.
+
+* Lvalues and Rvalues
+
+* What are lvalues and rvalues?
+
+* A good grasp of `lvalues` and `rvalues` in C++ is essential for understanding the more advanced concepts of `rvalue` references and `motion semantics`.
+
+* Let us start by stating that every expression in C++ has a type and belongs to a value category. When objects are created, copied or moved during the evaluation of an expression, the compiler uses these value expressions to decide which method to call or which operator to use.
+
+* ```cpp
+    int main()
+    {
+        // initialize some variables on the stack
+        int i, j, *p;
+
+        // correct usage of lvalues and rvalues
         
-        * In the first example we have seen that the default implementation of the copy constructor does not consider the "special" needs of a class which allocates and deallocates a shared resource on the heap. The problem with implicitly using the default copy constructor or assignment operator is that programmers are not forced to consider the implications for the memory management policy of their program. In the case of the first example, this leads to a segmentation fault and thus a program crash.
-    
-        * In order to properly manage memory allocation, deallocation and copying behavior, we have seen that there is an intricate relationship between destructor, copy constructor and copy assignment operator. To this end, the **Rule of Three** states that if a class needs to have an overloaded copy constructor, copy assignment operator, ~or~ destructor, then it must also implement the other two as well to ensure that memory is managed consistently. As we have seen, the copy constructor and copy assignment operator (which are often almost identical) control how the resource gets copied between objects while the destructor manages the resource deletion.
-    
-        * You may have noted that in the previous code example, the class `SharedCopy` does not implement the assignment operator. This is a violation of the **Rule of Three** and thus, if we were to use something like `destination3 = source` instead of `SharedCopy destination3(source)`, the counter variable would not be properly decremented.
-    
-        * The copying policies discussed in this chapter are the basis for a powerful concept in C++11 - smart pointers. But before we discuss these, we need to go into further detail on move semantics, which is a prerequisite you need to learn more about so you can properly understand the exclusive ownership policy as well as the **Rule of Five**, both of which we will discuss very soon. But before we discuss move semantics, we need to look into the concept of `lvalues` and `rvalues` in the next section.
-    
-    * Lvalues and Rvalues
-    
-        * What are lvalues and rvalues?
-    
-        * A good grasp of `lvalues` and `rvalues` in C++ is essential for understanding the more advanced concepts of `rvalue` references and `motion semantics`.
-    
-        * Let us start by stating that every expression in C++ has a type and belongs to a value category. When objects are created, copied or moved during the evaluation of an expression, the compiler uses these value expressions to decide which method to call or which operator to use.
-    
-        * ```cpp
-            int main()
-            {
-                // initialize some variables on the stack
-                int i, j, *p;
-    
-                // correct usage of lvalues and rvalues
-                
-                i = 42; // i is an lvalue and 42 is an rvalue
-                
-                p = new int;
-                *p = i; // the dereferenced pointer is an lvalue
-                delete p; 
-                
-                ((i < 42) ? i : j) = 23; // the conditional operator returns an lvalue (eiter i or j)
-    
-                // incorrect usage of lvalues and rvalues
-                //42 = i; // error : the left operand must be an lvalue
-                //j * 42 = 23; // error : the left operand must be an lvalue
-    
-                return 0; 
-            }
-            ```
+        i = 42; // i is an lvalue and 42 is an rvalue
+        
+        p = new int;
+        *p = i; // the dereferenced pointer is an lvalue
+        delete p; 
+        
+        ((i < 42) ? i : j) = 23; // the conditional operator returns an lvalue (eiter i or j)
+
+        // incorrect usage of lvalues and rvalues
+        //42 = i; // error : the left operand must be an lvalue
+        //j * 42 = 23; // error : the left operand must be an lvalue
+
+        return 0; 
+    }
+    ```
     
     * Lvalue reference
     
