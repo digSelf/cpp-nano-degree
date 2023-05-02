@@ -4633,52 +4633,51 @@ delete: Memory is freed again
     * How to crack the confusing world of lvalues and rvalues in C++? It is easy!
     * [Lvalues and Rvalues (C++)](https://docs.microsoft.com/en-us/cpp/cpp/lvalues-and-rvalues-visual-cpp?view=msvc-160)
     
-    * `Rvalue` references and `std::move`
+### `Rvalue` references and `std::move`
     
-        * In order to fully understand the concept of smart pointers in the next lesson, we first need to take a look at a powerful concept introduced with C++11 called `move semantics`.
-    
-        * The last section on `lvalues`, `rvalues` and especially `rvalue` references is an important prerequisite for understanding the concept of moving data structures.
-    
-        * Let us consider the function on the right which takes an `rvalue` reference as its parameter.
-    
-        * ```cpp
-            #include <iostream>
-    
-            void myFunction(int &&val)
-            {
-                std::cout << "val = " << val << std::endl;
-            }
-    
-            int main()
-            {
-                myFunction(42);
-    
-                return 0; 
-            }
-            ```
-    
-        * The important message of the function argument of `myFunction` to the programmer is : The object that binds to the `rvalue` reference `&&val` is yours, it is not needed anymore within the scope of the caller (which is main). As discussed in the previous section on `rvalue` references, this is interesting from two perspectives:
-    
-        * Passing values like this `improves performance` as no temporary copy needs to be made anymore and `ownership changes`, since the object the reference binds to has been abandoned by the caller and now binds to a handle which is available only to the receiver. This could not have been achieved with `lvalue` references as any change to the object that binds to the `lvalue` **reference** would also be visible on the caller side.    
-    
-        * There is one more important aspect we need to consider: `rvalue` references are themselves `lvalues`. While this might seem confusing at first glance, it really is the mechanism that enables `move semantics`: A reference is always defined in a certain context (such as in the above example the variable val) . Even though the object it refers to (the number 42) may be disposable in the context it has been created (the main function), it is not disposable in the context of the reference . So within the scope of `myFunction`, `val` is an `lvalue` as it gives access to the memory location where the number 42 is stored.
-    
-        * Note however that in the above code example we cannot pass an `lvalue` to `myFunction`, because an `rvalue` reference cannot bind to an `lvalue`. The code
-    
-        * ```cpp
-            int i = 23;
-            myFunction(i)
-            ```
-    
-        * would result in a compiler error. There is a solution to this problem though: The function `std::move` converts an `lvalue` into an `rvalue` (actually, to be exact, into an `xvalue`, which we will not discuss here for the sake of clarity), which makes it possible to use the `lvalue` as an argument for the function:
-    
-        * ```cpp
-            int i = 23; 
-            myFunction(std::move(i));
-            ```
-        
-        * In doing this, we state that in the scope of `main` we will not use `i` anymore, which now exists only in the scope of `myFunction`. Using `std::move` in this way is one of the components of `move semantics`, which we will look into shortly. But first let us consider an example of the `Rule of Three`.
+* In order to fully understand the concept of smart pointers in the next lesson, we first need to take a look at a powerful concept introduced with C++11 called `move semantics`.
 
+* The last section on `lvalues`, `rvalues` and especially `rvalue` references is an important prerequisite for understanding the concept of moving data structures.
+
+* Let us consider the function on the right which takes an `rvalue` reference as its parameter.
+
+* ```cpp
+    #include <iostream>
+
+    void myFunction(int &&val)
+    {
+        std::cout << "val = " << val << std::endl;
+    }
+
+    int main()
+    {
+        myFunction(42);
+
+        return 0; 
+    }
+    ```
+
+* The important message of the function argument of `myFunction` to the programmer is : The object that binds to the `rvalue` reference `&&val` is yours, it is not needed anymore within the scope of the caller (which is main). As discussed in the previous section on `rvalue` references, this is interesting from two perspectives:
+
+* Passing values like this `improves performance` as no temporary copy needs to be made anymore and `ownership changes`, since the object the reference binds to has been abandoned by the caller and now binds to a handle which is available only to the receiver. This could not have been achieved with `lvalue` references as any change to the object that binds to the `lvalue` **reference** would also be visible on the caller side.    
+
+* There is one more important aspect we need to consider: `rvalue` references are themselves `lvalues`. While this might seem confusing at first glance, it really is the mechanism that enables `move semantics`: A reference is always defined in a certain context (such as in the above example the variable val) . Even though the object it refers to (the number 42) may be disposable in the context it has been created (the main function), it is not disposable in the context of the reference . So within the scope of `myFunction`, `val` is an `lvalue` as it gives access to the memory location where the number 42 is stored.
+
+* Note however that in the above code example we cannot pass an `lvalue` to `myFunction`, because an `rvalue` reference cannot bind to an `lvalue`. The code
+
+* ```cpp
+    int i = 23;
+    myFunction(i)
+    ```
+
+* would result in a compiler error. There is a solution to this problem though: The function `std::move` converts an `lvalue` into an `rvalue` (actually, to be exact, into an `xvalue`, which we will not discuss here for the sake of clarity), which makes it possible to use the `lvalue` as an argument for the function:
+
+* ```cpp
+    int i = 23; 
+    myFunction(std::move(i));
+    ```
+
+* In doing this, we state that in the scope of `main` we will not use `i` anymore, which now exists only in the scope of `myFunction`. Using `std::move` in this way is one of the components of `move semantics`, which we will look into shortly. But first let us consider an example of the `Rule of Three`.
 
 ​    
 ​    * Let us consider the example to the right of a class which manages a block of dynamic memory and incrementally add new functionality to it. You will add the main function shown above later on in this notebook.
@@ -4701,78 +4700,78 @@ delete: Memory is freed again
 ​                std::cout << "CREATING instance of MyMovableClass at " << this << " allocated with size = " << _size*sizeof(int)  << " bytes" << std::endl;
 ​            }
 ​    
-            ~MyMovableClass() // 1 : destructor
-            {
-                std::cout << "DELETING instance of MyMovableClass at " << this << std::endl;
-                delete[] _data;
-            }
-        };
-        ```
-    
-    * In this class, a block of heap memory is allocated in the constructor and deallocated in the destructor. As we have discussed before, when either destructor, copy constructor or copy assignment operator are defined, it is good practice to also define the other two (known as the `Rule of Three`). While the compiler would generate default versions of the missing components, these would not properly reflect the memory management strategy of our class, so leaving out the manual
-    
-    * So let us start with the copy constructor of `MyMovableClass`, which could look like the following:
-    
-    * ```cpp
-        MyMovableClass(const MyMovableClass &source) // 2 : copy constructor
+        ~MyMovableClass() // 1 : destructor
         {
-            _size = source._size;
-            _data = new int[_size];
-            *_data = *source._data;
-            std::cout << "COPYING content of instance " << &source << " to instance " << this << std::endl;
-        }
-        ```
-    
-    * Similar to an example in the section on copy semantics, the copy constructor takes an lvalue reference to the source instance, allocates a block of memory of the same size as in the source and then copies the data into its members (as a deep copy).
-    
-    * Next, let us take a look at the copy assignment operator:
-    
-    * ```cpp
-        MyMovableClass &operator=(const MyMovableClass &source) // 3 : copy assignment operator
-        {
-            std::cout << "ASSIGNING content of instance " << &source << " to instance " << this << std::endl;
-            if (this == &source)
-                return *this;
+            std::cout << "DELETING instance of MyMovableClass at " << this << std::endl;
             delete[] _data;
-            _data = new int[source._size];
-            *_data = *source._data;
-            _size = source._size;
+        }
+    };
+    ```
+
+* In this class, a block of heap memory is allocated in the constructor and deallocated in the destructor. As we have discussed before, when either destructor, copy constructor or copy assignment operator are defined, it is good practice to also define the other two (known as the `Rule of Three`). While the compiler would generate default versions of the missing components, these would not properly reflect the memory management strategy of our class, so leaving out the manual
+
+* So let us start with the copy constructor of `MyMovableClass`, which could look like the following:
+
+* ```cpp
+    MyMovableClass(const MyMovableClass &source) // 2 : copy constructor
+    {
+        _size = source._size;
+        _data = new int[_size];
+        *_data = *source._data;
+        std::cout << "COPYING content of instance " << &source << " to instance " << this << std::endl;
+    }
+    ```
+
+* Similar to an example in the section on copy semantics, the copy constructor takes an lvalue reference to the source instance, allocates a block of memory of the same size as in the source and then copies the data into its members (as a deep copy).
+
+* Next, let us take a look at the copy assignment operator:
+
+* ```cpp
+    MyMovableClass &operator=(const MyMovableClass &source) // 3 : copy assignment operator
+    {
+        std::cout << "ASSIGNING content of instance " << &source << " to instance " << this << std::endl;
+        if (this == &source)
             return *this;
-        }
-        ```
-    
-    * The `if-statement` at the top of the above implementation protects against self-assignment and is standard boilerplate code for the user-defined assignment operator. The remainder of the code is more or less identical to the copy constructor, apart from returning a reference to the own instance using this.
-    
-    * You might have noticed that both copy constructor and assignment operator take a `const` reference to the source object as an argument, by which they promise that they won’ (and can’t) modify the content of source.
-    
-    * We can now use our class to copy objects as shown in the following implementation of main:
-    
-    * ```cpp
-        int main()
-        {
-            MyMovableClass obj1(10); // regular constructor
-            MyMovableClass obj2(obj1); // copy constructor
-            obj2 = obj1; // copy assignment operator
-    
-            return 0;
-        }
-        ```
-    
-    * In the main above, the object `obj1` is created using the regular constructor of `MyMovableClass`. Then, both the copy constructor as well as the assignment operator are used with the latter one not creating a new object but instead assigning the content of `obj1` to `obj2` as defined by our copying policy.
-    
-    * The output of this textbook implementation of the Rule of Three looks like this:
-    
-    * ```bash
-        CREATING instance of MyMovableClass at 0x7ffeefbff618 allocated with size = 40 bytes
-    
-        COPYING content of instance 0x7ffeefbff618 to instance 0x7ffeefbff608
-    
-        ASSIGNING content of instance 0x7ffeefbff618 to instance 0x7ffeefbff608
-    
-        DELETING instance of MyMovableClass at 0x7ffeefbff608
-    
-        DELETING instance of MyMovableClass at 0x7ffeefbff618
-        ```
+        delete[] _data;
+        _data = new int[source._size];
+        *_data = *source._data;
+        _size = source._size;
+        return *this;
+    }
+    ```
+
+* The `if-statement` at the top of the above implementation protects against self-assignment and is standard boilerplate code for the user-defined assignment operator. The remainder of the code is more or less identical to the copy constructor, apart from returning a reference to the own instance using this.
+
+* You might have noticed that both copy constructor and assignment operator take a `const` reference to the source object as an argument, by which they promise that they won’ (and can’t) modify the content of source.
+
+* We can now use our class to copy objects as shown in the following implementation of main:
+
+* ```cpp
+    int main()
+    {
+        MyMovableClass obj1(10); // regular constructor
+        MyMovableClass obj2(obj1); // copy constructor
+        obj2 = obj1; // copy assignment operator
+
+        return 0;
+    }
+    ```
+
+* In the main above, the object `obj1` is created using the regular constructor of `MyMovableClass`. Then, both the copy constructor as well as the assignment operator are used with the latter one not creating a new object but instead assigning the content of `obj1` to `obj2` as defined by our copying policy.
+
+* The output of this textbook implementation of the Rule of Three looks like this:
+
+* ```bash
+    CREATING instance of MyMovableClass at 0x7ffeefbff618 allocated with size = 40 bytes
+
+    COPYING content of instance 0x7ffeefbff618 to instance 0x7ffeefbff608
+
+    ASSIGNING content of instance 0x7ffeefbff618 to instance 0x7ffeefbff608
+
+    DELETING instance of MyMovableClass at 0x7ffeefbff608
+
+    DELETING instance of MyMovableClass at 0x7ffeefbff618
+    ```
     
     * Limitations of Our Current Class Design
     
