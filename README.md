@@ -4679,33 +4679,33 @@ delete: Memory is freed again
 
 * In doing this, we state that in the scope of `main` we will not use `i` anymore, which now exists only in the scope of `myFunction`. Using `std::move` in this way is one of the components of `move semantics`, which we will look into shortly. But first let us consider an example of the `Rule of Three`.
 
-    * Let us consider the example to the right of a class which manages a block of dynamic memory and incrementally add new functionality to it. You will add the main function shown above later on in this notebook.
+* Let us consider the example to the right of a class which manages a block of dynamic memory and incrementally add new functionality to it. You will add the main function shown above later on in this notebook.
 ​    
-​    * ```cpp
-​        #include <stdlib.h>
-​        #include <iostream>
+* ```cpp
+#include <stdlib.h>
+#include <iostream>
 ​    
-​        class MyMovableClass
-​        {
-​        private:
-​            int _size;
-​            int *_data;
+class MyMovableClass
+{
+private:
+    int _size;
+    int *_data;
+
+public:
+​    MyMovableClass(size_t size) // constructor
+​    {
+​       _size = size;
+​       _data = new int[_size];
+​       std::cout << "CREATING instance of MyMovableClass at " << this << " allocated with size = " << _size*sizeof(int)  << " bytes" << std::endl;
+​    }
 ​    
-​        public:
-​            MyMovableClass(size_t size) // constructor
-​            {
-​                _size = size;
-​                _data = new int[_size];
-​                std::cout << "CREATING instance of MyMovableClass at " << this << " allocated with size = " << _size*sizeof(int)  << " bytes" << std::endl;
-​            }
-​    
-        ~MyMovableClass() // 1 : destructor
-        {
-            std::cout << "DELETING instance of MyMovableClass at " << this << std::endl;
-            delete[] _data;
-        }
-    };
-    ```
+    ~MyMovableClass() // 1 : destructor
+    {
+        std::cout << "DELETING instance of MyMovableClass at " << this << std::endl;
+        delete[] _data;
+    }
+};
+```
 
 * In this class, a block of heap memory is allocated in the constructor and deallocated in the destructor. As we have discussed before, when either destructor, copy constructor or copy assignment operator are defined, it is good practice to also define the other two (known as the `Rule of Three`). While the compiler would generate default versions of the missing components, these would not properly reflect the memory management strategy of our class, so leaving out the manual
 
