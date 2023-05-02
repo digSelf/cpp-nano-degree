@@ -4679,8 +4679,7 @@ delete: Memory is freed again
 
 * In doing this, we state that in the scope of `main` we will not use `i` anymore, which now exists only in the scope of `myFunction`. Using `std::move` in this way is one of the components of `move semantics`, which we will look into shortly. But first let us consider an example of the `Rule of Three`.
 
-​    
-​    * Let us consider the example to the right of a class which manages a block of dynamic memory and incrementally add new functionality to it. You will add the main function shown above later on in this notebook.
+    * Let us consider the example to the right of a class which manages a block of dynamic memory and incrementally add new functionality to it. You will add the main function shown above later on in this notebook.
 ​    
 ​    * ```cpp
 ​        #include <stdlib.h>
