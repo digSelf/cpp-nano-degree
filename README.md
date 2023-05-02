@@ -4681,7 +4681,7 @@ delete: Memory is freed again
 
 * Let us consider the example to the right of a class which manages a block of dynamic memory and incrementally add new functionality to it. You will add the main function shown above later on in this notebook.
 ​    
-* ```cpp
+```cpp
 #include <stdlib.h>
 #include <iostream>
 ​    
