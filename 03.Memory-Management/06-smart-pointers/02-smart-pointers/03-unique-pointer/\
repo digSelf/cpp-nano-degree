@@ -1,0 +1,25 @@
+#include <iostream>
+#include <memory>
+#include <string>
+
+class MyClass {
+private:
+    std::string text_;
+
+public:
+    MyClass() = default;
+    MyClass(std::string text) : text_(text) {}
+
+    ~MyClass() { std::cout << text_ << " destroyed " << std::endl; }
+    
+    void set_text(std::string text) { text_ = text; }
+};
+
+int main()
+{
+    // create unique pointer to properietary calss
+    std::unique_queue<MyClass> myclass1(MyClass());
+    std::cout << "Hello world" << std::endl;
+    return 0;
+}
+
