@@ -5280,337 +5280,337 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
         }
         ```
 
-* RAII and smart pointers
+### RAII and smart pointers
 
-    * In the last section, we have discussed the powerful RAII idiom, which reduces the risk of improperly managed resources. Applied to the concept of memory management, `RAII` enables us to encapsulate `new` and `delete` calls within a class and thus present the programmer with a clean interface to the resource he intends to use. Since C++11, there exists a language feature called smart pointers, which builds on the concept of `RAII` and - without exaggeration - revolutionizes the way we use resources on the heap. Let’s take a look.
+* In the last section, we have discussed the powerful RAII idiom, which reduces the risk of improperly managed resources. Applied to the concept of memory management, `RAII` enables us to encapsulate `new` and `delete` calls within a class and thus present the programmer with a clean interface to the resource he intends to use. Since C++11, there exists a language feature called smart pointers, which builds on the concept of `RAII` and - without exaggeration - revolutionizes the way we use resources on the heap. Let’s take a look.
 
-* Smart pointer overview
+### Smart pointer overview
 
-    * Since C++11, the standard library includes smart pointers, which help to ensure that programs are free of memory leaks while also remaining exception-safe. With smart pointers, resource acquisition occurs at the same time that the object is initialized (when instantiated with `make_shared` or `make_unique`), so that all resources for the object are created and initialized in a single line of code.
+* Since C++11, the standard library includes smart pointers, which help to ensure that programs are free of memory leaks while also remaining exception-safe. With smart pointers, resource acquisition occurs at the same time that the object is initialized (when instantiated with `make_shared` or `make_unique`), so that all resources for the object are created and initialized in a single line of code.
 
-    * In modern C++, `raw pointers` managed with `new` and `delete` should only be used in small blocks of code with limited scope, where performance is critical (such as with `placement new`) and ownership rights of the memory resource are clear. We will look at some guidelines on where to use which pointer later.
+* In modern C++, `raw pointers` managed with `new` and `delete` should only be used in small blocks of code with limited scope, where performance is critical (such as with `placement new`) and ownership rights of the memory resource are clear. We will look at some guidelines on where to use which pointer later.
 
-    * C++11 has introduced three types of `smart pointers`, which are defined in the header of the standard library:
+* C++11 has introduced three types of `smart pointers`, which are defined in the header of the standard library:
 
-        * The unique pointer `std::unique_ptr` is a smart pointer which exclusively owns a dynamically allocated resource on the heap. **There must not be a second unique pointer to the same resource**.
+    * The unique pointer `std::unique_ptr` is a smart pointer which exclusively owns a dynamically allocated resource on the heap. **There must not be a second unique pointer to the same resource**.
 
-        * The shared pointer `std::shared_ptr` points to a heap resource but does not explicitly own it. There may even be several shared pointers to the same resource, each of which will increase an internal reference count. As soon as this count reaches zero, the resource will automatically be deallocated.
+    * The shared pointer `std::shared_ptr` points to a heap resource but does not explicitly own it. There may even be several shared pointers to the same resource, each of which will increase an internal reference count. As soon as this count reaches zero, the resource will automatically be deallocated.
 
-        * The weak pointer `std::weak_ptr` behaves similar to the shared pointer but does not increase the reference counter.
+    * The weak pointer `std::weak_ptr` behaves similar to the shared pointer but does not increase the reference counter.
 
-    * Prior to C++11, there was a concept called `std::auto_ptr`, which tried to realize a similar idea. **However, this concept can now be safely considered as deprecated and should not be used anymore.**
+* Prior to C++11, there was a concept called `std::auto_ptr`, which tried to realize a similar idea. **However, this concept can now be safely considered as deprecated and should not be used anymore.**
 
-    * Let us now look at each of the three smart pointer types in detail.
+* Let us now look at each of the three smart pointer types in detail.
 
-* The Unique pointer
+### The Unique pointer
 
-    * A unique pointer is the exclusive owner of the memory resource it represents. There must not be a second unique pointer to the same memory resource, otherwise there will be a compiler error. As soon as the unique pointer goes out of scope, the memory resource is deallocated again. Unique pointers are useful when working with a temporary heap resource that is no longer needed once it goes out of scope.
+* A unique pointer is the exclusive owner of the memory resource it represents. There must not be a second unique pointer to the same memory resource, otherwise there will be a compiler error. As soon as the unique pointer goes out of scope, the memory resource is deallocated again. Unique pointers are useful when working with a temporary heap resource that is no longer needed once it goes out of scope.
 
-    * The following diagram illustrates the basic idea of a unique pointer:
+* The following diagram illustrates the basic idea of a unique pointer:
 
-    * ![unique_pointer](./images/unique_pointer.png)
+* ![unique_pointer](./images/unique_pointer.png)
 
-    * In the example, a resource in memory is referenced by a unique pointer instance `sourcePtr`. Then, the resource is reassigned to another unique pointer instance `destPtr` using `std::move`. The resource is now owned by `destPtr` while `sourcePtr` can still be used but does not manage a resource anymore.
+* In the example, a resource in memory is referenced by a unique pointer instance `sourcePtr`. Then, the resource is reassigned to another unique pointer instance `destPtr` using `std::move`. The resource is now owned by `destPtr` while `sourcePtr` can still be used but does not manage a resource anymore.
 
-    * A unique pointer is constructed using the following syntax:
+* A unique pointer is constructed using the following syntax:
 
-        * `std::unique_ptr<Type> p(new Type);`
+    * `std::unique_ptr<Type> p(new Type);`
+
+* ```cpp
+    #include <memory>
     
-    * ```cpp
-        #include <memory>
-        
-        void RawPointer()
-        {
-            int *raw = new int; // create a raw pointer on the heap
-            *raw = 1; // assign a value
-            delete raw; // delete the resource again
-        }
-        
-        void UniquePointer()
-        {
-            std::unique_ptr<int> unique(new int); // create a unique pointer on the stack
-            *unique = 2; // assign a value
-            // delete is not neccessary
-        }
-        ```
-
-    * In the example on the right we will see how a unique pointer is constructed and how it compares to a raw pointer.
-
-    * The function `RawPointer` contains the familiar steps of (1) allocating memory on the heap with new and storing the address in a pointer variable, (2) assigning a value to the memory block using the `dereferencing operator *` and (3) finally deleting the resource on the heap. As we already know, forgetting to call delete will result in a memory leak.
-
-    * The function `UniquePointer` shows how to achieve the same goal using a smart pointer from the standard library. As can be seen, a smart pointer is a class template that is declared on the stack and then initialized by a raw pointer (returned by new ) to a heap-allocated object. The smart pointer is now responsible for deleting the memory that the raw pointer specifies - which happens as soon as the smart pointer goes out of scope. **Note that smart pointers always need to be declared on the stack, otherwise the scoping mechanism would not work.**
-
-    * **The smart pointer destructor contains the call to delete, and because the smart pointer is declared on the stack, its destructor is invoked when the smart pointer goes out of scope, even if an exception is thrown.**
-
-    * In the example now on the right, we will construct a `unique pointer` to a custom class. Also, we will see how the standard `->` and `*` operators can be used to access member functions of the managed object, just as we would with a raw pointer:
-
-    * ```cpp
-        #include <iostream>
-        #include <memory>
-        #include <string>
-        
-        class MyClass
-        {
-        private:
-            std::string _text;
-        
-        public:
-            MyClass() {}
-            MyClass(std::string text) { _text = text; }
-            ~MyClass() { std::cout << _text << " destroyed" << std::endl; }
-            void setText(std::string text) { _text = text; }
-        };
-        
-        int main()
-        {
-            // create unique pointer to proprietary class
-            std::unique_ptr<MyClass> myClass1(new MyClass());
-            std::unique_ptr<MyClass> myClass2(new MyClass("String 2"));
-        
-            // call member function using ->
-            myClass1->setText("String 1");
-        
-            // use the dereference operator * 
-            *myClass1 = *myClass2;
-        
-            // use the .get() function to retrieve a raw pointer to the object
-            std::cout << "Objects have stack addresses " << myClass1.get() << " and " << myClass2.get() << std::endl;
-        
-            return 0;
-        }
-        ```
-
-    * Note that the custom class `MyClass` has two constructors, one without arguments and one with a `string` to be passed, which initializes a member variable `_text` that lives on the stack. Also, once an object of this class gets destroyed, a message to the console is printed, along with the value of `_text`. In main, two unique pointers are created with the address of a `MyClass` object on the heap as arguments. With `myClass2`, we can see that constructor arguments can be passed just as we would with raw pointers. After both pointers have been created, we can use the `->` operator to access members of the class, such as calling the function `setText`. From looking at the function call alone you would not be able to tell that `myClass1` is in fact a smart pointer. Also, we can use the dereference operator `*` to access the value of `myClass1` and `myClass2` and assign the one to the other. Finally, the `.` operator gives us access to proprietary functions of the smart pointer, such as retrieving the internal raw pointer with `get()`.
-
-    * The console output of the program looks like the following:
-
-    * ```bash
-        Objects have stack addresses 0x1004000e0 and 0x100400100
-        String 2 destroyed
-        String 2 destroyed
-        ```
+    void RawPointer()
+    {
+        int *raw = new int; // create a raw pointer on the heap
+        *raw = 1; // assign a value
+        delete raw; // delete the resource again
+    }
     
-    * Obviously, both pointers have different addresses on the stack, even after copying the contents from `myClass2` to `myClass1`. As can be seen from the last two lines of the output, the destructor of both objects gets called automatically at the end of the program and - as expected - the value of the internal string is identical due to the copy operation.
+    void UniquePointer()
+    {
+        std::unique_ptr<int> unique(new int); // create a unique pointer on the stack
+        *unique = 2; // assign a value
+        // delete is not neccessary
+    }
+    ```
 
-    * Summing up, the unique pointer allows a single owner of the underlying internal raw pointer. Unique pointers should be the default choice unless you know for certain that sharing is required at a later stage. We have already seen how to transfer ownership of a resource using the `Rule of Five` and move semantics. Internally, the unique pointer uses this very concept along with `RAII` to encapsulate a resource (the raw pointer) and transfer it between pointer objects when either the move assignment operator or the move constructor are called. Also, a key feature of a `unique pointer`, which makes it so well-suited as a return type for many functions, is the possibility to convert it to a `shared pointer`. We will have a deeper look into this in the section on ownership transfer.
+* In the example on the right we will see how a unique pointer is constructed and how it compares to a raw pointer.
 
-* The Shared Pointer
+* The function `RawPointer` contains the familiar steps of (1) allocating memory on the heap with new and storing the address in a pointer variable, (2) assigning a value to the memory block using the `dereferencing operator *` and (3) finally deleting the resource on the heap. As we already know, forgetting to call delete will result in a memory leak.
 
-    * Just as the `unique pointer`, a `shared pointer` owns the resource it points to. The main difference between the two smart pointers is that shared pointers keep a reference counter on how many of them point to the same memory resource. Each time a `shared pointer` goes out of scope, the counter is decreased. When it reaches zero (i.e. when the last shared pointer to the resource is about to vanish). the memory is properly deallocated. This `smart pointer` type is useful for cases where you require access to a memory location on the heap in multiple parts of your program and you want to make sure that whoever owns a `shared pointer` to the memory can rely on the fact that it will be accessible throughout the lifetime of that pointer.
+* The function `UniquePointer` shows how to achieve the same goal using a smart pointer from the standard library. As can be seen, a smart pointer is a class template that is declared on the stack and then initialized by a raw pointer (returned by new ) to a heap-allocated object. The smart pointer is now responsible for deleting the memory that the raw pointer specifies - which happens as soon as the smart pointer goes out of scope. **Note that smart pointers always need to be declared on the stack, otherwise the scoping mechanism would not work.**
 
-    * The following diagram illustrates the basic idea of a shared pointer:
+* **The smart pointer destructor contains the call to delete, and because the smart pointer is declared on the stack, its destructor is invoked when the smart pointer goes out of scope, even if an exception is thrown.**
 
-    * ![shared_pointer](./images/shared_pointer.png)
+* In the example now on the right, we will construct a `unique pointer` to a custom class. Also, we will see how the standard `->` and `*` operators can be used to access member functions of the managed object, just as we would with a raw pointer:
 
-    * Please take a look at the code on the right.
+* ```cpp
+    #include <iostream>
+    #include <memory>
+    #include <string>
+    
+    class MyClass
+    {
+    private:
+        std::string _text;
+    
+    public:
+        MyClass() {}
+        MyClass(std::string text) { _text = text; }
+        ~MyClass() { std::cout << _text << " destroyed" << std::endl; }
+        void setText(std::string text) { _text = text; }
+    };
+    
+    int main()
+    {
+        // create unique pointer to proprietary class
+        std::unique_ptr<MyClass> myClass1(new MyClass());
+        std::unique_ptr<MyClass> myClass2(new MyClass("String 2"));
+    
+        // call member function using ->
+        myClass1->setText("String 1");
+    
+        // use the dereference operator * 
+        *myClass1 = *myClass2;
+    
+        // use the .get() function to retrieve a raw pointer to the object
+        std::cout << "Objects have stack addresses " << myClass1.get() << " and " << myClass2.get() << std::endl;
+    
+        return 0;
+    }
+    ```
 
-    * ```cpp
-        #include <iostream>
-        #include <memory>
-        
-        int main()
+* Note that the custom class `MyClass` has two constructors, one without arguments and one with a `string` to be passed, which initializes a member variable `_text` that lives on the stack. Also, once an object of this class gets destroyed, a message to the console is printed, along with the value of `_text`. In main, two unique pointers are created with the address of a `MyClass` object on the heap as arguments. With `myClass2`, we can see that constructor arguments can be passed just as we would with raw pointers. After both pointers have been created, we can use the `->` operator to access members of the class, such as calling the function `setText`. From looking at the function call alone you would not be able to tell that `myClass1` is in fact a smart pointer. Also, we can use the dereference operator `*` to access the value of `myClass1` and `myClass2` and assign the one to the other. Finally, the `.` operator gives us access to proprietary functions of the smart pointer, such as retrieving the internal raw pointer with `get()`.
+
+* The console output of the program looks like the following:
+
+* ```bash
+    Objects have stack addresses 0x1004000e0 and 0x100400100
+    String 2 destroyed
+    String 2 destroyed
+    ```
+
+* Obviously, both pointers have different addresses on the stack, even after copying the contents from `myClass2` to `myClass1`. As can be seen from the last two lines of the output, the destructor of both objects gets called automatically at the end of the program and - as expected - the value of the internal string is identical due to the copy operation.
+
+* Summing up, the unique pointer allows a single owner of the underlying internal raw pointer. Unique pointers should be the default choice unless you know for certain that sharing is required at a later stage. We have already seen how to transfer ownership of a resource using the `Rule of Five` and move semantics. Internally, the unique pointer uses this very concept along with `RAII` to encapsulate a resource (the raw pointer) and transfer it between pointer objects when either the move assignment operator or the move constructor are called. Also, a key feature of a `unique pointer`, which makes it so well-suited as a return type for many functions, is the possibility to convert it to a `shared pointer`. We will have a deeper look into this in the section on ownership transfer.
+
+### The Shared Pointer
+
+* Just as the `unique pointer`, a `shared pointer` owns the resource it points to. The main difference between the two smart pointers is that shared pointers keep a reference counter on how many of them point to the same memory resource. Each time a `shared pointer` goes out of scope, the counter is decreased. When it reaches zero (i.e. when the last shared pointer to the resource is about to vanish). the memory is properly deallocated. This `smart pointer` type is useful for cases where you require access to a memory location on the heap in multiple parts of your program and you want to make sure that whoever owns a `shared pointer` to the memory can rely on the fact that it will be accessible throughout the lifetime of that pointer.
+
+* The following diagram illustrates the basic idea of a shared pointer:
+
+* ![shared_pointer](./images/shared_pointer.png)
+
+* Please take a look at the code on the right.
+
+* ```cpp
+    #include <iostream>
+    #include <memory>
+    
+    int main()
+    {
+        std::shared_ptr<int> shared1(new int);
+        std::cout << "shared pointer count = " << shared1.use_count() << std::endl;
+    
         {
-            std::shared_ptr<int> shared1(new int);
+            std::shared_ptr<int> shared2 = shared1;
             std::cout << "shared pointer count = " << shared1.use_count() << std::endl;
-        
-            {
-                std::shared_ptr<int> shared2 = shared1;
-                std::cout << "shared pointer count = " << shared1.use_count() << std::endl;
-            }
-            
-            std::cout << "shared pointer count = " << shared1.use_count() << std::endl;
-        
-            return 0;
         }
-        ```
+        
+        std::cout << "shared pointer count = " << shared1.use_count() << std::endl;
     
-    * We can see that shared pointers are constructed just as `unique pointers` are. Also, we can access the internal reference count by using the method `use_count()`. In the inner block, a second shared pointer `shared2` is created and `shared1` is assigned to it. In the `copy constructor`, the internal resource pointer is copied to `shared2` and the resource counter is incremented in both `shared1` and `shared2`. Let us take a look at the output of the code:
+        return 0;
+    }
+    ```
 
-    * ```bash
-        shared pointer count = 1
-        shared pointer count = 2
-        shared pointer count = 1
-        ```
+* We can see that shared pointers are constructed just as `unique pointers` are. Also, we can access the internal reference count by using the method `use_count()`. In the inner block, a second shared pointer `shared2` is created and `shared1` is assigned to it. In the `copy constructor`, the internal resource pointer is copied to `shared2` and the resource counter is incremented in both `shared1` and `shared2`. Let us take a look at the output of the code:
+
+* ```bash
+    shared pointer count = 1
+    shared pointer count = 2
+    shared pointer count = 1
+    ```
+
+* You may have noticed that the lifetime of `shared2` is **limited to the scope denoted by the enclosing curly brackets**. Thus, once this scope is left and `shared2` is destroyed, the reference counter in `shared1` is decremented by one - which is reflected in the three console outputs given above.
+
+* A `shared pointer` can also be redirected by using the `reset()` function. If the resource which a `shared pointer` manages is no longer needed in the current scope, the pointer can be reset to manage a difference resource as illustrated in the example on the right.
+
+* ```cpp
+    #include <iostream>
+    #include <memory>
     
-    * You may have noticed that the lifetime of `shared2` is **limited to the scope denoted by the enclosing curly brackets**. Thus, once this scope is left and `shared2` is destroyed, the reference counter in `shared1` is decremented by one - which is reflected in the three console outputs given above.
+    class MyClass
+    {
+    public:
+        ~MyClass() { std::cout << "Destructor of MyClass called" << std::endl; }
+    };
+    
+    int main()
+    {
+        std::shared_ptr<MyClass> shared(new MyClass);
+        std::cout << "shared pointer count = " << shared.use_count() << std::endl;
+    
+        shared.reset(new MyClass);
+        std::cout << "shared pointer count = " << shared.use_count() << std::endl;
+    
+        return 0;
+    }
+    ```
 
-    * A `shared pointer` can also be redirected by using the `reset()` function. If the resource which a `shared pointer` manages is no longer needed in the current scope, the pointer can be reset to manage a difference resource as illustrated in the example on the right.
+* Note that in the example, the destructor of `MyClass` prints a string to the console when called. The output of the program looks like the following:
 
-    * ```cpp
-        #include <iostream>
-        #include <memory>
-        
-        class MyClass
+* ```bash
+    shared pointer count = 1
+    Destructor of MyClass called
+    shared pointer count = 1
+    Destructor of MyClass called
+    ```
+
+* After creation, the program prints `1` as the reference count of `shared`. Then, the `reset` function is called with a new instance of `MyClass` as an argument. This causes the destructor of the first `MyClass` instance to be called, hence the console output. As can be seen, the reference count of the `shared pointer` is still at `1`. Then, at the end of the program, the destructor of the second `MyClass` object is called once the path of execution leaves the scope of main.
+
+* Despite all the advantages of `shared pointers`, it is still possible to have problems with memory management though. Consider the scenario on the right.
+
+* ```cpp
+    #include <iostream>
+    #include <memory>
+    
+    class MyClass
+    {
+    public:
+        std::shared_ptr<MyClass> _member;
+        ~MyClass() { std::cout << "Destructor of MyClass called" << std::endl; }
+    };
+    
+    int main()
+    {
+        std::shared_ptr<MyClass> myClass1(new MyClass);
+        std::shared_ptr<MyClass> myClass2(new MyClass);
+    
+        return 0;
+    }
+    ```
+
+* In main, two shared pointers `myClass1` and `myClass2` which are managing objects of type `MyClass` are allocated on the stack. As can be seen from the console output, both smart pointers are automatically deallocated when the scope of main ends:
+
+* ```bash
+    Destructor of MyClass called
+    Destructor of MyClass called
+    ```
+
+* When the following two lines are added to main, the result is quite different:
+
+* ```cpp
+    myClass1->_member = myClass2;
+    myClass2->_member = myClass1;
+    ```
+
+* These two lines produce a circular reference. When `myClass1` goes out of scope at the end of main, its destructor can’t clean up memory as there is still a reference count of `1` in the `smart pointer`, which is caused by the shared pointer `_member` in `myClass2`. The same holds true for `myClass2`, which can not be properly deleted as there is still a shared pointer to it in `myClass1`. This `deadlock` situation prevents the destructors from being called and causes a memory leak. When we use `Valgrind` on this program, we get the following summary:
+
+* ```bash
+    ==20360== LEAK SUMMARY:
+    ==20360==    definitely lost: 16 bytes in 1 blocks
+    ==20360==    indirectly lost: 80 bytes in 3 blocks
+    ==20360==      possibly lost: 72 bytes in 3 blocks
+    ==20360==    still reachable: 200 bytes in 6 blocks
+    ==20360==         suppressed: 18,985 bytes in 160 blocks
+    ```
+
+* As can be seen, the memory leak is clearly visible with 16 bytes being marked as "definitely lost". To prevent such circular references, there is a third smart pointer, which we will look at in the following.
+
+### The Weak Pointer
+
+* Similar to `shared pointers`, there can be multiple weak pointers to the same resource. The main difference though is that weak pointers **do not increase the reference count**. Weak pointers hold a non-owning reference to an object that is managed by another `shared pointer`.
+
+* The following rule applies to `weak pointers`: **You can only create weak pointers out of shared pointers** or out of **another weak pointer**. The code on the right shows a few examples of how to use and how not to use weak pointers.
+
+* ```cpp
+    #include <iostream>
+    #include <memory>
+    
+    int main()
+    {
+        std::shared_ptr<int> mySharedPtr(new int);
+        std::cout << "shared pointer count = " << mySharedPtr.use_count() << std::endl;
+    
+        std::weak_ptr<int> myWeakPtr1(mySharedPtr);
+        std::weak_ptr<int> myWeakPtr2(myWeakPtr1);
+        std::cout << "shared pointer count = " << mySharedPtr.use_count() << std::endl;
+    
+        // std::weak_ptr<int> myWeakPtr3(new int); // COMPILE ERROR
+    
+        return 0;
+    }
+    ```
+
+* The output looks as follows:
+
+* ```bash
+    shared pointer count = 1
+    shared pointer count = 1
+    ```
+
+* First, a `shared pointer` to an integer is created with a reference count of `1` after creation. Then, two `weak pointers` to the integer resource are created, the first directly from the `shared pointer` and the second indirectly from the first weak pointer. As can be seen from the output, neither of both weak pointers increased the reference count. At the end of `main`, the attempt to directly create a weak pointer to an integer resource would lead to a compile error.
+
+* As we have seen with `raw pointers`, you can never be sure wether the memory resource to which the pointer refers is still valid. With a `weak pointer`, even though this type does not prevent an object from being deleted, the validity of its resource can be checked. The code on the right illustrates how to use the `expired()` function to do this.
+
+* ```cpp
+    #include <iostream>
+    #include <memory>
+    
+    int main()
+    {
+        std::shared_ptr<int> mySharedPtr(new int);
+        std::weak_ptr<int> myWeakPtr(mySharedPtr);
+    
+        mySharedPtr.reset(new int);
+    
+        if (myWeakPtr.expired() == true)
         {
-        public:
-            ~MyClass() { std::cout << "Destructor of MyClass called" << std::endl; }
-        };
-        
-        int main()
-        {
-            std::shared_ptr<MyClass> shared(new MyClass);
-            std::cout << "shared pointer count = " << shared.use_count() << std::endl;
-        
-            shared.reset(new MyClass);
-            std::cout << "shared pointer count = " << shared.use_count() << std::endl;
-        
-            return 0;
+            std::cout << "Weak pointer expired!" << std::endl;
         }
-        ```
-
-    * Note that in the example, the destructor of `MyClass` prints a string to the console when called. The output of the program looks like the following:
-
-    * ```bash
-        shared pointer count = 1
-        Destructor of MyClass called
-        shared pointer count = 1
-        Destructor of MyClass called
-        ```
     
-    * After creation, the program prints `1` as the reference count of `shared`. Then, the `reset` function is called with a new instance of `MyClass` as an argument. This causes the destructor of the first `MyClass` instance to be called, hence the console output. As can be seen, the reference count of the `shared pointer` is still at `1`. Then, at the end of the program, the destructor of the second `MyClass` object is called once the path of execution leaves the scope of main.
+        return 0;
+    }
+    ```
 
-    * Despite all the advantages of `shared pointers`, it is still possible to have problems with memory management though. Consider the scenario on the right.
+* Thus, with `smart pointers`, there will always be a managing instance which is responsible for the proper `allocation` and `deallocation` of a resource. In some cases it might be necessary to convert from one `smart pointer` type to another. Let us take a look at the set of possible conversions in the following.
 
-    * ```cpp
-        #include <iostream>
-        #include <memory>
-        
-        class MyClass
-        {
-        public:
-            std::shared_ptr<MyClass> _member;
-            ~MyClass() { std::cout << "Destructor of MyClass called" << std::endl; }
-        };
-        
-        int main()
-        {
-            std::shared_ptr<MyClass> myClass1(new MyClass);
-            std::shared_ptr<MyClass> myClass2(new MyClass);
-        
-            return 0;
-        }
-        ```
+### Converting between smart pointers
 
-    * In main, two shared pointers `myClass1` and `myClass2` which are managing objects of type `MyClass` are allocated on the stack. As can be seen from the console output, both smart pointers are automatically deallocated when the scope of main ends:
+* The example on the right illustrates how to convert between the different pointer types.
 
-    * ```bash
-        Destructor of MyClass called
-        Destructor of MyClass called
-        ```
+* ```cpp
+    #include <iostream>
+    #include <memory>
     
-    * When the following two lines are added to main, the result is quite different:
-
-    * ```cpp
-        myClass1->_member = myClass2;
-        myClass2->_member = myClass1;
-        ```
+    int main()
+    {
+        // construct a unique pointer
+        std::unique_ptr<int> uniquePtr(new int);
+        
+        // (1) shared pointer from unique pointer
+        std::shared_ptr<int> sharedPtr1 = std::move(uniquePtr);
     
-    * These two lines produce a circular reference. When `myClass1` goes out of scope at the end of main, its destructor can’t clean up memory as there is still a reference count of `1` in the `smart pointer`, which is caused by the shared pointer `_member` in `myClass2`. The same holds true for `myClass2`, which can not be properly deleted as there is still a shared pointer to it in `myClass1`. This `deadlock` situation prevents the destructors from being called and causes a memory leak. When we use `Valgrind` on this program, we get the following summary:
-
-    * ```bash
-        ==20360== LEAK SUMMARY:
-        ==20360==    definitely lost: 16 bytes in 1 blocks
-        ==20360==    indirectly lost: 80 bytes in 3 blocks
-        ==20360==      possibly lost: 72 bytes in 3 blocks
-        ==20360==    still reachable: 200 bytes in 6 blocks
-        ==20360==         suppressed: 18,985 bytes in 160 blocks
-        ```
+        // (2) shared pointer from weak pointer
+        std::weak_ptr<int> weakPtr(sharedPtr1);
+        std::shared_ptr<int> sharedPtr2 = weakPtr.lock();
     
-    * As can be seen, the memory leak is clearly visible with 16 bytes being marked as "definitely lost". To prevent such circular references, there is a third smart pointer, which we will look at in the following.
-
-* The Weak Pointer
-
-    * Similar to `shared pointers`, there can be multiple weak pointers to the same resource. The main difference though is that weak pointers **do not increase the reference count**. Weak pointers hold a non-owning reference to an object that is managed by another `shared pointer`.
-
-    * The following rule applies to `weak pointers`: **You can only create weak pointers out of shared pointers** or out of **another weak pointer**. The code on the right shows a few examples of how to use and how not to use weak pointers.
-
-    * ```cpp
-        #include <iostream>
-        #include <memory>
-        
-        int main()
-        {
-            std::shared_ptr<int> mySharedPtr(new int);
-            std::cout << "shared pointer count = " << mySharedPtr.use_count() << std::endl;
-        
-            std::weak_ptr<int> myWeakPtr1(mySharedPtr);
-            std::weak_ptr<int> myWeakPtr2(myWeakPtr1);
-            std::cout << "shared pointer count = " << mySharedPtr.use_count() << std::endl;
-        
-            // std::weak_ptr<int> myWeakPtr3(new int); // COMPILE ERROR
-        
-            return 0;
-        }
-        ```
-
-    * The output looks as follows:
-
-    * ```bash
-        shared pointer count = 1
-        shared pointer count = 1
-        ```
+        // (3) raw pointer from shared (or unique) pointer   
+        int *rawPtr = sharedPtr2.get();
+        delete rawPtr;
     
-    * First, a `shared pointer` to an integer is created with a reference count of `1` after creation. Then, two `weak pointers` to the integer resource are created, the first directly from the `shared pointer` and the second indirectly from the first weak pointer. As can be seen from the output, neither of both weak pointers increased the reference count. At the end of `main`, the attempt to directly create a weak pointer to an integer resource would lead to a compile error.
+        return 0;
+    }
+    ```
 
-    * As we have seen with `raw pointers`, you can never be sure wether the memory resource to which the pointer refers is still valid. With a `weak pointer`, even though this type does not prevent an object from being deleted, the validity of its resource can be checked. The code on the right illustrates how to use the `expired()` function to do this.
+* In `(1)`, a conversion from `unique pointer` to `shared pointer` is performed. You can see that this can be achieved by using `std::move`, which calls the `move assignment operator` on `sharedPtr1` and steals the resource from `uniquePtr` while at the same time invalidating its resource handle on the heap-allocated integer.
 
-    * ```cpp
-        #include <iostream>
-        #include <memory>
-        
-        int main()
-        {
-            std::shared_ptr<int> mySharedPtr(new int);
-            std::weak_ptr<int> myWeakPtr(mySharedPtr);
-        
-            mySharedPtr.reset(new int);
-        
-            if (myWeakPtr.expired() == true)
-            {
-                std::cout << "Weak pointer expired!" << std::endl;
-            }
-        
-            return 0;
-        }
-        ```
-    
-    * Thus, with `smart pointers`, there will always be a managing instance which is responsible for the proper `allocation` and `deallocation` of a resource. In some cases it might be necessary to convert from one `smart pointer` type to another. Let us take a look at the set of possible conversions in the following.
+* In `(2)`, you can see how to convert from `weak` to `shared pointer`. Imagine that you have been passed a `weak pointer` to a memory object which you want to work on. To avoid invalid memory access, **you want to make sure that the object will not be deallocated** before your work on it has been finished. To do this, you can convert a `weak pointer` to a `shared pointer` by calling the `lock()` function on the `weak pointer`.
 
-* Converting between smart pointers
+* In `(3)`, a `raw pointer` is extracted from a `shared pointer`. However, this operation does not decrease the reference count within `sharedPtr2`. This means that calling `delete` on `rawPtr` in the last line before `main` returns will generate a `runtime error` as a resource is trying to be deleted which is managed by `sharedPtr2` and has already been removed. The output of the program when compiled with `g++` thus is: `malloc: *** error for object 0x1003001f0: pointer being freed was not allocated`.
 
-    * The example on the right illustrates how to convert between the different pointer types.
-
-    * ```cpp
-        #include <iostream>
-        #include <memory>
-        
-        int main()
-        {
-            // construct a unique pointer
-            std::unique_ptr<int> uniquePtr(new int);
-            
-            // (1) shared pointer from unique pointer
-            std::shared_ptr<int> sharedPtr1 = std::move(uniquePtr);
-        
-            // (2) shared pointer from weak pointer
-            std::weak_ptr<int> weakPtr(sharedPtr1);
-            std::shared_ptr<int> sharedPtr2 = weakPtr.lock();
-        
-            // (3) raw pointer from shared (or unique) pointer   
-            int *rawPtr = sharedPtr2.get();
-            delete rawPtr;
-        
-            return 0;
-        }
-        ```
-
-    * In `(1)`, a conversion from `unique pointer` to `shared pointer` is performed. You can see that this can be achieved by using `std::move`, which calls the `move assignment operator` on `sharedPtr1` and steals the resource from `uniquePtr` while at the same time invalidating its resource handle on the heap-allocated integer.
-
-    * In `(2)`, you can see how to convert from `weak` to `shared pointer`. Imagine that you have been passed a `weak pointer` to a memory object which you want to work on. To avoid invalid memory access, **you want to make sure that the object will not be deallocated** before your work on it has been finished. To do this, you can convert a `weak pointer` to a `shared pointer` by calling the `lock()` function on the `weak pointer`.
-
-    * In `(3)`, a `raw pointer` is extracted from a `shared pointer`. However, this operation does not decrease the reference count within `sharedPtr2`. This means that calling `delete` on `rawPtr` in the last line before `main` returns will generate a `runtime error` as a resource is trying to be deleted which is managed by `sharedPtr2` and has already been removed. The output of the program when compiled with `g++` thus is: `malloc: *** error for object 0x1003001f0: pointer being freed was not allocated`.
-
-    * Note that there are no options for converting away from a shared pointer. Once you have created a shared pointer, you must stick to it (or a copy of it) for the remainder of your program.
+* Note that there are no options for converting away from a shared pointer. Once you have created a shared pointer, you must stick to it (or a copy of it) for the remainder of your program.
 
 * When to use `raw pointers` and `smart pointers`?
 
@@ -5660,224 +5660,224 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
 
     * The remaining set of guideline rules referring to `smart pointers` are mostly concerning the question of how to pass a `smart pointer` to a function. We will discuss this question in the next concept.
 
-* Transferring Ownership
+### Transferring Ownership
 
-    * In the previous section, we have taken a look at the three smart pointer types in C++. In addition to `smart pointers`, you are now also familiar with `move semantics`, which is of particular importance in this section. In the following, we will discuss how to properly pass and return `smart pointers` to functions and vice-versa. In modern C++, there are various ways of doing this and in many cases, the method of choice has an impact on both performance and code robustness. The basis of this section are the C++ core guidelines on `smart pointers`, some of which we will be examining in the following.
+* In the previous section, we have taken a look at the three smart pointer types in C++. In addition to `smart pointers`, you are now also familiar with `move semantics`, which is of particular importance in this section. In the following, we will discuss how to properly pass and return `smart pointers` to functions and vice-versa. In modern C++, there are various ways of doing this and in many cases, the method of choice has an impact on both performance and code robustness. The basis of this section are the C++ core guidelines on `smart pointers`, some of which we will be examining in the following.
 
-    * Passing `smart pointers` to functions
+* Passing `smart pointers` to functions
 
-        * Let us consider the following recommendation of the C++ guidelines on smart pointers:
+    * Let us consider the following recommendation of the C++ guidelines on smart pointers:
 
-        * R. 30 : Take `smart pointers` as parameters only to explicitly express lifetime semantics
+    * R. 30 : Take `smart pointers` as parameters only to explicitly express lifetime semantics
 
-        * The core idea behind this rule is the notion that functions that only manipulate objects without affecting its lifetime in any way should not be concerned with a particular kind of `smart pointer`. A function that does not manipulate the lifetime or ownership should use `raw pointers` or `references` instead. A function should take `smart pointers` as parameter only if it examines or manipulates the `smart pointer` itself. As we have seen, `smart pointers` are classes that provide several features such as counting the references of a `shared_ptr` or increasing them by making a copy. Also, data can be moved from one `unique_ptr` to another and thus transferring the ownership. **A particular function should accept smart pointers only if it expects to do something of this sort.** If a function just needs to operate on the underlying object without the need of using any `smart pointer property`, **it should accept the objects via raw pointers or references instead.**
+    * The core idea behind this rule is the notion that functions that only manipulate objects without affecting its lifetime in any way should not be concerned with a particular kind of `smart pointer`. A function that does not manipulate the lifetime or ownership should use `raw pointers` or `references` instead. A function should take `smart pointers` as parameter only if it examines or manipulates the `smart pointer` itself. As we have seen, `smart pointers` are classes that provide several features such as counting the references of a `shared_ptr` or increasing them by making a copy. Also, data can be moved from one `unique_ptr` to another and thus transferring the ownership. **A particular function should accept smart pointers only if it expects to do something of this sort.** If a function just needs to operate on the underlying object without the need of using any `smart pointer property`, **it should accept the objects via raw pointers or references instead.**
 
-        * The following examples are pass-by-value types that lend the ownership of the underlying object:
+    * The following examples are pass-by-value types that lend the ownership of the underlying object:
 
-            * `void f(std::unique_ptr<MyObject> ptr)`
-            * `void f(std::shared_ptr<MyObject> ptr)`
-            * `void f(std::weak_ptr<MyObject> ptr)`
+        * `void f(std::unique_ptr<MyObject> ptr)`
+        * `void f(std::shared_ptr<MyObject> ptr)`
+        * `void f(std::weak_ptr<MyObject> ptr)`
 
-        * Passing `smart pointers` by value means to lend their ownership to a particular function `f`. In the above examples 1-3, all pointers are **passed by value**, i.e. the function `f` has a private copy of it which it can (and should) modify. Depending on the type of `smart pointer`, a tailored strategy needs to be used. Before going into details, let us take a look at the underlying rule from the C++ guidelines (where "widget" can be understood as "class").
+    * Passing `smart pointers` by value means to lend their ownership to a particular function `f`. In the above examples 1-3, all pointers are **passed by value**, i.e. the function `f` has a private copy of it which it can (and should) modify. Depending on the type of `smart pointer`, a tailored strategy needs to be used. Before going into details, let us take a look at the underlying rule from the C++ guidelines (where "widget" can be understood as "class").
 
-        * R.32: Take a `unique_ptr` parameter to express that a function assumes ownership of a widget
+    * R.32: Take a `unique_ptr` parameter to express that a function assumes ownership of a widget
+
+* The basic idea of a `unique_ptr` is that there exists only a single instance of it. This is why it can’t be copied to a local function but needs to be moved instead with the function `std::move`. The code example on the right illustrates the principle of transferring the object managed by the unique pointer `uniquePtr` into a function `f`.
+
+* ```cpp
+    #include <iostream>
+    #include <memory>
     
-    * The basic idea of a `unique_ptr` is that there exists only a single instance of it. This is why it can’t be copied to a local function but needs to be moved instead with the function `std::move`. The code example on the right illustrates the principle of transferring the object managed by the unique pointer `uniquePtr` into a function `f`.
-
-    * ```cpp
-        #include <iostream>
-        #include <memory>
-        
-        class MyClass
-        {
-        private:
-            int _member;
-        
-        public:
-            MyClass(int val) : _member{val} {}
-            void printVal() { std::cout << ", managed object " << this << " with val = " << _member << std::endl; }
-        };
-        
-        void f(std::unique_ptr<MyClass> ptr)
-        {
-            std::cout << "unique_ptr " << &ptr;
-            ptr->printVal();
-        }
-        
-        int main()
-        {
-            std::unique_ptr<MyClass> uniquePtr = std::make_unique<MyClass>(23);
-            std::cout << "unique_ptr " << &uniquePtr;
+    class MyClass
+    {
+    private:
+        int _member;
+    
+    public:
+        MyClass(int val) : _member{val} {}
+        void printVal() { std::cout << ", managed object " << this << " with val = " << _member << std::endl; }
+    };
+    
+    void f(std::unique_ptr<MyClass> ptr)
+    {
+        std::cout << "unique_ptr " << &ptr;
+        ptr->printVal();
+    }
+    
+    int main()
+    {
+        std::unique_ptr<MyClass> uniquePtr = std::make_unique<MyClass>(23);
+        std::cout << "unique_ptr " << &uniquePtr;
+        uniquePtr->printVal();
+    
+        f(std::move(uniquePtr));
+    
+        if (uniquePtr)
             uniquePtr->printVal();
-        
-            f(std::move(uniquePtr));
-        
-            if (uniquePtr)
-                uniquePtr->printVal();
-        
-            return 0;
-        }
-        ```
-
-    * The class `MyClass` has a private object `_member` and a public function `printVal()` which prints the address of the managed object `(this)` as well as the member value to the console. In main, an instance of `MyClass` is created by the factory function `make_unique()` and assigned to a `unique pointer` instance `uniquePtr` for management. Then, the pointer instance is moved into the function `f` using `move semantics`. As we have not overloaded the `move constructor` or `move assignment` operator in `MyClass`, the compiler is using the default implementation. In `f`, the address of the copied / moved unique pointer `ptr` is printed and the function `printVal()` is called on it. When the path of execution returns to `main()`, the program checks for the validity of `uniquePtr` and, if valid, calls the function `printVal()` on it again. Here is the console output of the program:
-
-    * ```bash
-        unique_ptr 0x7ffeefbff710, managed object 0x100300060 with val = 23
-        unique_ptr 0x7ffeefbff6f0, managed object 0x100300060 with val = 23
-        ```
     
-    * The output nicely illustrates the `copy / move operation`. Note that the address of `unique_ptr` differs between the two calls while the address of the managed object as well as of the value are identical. This is consistent with the inner workings of the `move constructor`, which we overloaded in a previous section. The `copy-by-value` behavior of `f()` creates a new instance of the `unique pointer` but then switches the address of the managed `MyClass` instance from `source` to `destination`. After the move is complete, we can still use the variable `uniquePtr` in `main` but it now is only an empty shell which does not contain an object to manage.
+        return 0;
+    }
+    ```
 
-    * When passing a `shared pointer` by value, `move semantics` are not needed. As with `unique pointers`, there is an underlying rule for transferring the ownership of a `shared pointer` to a function:
+* The class `MyClass` has a private object `_member` and a public function `printVal()` which prints the address of the managed object `(this)` as well as the member value to the console. In main, an instance of `MyClass` is created by the factory function `make_unique()` and assigned to a `unique pointer` instance `uniquePtr` for management. Then, the pointer instance is moved into the function `f` using `move semantics`. As we have not overloaded the `move constructor` or `move assignment` operator in `MyClass`, the compiler is using the default implementation. In `f`, the address of the copied / moved unique pointer `ptr` is printed and the function `printVal()` is called on it. When the path of execution returns to `main()`, the program checks for the validity of `uniquePtr` and, if valid, calls the function `printVal()` on it again. Here is the console output of the program:
 
-    * R.34: Take a `shared_ptr` parameter to express that a function is part owner
+* ```bash
+    unique_ptr 0x7ffeefbff710, managed object 0x100300060 with val = 23
+    unique_ptr 0x7ffeefbff6f0, managed object 0x100300060 with val = 23
+    ```
+
+* The output nicely illustrates the `copy / move operation`. Note that the address of `unique_ptr` differs between the two calls while the address of the managed object as well as of the value are identical. This is consistent with the inner workings of the `move constructor`, which we overloaded in a previous section. The `copy-by-value` behavior of `f()` creates a new instance of the `unique pointer` but then switches the address of the managed `MyClass` instance from `source` to `destination`. After the move is complete, we can still use the variable `uniquePtr` in `main` but it now is only an empty shell which does not contain an object to manage.
+
+* When passing a `shared pointer` by value, `move semantics` are not needed. As with `unique pointers`, there is an underlying rule for transferring the ownership of a `shared pointer` to a function:
+
+* R.34: Take a `shared_ptr` parameter to express that a function is part owner
+
+* ```cpp
+    #include <iostream>
+    #include <memory>
+    
+    void f(std::shared_ptr<MyClass> ptr)
+    {
+        std::cout << "shared_ptr (ref_cnt= " << ptr.use_count() << ") " << &ptr;
+        ptr->printVal();
+    }
+    
+    int main()
+    {
+        std::shared_ptr<MyClass> sharedPtr = std::make_shared<MyClass>(23);
+        std::cout << "shared_ptr (ref_cnt= " << sharedPtr.use_count() << ") " << &sharedPtr;
+        sharedPtr->printVal();
+    
+        f(sharedPtr);
+    
+        std::cout << "shared_ptr (ref_cnt= " << sharedPtr.use_count() << ") " << &sharedPtr;
+        sharedPtr->printVal();
+    
+        return 0;
+    }
+    ```
+* Consider the example on the right. The main difference in this example is that the `MyClass` instance is managed by a `shared pointer`. After creation in `main()`, the address of the pointer object as well as the current reference count are printed to the console. Then, `sharedPtr` is passed to the function `f()` by value, i.e. a copy is made. After returning to main, pointer address and reference counter are printed again. Here is what the output of the program looks like:
+
+* ```bash
+    shared_ptr (ref_cnt= 1) 0x7ffeefbff708, managed object 0x100300208 with val = 23
+    
+    shared_ptr (ref_cnt= 2) 0x7ffeefbff6e0, managed object 0x100300208 with val = 23
+    
+    shared_ptr (ref_cnt= 1) 0x7ffeefbff708, managed object 0x100300208 with val = 23
+    ```
+
+* Throughout the program, the address of the managed object does not change. When passed to `f()` , the reference count changes to `2`. After the function returns and the local `shared_ptr` is destroyed, the reference count changes back to `1`. In summary, `move semantics` are usually not needed when using `shared pointers`. Shared pointers can be passed by value safely and the main thing to remember is that with each pass, the internal reference counter is increased while the managed object stays the same.
+
+* Without giving an example here, the `weak_ptr` can be passed by value as well, just like the `shared pointer`. The only difference is that the pass does not increase the reference counter.
+
+* With the above examples, pass-by-value has been used to lend the ownership of `smart pointers`. Now let us consider the following additional rules from the C++ guidelines on `smart pointers`:
+
+* R.33: Take a `unique_ptr&` parameter to express that a function reseats the widget
+
+* and
+
+* R.35: Take a `shared_ptr&` parameter to express that a function might reseat the `shared pointer`
+
+* Both rules **recommend passing-by-reference, when the function is supposed to modify the ownership** of an existing `smart pointer` and not a copy. We pass a non-const reference to a `unique_ptr` to a function if it might modify it in any way, including deletion and reassignment to a different resource.
+
+* Passing a `unique_ptr` as `const` is not useful as the function will not be able to do anything with it: `Unique pointers` are all about proprietary ownership and as soon as the pointer is passed, the function will assume ownership. But without the right to modify the pointer, the options are very limited.
+
+* A `shared_ptr` can either be passed as `const` or `non-const` reference. The `const` should be used when you want to express that the function will only read from the pointer or it might create a `local copy` and `share ownership`.
+
+* Lastly, we will take a look at passing `raw pointers` and `references`. The general rule of thumb is that we can use a `simple raw pointer` (which can be null) or a plain reference (which can not be null), when the function we are passing will only inspect the managed object without modifying the `smart pointer`. The **internal (raw) pointer to the object can be retrieved using the `get()` member function**. Also, by providing access to the `raw pointer`, you can use the `smart pointer` to manage memory in your own code and pass the raw pointer to code that does not support `smart pointers`.
+
+* When using `raw pointers` retrieved from the `get()` function, you should take special care not to `delete` them or to create `new smart pointers` from them. If you did so, the ownership rules applying to the resource would be severely violated. When passing a `raw pointer` to a function or when returning it (see next section), `raw pointers` should always be considered as owned by the `smart pointer` from which the raw reference to the resource has been obtained.
+
+### Returning `smart pointers` from functions
+
+* With return values, the same logic that we have used for passing `smart pointers` to functions applies: Return a `smart pointer`, both `unique` or `shared`, if the caller needs to manipulate or access the pointer properties. In case the caller just needs the underlying object, a `raw pointer` should be returned.
+
+* `Smart pointers` should always be returned by value. This is not only simpler but also has the following advantages:
+
+    * The overhead usually associated with return-by-value due to the expensive copying process is significantly mitigated by the built-in `move semantics` of `smart pointers`. They only hold a reference to the `managed object`, which is quickly switched from `destination` to `source` during the `move process`.
+
+    * Since C++17, the compiler used `Return Value Optimization (RVO)` to avoid the copy usually associated with return-by-value. This technique, together with copy-elision, is able to optimize even `move semantics` and `smart pointers` (not in call cases though, they are still an essential part of modern C++).
+
+    * When returning a `shared_ptr` by value, the internal reference counter is guaranteed to be properly incremented. This is not the case when returning by `pointer` or by `reference`.
+
+* The topic of `smart pointers` is a complex one. In this course, we have covered many basics and some of the more advanced concepts. However, there are many more aspects to consider and features to use when integrating `smart pointers` into your code. The full set of smart pointer rules in the C++ guidelines is a good start to dig deeper into one of the most powerful features of modern C++.
+    
+### Best-Practices for `Passing Smart Pointers`
+
+* This sections contains a condensed summary of when (and when not) to use `smart pointers` and how to properly pass them between functions. This section is intended as a guide for your future use of this important feature in modern C++ and will hopefully encourage you not to ditch `raw pointers` altogether but instead to think about where your code could benefit from `smart pointers` - and when it would most probably not.
+
+* The following list contains all the variations (omitting const) of passing an object to a function:
+
+* ```cpp
+    void f( object* );  // (a)
+    void f( object& ); // (b)
+    void f( unique_ptr<object> ); // (c)
+    void f( unique_ptr<object>& ); // (d)
+    void f( shared_ptr<object> ); // (e)
+    void f( shared_ptr<object>& ); // (f)
+    ```
+
+* The Preferred Way
+  
+    * The preferred way of to pass object parameters is by using a) or b) :
 
     * ```cpp
-        #include <iostream>
-        #include <memory>
-        
-        void f(std::shared_ptr<MyClass> ptr)
-        {
-            std::cout << "shared_ptr (ref_cnt= " << ptr.use_count() << ") " << &ptr;
-            ptr->printVal();
-        }
-        
-        int main()
-        {
-            std::shared_ptr<MyClass> sharedPtr = std::make_shared<MyClass>(23);
-            std::cout << "shared_ptr (ref_cnt= " << sharedPtr.use_count() << ") " << &sharedPtr;
-            sharedPtr->printVal();
-        
-            f(sharedPtr);
-        
-            std::cout << "shared_ptr (ref_cnt= " << sharedPtr.use_count() << ") " << &sharedPtr;
-            sharedPtr->printVal();
-        
-            return 0;
-        }
-        ```
-    * Consider the example on the right. The main difference in this example is that the `MyClass` instance is managed by a `shared pointer`. After creation in `main()`, the address of the pointer object as well as the current reference count are printed to the console. Then, `sharedPtr` is passed to the function `f()` by value, i.e. a copy is made. After returning to main, pointer address and reference counter are printed again. Here is what the output of the program looks like:
-
-    * ```bash
-        shared_ptr (ref_cnt= 1) 0x7ffeefbff708, managed object 0x100300208 with val = 23
-        
-        shared_ptr (ref_cnt= 2) 0x7ffeefbff6e0, managed object 0x100300208 with val = 23
-        
-        shared_ptr (ref_cnt= 1) 0x7ffeefbff708, managed object 0x100300208 with val = 23
-        ```
-    
-    * Throughout the program, the address of the managed object does not change. When passed to `f()` , the reference count changes to `2`. After the function returns and the local `shared_ptr` is destroyed, the reference count changes back to `1`. In summary, `move semantics` are usually not needed when using `shared pointers`. Shared pointers can be passed by value safely and the main thing to remember is that with each pass, the internal reference counter is increased while the managed object stays the same.
-
-    * Without giving an example here, the `weak_ptr` can be passed by value as well, just like the `shared pointer`. The only difference is that the pass does not increase the reference counter.
-
-    * With the above examples, pass-by-value has been used to lend the ownership of `smart pointers`. Now let us consider the following additional rules from the C++ guidelines on `smart pointers`:
-
-    * R.33: Take a `unique_ptr&` parameter to express that a function reseats the widget
-
-    * and
-
-    * R.35: Take a `shared_ptr&` parameter to express that a function might reseat the `shared pointer`
-
-    * Both rules **recommend passing-by-reference, when the function is supposed to modify the ownership** of an existing `smart pointer` and not a copy. We pass a non-const reference to a `unique_ptr` to a function if it might modify it in any way, including deletion and reassignment to a different resource.
-
-    * Passing a `unique_ptr` as `const` is not useful as the function will not be able to do anything with it: `Unique pointers` are all about proprietary ownership and as soon as the pointer is passed, the function will assume ownership. But without the right to modify the pointer, the options are very limited.
-
-    * A `shared_ptr` can either be passed as `const` or `non-const` reference. The `const` should be used when you want to express that the function will only read from the pointer or it might create a `local copy` and `share ownership`.
-
-    * Lastly, we will take a look at passing `raw pointers` and `references`. The general rule of thumb is that we can use a `simple raw pointer` (which can be null) or a plain reference (which can not be null), when the function we are passing will only inspect the managed object without modifying the `smart pointer`. The **internal (raw) pointer to the object can be retrieved using the `get()` member function**. Also, by providing access to the `raw pointer`, you can use the `smart pointer` to manage memory in your own code and pass the raw pointer to code that does not support `smart pointers`.
-
-    * When using `raw pointers` retrieved from the `get()` function, you should take special care not to `delete` them or to create `new smart pointers` from them. If you did so, the ownership rules applying to the resource would be severely violated. When passing a `raw pointer` to a function or when returning it (see next section), `raw pointers` should always be considered as owned by the `smart pointer` from which the raw reference to the resource has been obtained.
-
-    * Returning `smart pointers` from functions
-
-        * With return values, the same logic that we have used for passing `smart pointers` to functions applies: Return a `smart pointer`, both `unique` or `shared`, if the caller needs to manipulate or access the pointer properties. In case the caller just needs the underlying object, a `raw pointer` should be returned.
-
-        * `Smart pointers` should always be returned by value. This is not only simpler but also has the following advantages:
-
-            * The overhead usually associated with return-by-value due to the expensive copying process is significantly mitigated by the built-in `move semantics` of `smart pointers`. They only hold a reference to the `managed object`, which is quickly switched from `destination` to `source` during the `move process`.
-
-            * Since C++17, the compiler used `Return Value Optimization (RVO)` to avoid the copy usually associated with return-by-value. This technique, together with copy-elision, is able to optimize even `move semantics` and `smart pointers` (not in call cases though, they are still an essential part of modern C++).
-
-            * When returning a `shared_ptr` by value, the internal reference counter is guaranteed to be properly incremented. This is not the case when returning by `pointer` or by `reference`.
-
-        * The topic of `smart pointers` is a complex one. In this course, we have covered many basics and some of the more advanced concepts. However, there are many more aspects to consider and features to use when integrating `smart pointers` into your code. The full set of smart pointer rules in the C++ guidelines is a good start to dig deeper into one of the most powerful features of modern C++.
-    
-* Best-Practices for `Passing Smart Pointers`
-
-    * This sections contains a condensed summary of when (and when not) to use `smart pointers` and how to properly pass them between functions. This section is intended as a guide for your future use of this important feature in modern C++ and will hopefully encourage you not to ditch `raw pointers` altogether but instead to think about where your code could benefit from `smart pointers` - and when it would most probably not.
-
-    * The following list contains all the variations (omitting const) of passing an object to a function:
-
-    * ```cpp
-        void f( object* );  // (a)
-        void f( object& ); // (b)
-        void f( unique_ptr<object> ); // (c)
-        void f( unique_ptr<object>& ); // (d)
-        void f( shared_ptr<object> ); // (e)
-        void f( shared_ptr<object>& ); // (f)
+        void f( object* );             
+        void f( object& );           
         ```
 
-    * The Preferred Way
-      
-        * The preferred way of to pass object parameters is by using a) or b) :
+    * In doing so, we do not have to worry about the `lifetime policy` a caller might have implemented. Using a specific `smart pointer` in a case where we only want to observe an object or manipulate a member might be overly restrictive.
 
-        * ```cpp
-            void f( object* );             
-            void f( object& );           
-            ```
+    * With the `non-owning raw pointer` `*` or the `reference` `&` we can observe an object from which we can assume that its lifetime will exceed the lifetime of the function parameter. In concurrency however, this might not be the case, but for linear code we can safely assume this.
 
-        * In doing so, we do not have to worry about the `lifetime policy` a caller might have implemented. Using a specific `smart pointer` in a case where we only want to observe an object or manipulate a member might be overly restrictive.
+    * To decide wether a `*` or `&` is more appropriate, you should think about wether you need to express that there is no object. This can only be done with pointers by passing e.g. `nullptr`. In most other cases, you should use a reference instead.
 
-        * With the `non-owning raw pointer` `*` or the `reference` `&` we can observe an object from which we can assume that its lifetime will exceed the lifetime of the function parameter. In concurrency however, this might not be the case, but for linear code we can safely assume this.
+* The Object Sink
 
-        * To decide wether a `*` or `&` is more appropriate, you should think about wether you need to express that there is no object. This can only be done with pointers by passing e.g. `nullptr`. In most other cases, you should use a reference instead.
+    * The preferred way of passing an object to a function so that the function takes ownership of the object (or "consumes" it) is by using method c) from the above list:
 
-    * The Object Sink
+    * `void f( unique_ptr<object> );`
 
-        * The preferred way of passing an object to a function so that the function takes ownership of the object (or "consumes" it) is by using method c) from the above list:
+    * In this case, we are passing a `unique pointer` by value from caller to function, which then takes ownership of the the pointer and the underlying object. This is only possible using `move semantics` as there may be only a single reference to the object managed by the `unique pointer`.
 
-        * `void f( unique_ptr<object> );`
+    * After the object has been passed in this way, the caller will have an invalid `unique pointer` and the function to which the object now belongs may destroy it or move it somewhere else.
 
-        * In this case, we are passing a `unique pointer` by value from caller to function, which then takes ownership of the the pointer and the underlying object. This is only possible using `move semantics` as there may be only a single reference to the object managed by the `unique pointer`.
+    * Using `const` with this particular call does not make sense as it models an ownership transfer so the source will be definitely modified.
 
-        * After the object has been passed in this way, the caller will have an invalid `unique pointer` and the function to which the object now belongs may destroy it or move it somewhere else.
+* In And Out Again 1
 
-        * Using `const` with this particular call does not make sense as it models an ownership transfer so the source will be definitely modified.
+    * In some cases, we want to modify a unique pointer (not necessarily the underlying object) and re-use it in the context of the caller. In this case, method d) from the above list might be most suitable:
 
-    * In And Out Again 1
+    * void `f( unique_ptr<object>& );`
 
-        * In some cases, we want to modify a unique pointer (not necessarily the underlying object) and re-use it in the context of the caller. In this case, method d) from the above list might be most suitable:
+    * Using this call structure, the function states that it might modify the smart pointer, e.g. by redirecting it to another object. It is not recommended to use it for accepting an object only because we should avoid restricting ourselves unnecessarily to a particular object lifetime strategy on the caller side.
 
-        * void `f( unique_ptr<object>& );`
+    * Using `const` with this call structure is not recommendable as we would not be able to modify the `unique_ptr` in this case. In case you want to modify the underlying object, use method a) instead.
 
-        * Using this call structure, the function states that it might modify the smart pointer, e.g. by redirecting it to another object. It is not recommended to use it for accepting an object only because we should avoid restricting ourselves unnecessarily to a particular object lifetime strategy on the caller side.
+* Sharing Object Ownership
 
-        * Using `const` with this call structure is not recommendable as we would not be able to modify the `unique_ptr` in this case. In case you want to modify the underlying object, use method a) instead.
+    * In the last examples, we have looked at strategies involving unique ownership. In this example, we want to express that a function will store and share ownership of an object on the heap. This can be achieved by using method e) from the list above:
 
-    * Sharing Object Ownership
+    * `void f( shared_ptr<object> )`
 
-        * In the last examples, we have looked at strategies involving unique ownership. In this example, we want to express that a function will store and share ownership of an object on the heap. This can be achieved by using method e) from the list above:
+    * In this example, we are making a copy of the `shared pointer` passed to the function. In doing so, the internal reference counter within all shared pointers referring to the same heap object is incremented by one.
 
-        * `void f( shared_ptr<object> )`
+    * This strategy can be recommended for cases where the function needs to retain a copy of the `shared_ptr` and thus share ownership of the object. This is of interest when we need access to `smart pointer` functions such as the `reference count` or we must make sure that the object to which the `shared pointer` refers is not prematurely deallocated (which might happen in concurrent programming).
 
-        * In this example, we are making a copy of the `shared pointer` passed to the function. In doing so, the internal reference counter within all shared pointers referring to the same heap object is incremented by one.
+    * If the local scope of the function is not the final destination, a `shared pointer` can also be moved, which does not increase the reference count and is thus more effective.
 
-        * This strategy can be recommended for cases where the function needs to retain a copy of the `shared_ptr` and thus share ownership of the object. This is of interest when we need access to `smart pointer` functions such as the `reference count` or we must make sure that the object to which the `shared pointer` refers is not prematurely deallocated (which might happen in concurrent programming).
+    * A disadvantage of using a `shared_ptr` as a function argument is that the function will be limited to using only objects that are managed by `shared pointers` - which limits flexibility and reusability of the code.
 
-        * If the local scope of the function is not the final destination, a `shared pointer` can also be moved, which does not increase the reference count and is thus more effective.
+* In And Out Again 2
 
-        * A disadvantage of using a `shared_ptr` as a function argument is that the function will be limited to using only objects that are managed by `shared pointers` - which limits flexibility and reusability of the code.
+    * As with `unique pointers`, the need to modify `shared pointers` and re-use them in the context of the caller might arise. In this case, method f) might be the right choice:
 
-    * In And Out Again 2
+    * `void f( shared_ptr<object>& );`
 
-        * As with `unique pointers`, the need to modify `shared pointers` and re-use them in the context of the caller might arise. In this case, method f) might be the right choice:
+    * This particular way of passing a `shared pointer` expresses that the function `f` will modify the pointer itself. As with method e), we will be limiting the usability of the function to cases where the object is managed by a `shared_ptr` and nothing else.
 
-        * `void f( shared_ptr<object>& );`
-
-        * This particular way of passing a `shared pointer` expresses that the function `f` will modify the pointer itself. As with method e), we will be limiting the usability of the function to cases where the object is managed by a `shared_ptr` and nothing else.
-
-    * Last Words
-        * The topic of `smart pointers` is a complex one. In this course, we have covered many basics and some of the more advanced concepts. However, for some cases there are more aspects to consider and features to use when integrating smart pointers into your code. The full set of smart pointer rules in the C++ guidelines is a good start to dig deeper into one of the most powerful features of modern C++.
+* Last Words
+    * The topic of `smart pointers` is a complex one. In this course, we have covered many basics and some of the more advanced concepts. However, for some cases there are more aspects to consider and features to use when integrating smart pointers into your code. The full set of smart pointer rules in the C++ guidelines is a good start to dig deeper into one of the most powerful features of modern C++.
 
 * Exercise
 
