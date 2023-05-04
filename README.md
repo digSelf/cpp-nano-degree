@@ -5114,7 +5114,7 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
 
 ## Smart Pointers
 
-* Resource Acquisition is Initialization
+### Resource Acquisition is Initialization
 
 * Error-prone memory management with new and delete
 
