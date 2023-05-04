@@ -4886,11 +4886,11 @@ public:
 
 * When are move semantics used?
 
-* Now that we have seen how move semantics work, let us take a look at situations where they actually apply.
+    * Now that we have seen how move semantics work, let us take a look at situations where they actually apply.
 
-* One of the primary areas of application are cases, where **heavy-weight** objects need to be passed around in a program. Copying these without move semantics can cause series performance issues. The idea in this scenario is to create the object a single time and then "simply" move it around using `rvalue` references and `move semantics`.
+    * One of the primary areas of application are cases, where **heavy-weight** objects need to be passed around in a program. Copying these without move semantics can cause series performance issues. The idea in this scenario is to create the object a single time and then "simply" move it around using `rvalue` references and `move semantics`.
 
-* A second area of application are cases where ownership needs to be transferred (such as with unique pointers, as we will soon see). The primary difference to shared references is that with move semantics we are not sharing anything but instead we are ensuring through a smart policy that only a single object at a time has access to and thus owns the resource.
+    * A second area of application are cases where ownership needs to be transferred (such as with unique pointers, as we will soon see). The primary difference to shared references is that with move semantics we are not sharing anything but instead we are ensuring through a smart policy that only a single object at a time has access to and thus owns the resource.
 
 * Let us look at some code examples:
 
@@ -5026,91 +5026,91 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
 
 * Then, the function is called with a temporary instance of MyMovableClass as its argument, which creates a temporary instance of MyMovableClass as an rvalue (4). But instead of making a copy of it as before, the move constructor is used (5) to transfer ownership of that temporary object to the function scope, which saves us one expensive deep-copy.
     
-    * Moving `lvalues`
+#### Moving `lvalues`
     
-        * There is one final aspect we need to look at: In some cases, it can make sense to treat `lvalues` like `rvalues`. At some point in your code, you might want to transfer ownership of a resource to another part of your program as it is not needed anymore in the current scope. But instead of copying it, you want to just move it as we have seen before. The "problem" with our implementation of `MyMovableClass` is that the call `useObject(obj1)` will trigger the `copy constructor` as we have seen in one of the last examples. But in order to move it, we would have to pretend to the compiler that `obj1` was an `rvalue` instead of an `lvalue` so that we can make an efficient `move operation` instead of an expensive copy.
+* There is one final aspect we need to look at: In some cases, it can make sense to treat `lvalues` like `rvalues`. At some point in your code, you might want to transfer ownership of a resource to another part of your program as it is not needed anymore in the current scope. But instead of copying it, you want to just move it as we have seen before. The "problem" with our implementation of `MyMovableClass` is that the call `useObject(obj1)` will trigger the `copy constructor` as we have seen in one of the last examples. But in order to move it, we would have to pretend to the compiler that `obj1` was an `rvalue` instead of an `lvalue` so that we can make an efficient `move operation` instead of an expensive copy.
+
+* There is a solution to this problem in `C++`, which is `std::move`. This function accepts an `lvalue` argument and returns it as an `rvalue` without triggering copy construction. So by passing an object to `std::move` we can force the compiler to use `move semantics`, either in the form of `move constructor` or the `move assignment operator`:
+
+* ```cpp
+    int main()
+    {
+        MyMovableClass obj1(100); // constructor
+
+        useObject(std::move(obj1));
+
+        return 0;
+    }
+    ```
+* Nothing much has changed, apart from `obj1` being passed to the `std::move` function. The output would look like the following:
+
+* ```bash
+    CREATING instance of MyMovableClass at 0x7ffeefbff718 allocated with size = 400 bytes
+
+    MOVING (c'tor) instance 0x7ffeefbff718 to instance 0x7ffeefbff708
+
+    using object 0x7ffeefbff708
+
+    DELETING instance of MyMovableClass at 0x7ffeefbff708
+    DELETING instance of MyMovableClass at 0x7ffeefbff718
+    ```
+
+* By using `std::move`, we were able to pass the ownership of the resources within `obj1` to the function `useObject`. The local copy `obj1` in the argument list was created with the `move constructor` and thus accepted the ownership transfer from `obj1` to `obj`. Note that after the call to `useObject`, the instance **`obj1` has been invalidated by setting its internal handle to null and thus may not be used anymore within the scope of main** (even though you could theoretically try to access it, but this would be a really bad idea).
     
-        * There is a solution to this problem in `C++`, which is `std::move`. This function accepts an `lvalue` argument and returns it as an `rvalue` without triggering copy construction. So by passing an object to `std::move` we can force the compiler to use `move semantics`, either in the form of `move constructor` or the `move assignment operator`:
-    
-        * ```cpp
-            int main()
-            {
-                MyMovableClass obj1(100); // constructor
-    
-                useObject(std::move(obj1));
-    
-                return 0;
-            }
-            ```
-        * Nothing much has changed, apart from `obj1` being passed to the `std::move` function. The output would look like the following:
-    
-        * ```bash
-            CREATING instance of MyMovableClass at 0x7ffeefbff718 allocated with size = 400 bytes
-    
-            MOVING (c'tor) instance 0x7ffeefbff718 to instance 0x7ffeefbff708
-    
-            using object 0x7ffeefbff708
-    
-            DELETING instance of MyMovableClass at 0x7ffeefbff708
-            DELETING instance of MyMovableClass at 0x7ffeefbff718
-            ```
-        
-        * By using `std::move`, we were able to pass the ownership of the resources within `obj1` to the function `useObject`. The local copy `obj1` in the argument list was created with the `move constructor` and thus accepted the ownership transfer from `obj1` to `obj`. Note that after the call to `useObject`, the instance **`obj1` has been invalidated by setting its internal handle to null and thus may not be used anymore within the scope of main** (even though you could theoretically try to access it, but this would be a really bad idea).
-    
-    * Exercises - Move semantics
-    
-        * Exercise 1:
-    
-        * ```cpp
-            /* 
-            Memory Management exercises part 1: Pass data between functions without using move semantics
-            */
-    
-            #include <iostream>
-            #include <vector>
-            #include <cmath>
-    
-            using namespace std;
-    
-            // pass back by pointer (old C++)
-            const int array_size = 1e6; // determines size of the random number array
-            vector<int> *RandomNumbers1()
-            {
-                vector<int> *random_numbers = new vector<int>[array_size]; // allocate memory on the heap...
-                for (int i = 0; i < array_size; i++)
-                {
-                    int b = rand();
-                    (*random_numbers).push_back(b); // ...and fill it with random numbers
-                }
-                return random_numbers; // return pointer to heap memory
-            }
-    
-            // pass back by reference (old C++)
-            void RandomNumbers2(vector<int> &random_numbers)
-            {
-                random_numbers.resize(array_size); // expand vector to desired size
-                for (int i = 0; i < array_size; i++)
-                {
-                    random_numbers[i] = rand();
-                }
-            }
-    
-            int main()
-            {
-                /* EXERCISE 1-1: Get access to random data using a returned pointer from function RandomNumbers1 and make sure that there are no memory leaks.*/
-                // store the data in a suitable variable named 'random_numbers_1' and free the associated memory immediately afterwards
-    
-                // SOLUTION to exercise 1-1
-                vector<int> *random_numbers_1 = RandomNumbers1(); // return-by-pointer
-                delete random_numbers_1;
-                /* EXERCISE 1-2: Get access to data using pass-by-reference */
-                // store the data in a suitable variable named 'random_numbers_2'
-    
-                // SOLUTION to exercise 1-2
-                vector<int> random_numbers_2; // create identifier to pass to the function
-                RandomNumbers2(random_numbers_2);
-            }
-            ```
+* Exercises - Move semantics
+
+* Exercise 1:
+
+* ```cpp
+    /* 
+    Memory Management exercises part 1: Pass data between functions without using move semantics
+    */
+
+    #include <iostream>
+    #include <vector>
+    #include <cmath>
+
+    using namespace std;
+
+    // pass back by pointer (old C++)
+    const int array_size = 1e6; // determines size of the random number array
+    vector<int> *RandomNumbers1()
+    {
+        vector<int> *random_numbers = new vector<int>[array_size]; // allocate memory on the heap...
+        for (int i = 0; i < array_size; i++)
+        {
+            int b = rand();
+            (*random_numbers).push_back(b); // ...and fill it with random numbers
+        }
+        return random_numbers; // return pointer to heap memory
+    }
+
+    // pass back by reference (old C++)
+    void RandomNumbers2(vector<int> &random_numbers)
+    {
+        random_numbers.resize(array_size); // expand vector to desired size
+        for (int i = 0; i < array_size; i++)
+        {
+            random_numbers[i] = rand();
+        }
+    }
+
+    int main()
+    {
+        /* EXERCISE 1-1: Get access to random data using a returned pointer from function RandomNumbers1 and make sure that there are no memory leaks.*/
+        // store the data in a suitable variable named 'random_numbers_1' and free the associated memory immediately afterwards
+
+        // SOLUTION to exercise 1-1
+        vector<int> *random_numbers_1 = RandomNumbers1(); // return-by-pointer
+        delete random_numbers_1;
+        /* EXERCISE 1-2: Get access to data using pass-by-reference */
+        // store the data in a suitable variable named 'random_numbers_2'
+
+        // SOLUTION to exercise 1-2
+        vector<int> random_numbers_2; // create identifier to pass to the function
+        RandomNumbers2(random_numbers_2);
+    }
+    ```
 
 ## Smart Pointers
 
