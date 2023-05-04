@@ -4894,7 +4894,7 @@ public:
 
 * Let us look at some code examples:
 
-* ```cpp
+```cpp
 int main()
 {
     MyMovableClass obj1(100), obj2(200); // constructor
@@ -4934,38 +4934,38 @@ int main()
 
 * Now consider the following main function instead:
 
-* ```cpp
-    int main()
-    {
-        MyMovableClass obj1(100); // constructor
+```cpp
+int main()
+{
+    MyMovableClass obj1(100); // constructor
 
-        obj1 = MyMovableClass(200); // move assignment operator
+    obj1 = MyMovableClass(200); // move assignment operator
 
-        MyMovableClass obj2 = MyMovableClass(300); // move constructor 
+    MyMovableClass obj2 = MyMovableClass(300); // move constructor 
 
-        return 0;
-    }
-    ```
+    return 0;
+}
+```
 
 * In this version, we also have an instance of `MyMovableClass`, obj1. Then, a second instance of `MyMovableClass` is created as an `rvalue`, which is assigned to obj1. Finally, we have a second lvalue `obj2`, which is created by assigning it an rvalue object. Let us take a look at the output of the program:
 
-* ```bash
-    CREATING instance of MyMovableClass at 0x7ffeefbff718 allocated with size = 400 bytes
+```bash
+CREATING instance of MyMovableClass at 0x7ffeefbff718 allocated with size = 400 bytes
 
-    CREATING instance of MyMovableClass at 0x7ffeefbff708 allocated with size = 800 bytes
+CREATING instance of MyMovableClass at 0x7ffeefbff708 allocated with size = 800 bytes
 
-    MOVING (assign) instance 0x7ffeefbff708 to instance 0x7ffeefbff718
+MOVING (assign) instance 0x7ffeefbff708 to instance 0x7ffeefbff718
 
-    DELETING instance of MyMovableClass at 0x7ffeefbff708
+DELETING instance of MyMovableClass at 0x7ffeefbff708
 
-    CREATING instance of MyMovableClass at 0x7ffeefbff6d8 allocated with size = 1200 bytes
+CREATING instance of MyMovableClass at 0x7ffeefbff6d8 allocated with size = 1200 bytes
 
-    MOVING (c'tor) instance 0x7ffeefbff6d8 to instance 0x7ffeefbff6e8
+MOVING (c'tor) instance 0x7ffeefbff6d8 to instance 0x7ffeefbff6e8
 
-    DELETING instance of MyMovableClass at 0x7ffeefbff6d8
-    DELETING instance of MyMovableClass at 0x7ffeefbff6e8
-    DELETING instance of MyMovableClass at 0x7ffeefbff718
-    ```
+DELETING instance of MyMovableClass at 0x7ffeefbff6d8
+DELETING instance of MyMovableClass at 0x7ffeefbff6e8
+DELETING instance of MyMovableClass at 0x7ffeefbff718
+```
 
 * If that is not the output you see, check this post about copy elision: https://stackoverflow.com/questions/13099603/c11-move-constructor-not-called-default-constructor-preferred
 
@@ -4975,7 +4975,7 @@ int main()
 
 * Let us now consider a final example:
 
-* ```cpp
+```cpp
 void useObject(MyMovableClass obj)
 {
     std::cout << "using object " << &obj << std::endl;
@@ -4995,7 +4995,7 @@ int main()
 
 * Let us take an immediate look at the output of the program, before going into details:
 
-* ```bash
+```bash
 (1)
 CREATING instance of MyMovableClass at 0x7ffeefbff718 allocated with size = 400 bytes
 
