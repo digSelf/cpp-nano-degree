@@ -5962,24 +5962,24 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
 
 ## Concurrency
 
-* Processes and Threads
+### Processes and Threads
 
-    * In this lesson, you will learn how to start and manage your first parallel path of execution, which runs concurrently with the main program and is thus asynchronous. In contrast to synchronous programs, the main program can continue with its line of execution without the need to wait for the parallel task to complete. The following figure illustrates this difference.
+* In this lesson, you will learn how to start and manage your first parallel path of execution, which runs concurrently with the main program and is thus asynchronous. In contrast to synchronous programs, the main program can continue with its line of execution without the need to wait for the parallel task to complete. The following figure illustrates this difference.
 
-    * ![threads](./images/threads.png)
+* ![threads](./images/threads.png)
 
-    * Before we start writing a first asynchronous program in C++, let us take a look at the differences between two important concepts : `processes` and `threads`.
+* Before we start writing a first asynchronous program in C++, let us take a look at the differences between two important concepts : `processes` and `threads`.
 
-    * A `process` (also called a `task`) is a computer program at runtime. It is comprised of the runtime environment provided by the operating system (OS), as well as of the embedded binary code of the program during execution. A process is controlled by the OS through certain actions with which it sets the process into one of several carefully defined states:
+* A `process` (also called a `task`) is a computer program at runtime. It is comprised of the runtime environment provided by the operating system (OS), as well as of the embedded binary code of the program during execution. A process is controlled by the OS through certain actions with which it sets the process into one of several carefully defined states:
 
-    * ![process_states](./images/process_states.png)
+* ![process_states](./images/process_states.png)
 
-    * **Ready** : After its creation, a process enters the ready state and is loaded into main memory. The process now is ready to run and is waiting for CPU time to be executed. Processes that are ready for execution by the CPU are stored in a queue managed by the OS.
-    * **Running** : The operating system has selected the process for execution and the instructions within the process are executed on one or more of the available CPU cores.
-    * **Blocked** : A process that is blocked is one that is waiting for an event (such as a system resource becoming available) or the completion of an I/O operation.
-    * **Terminated**: When a process completes its execution or when it is being explicitly killed, it changes to the "terminated" state. The underlying program is no longer executing, but the process remains in the process table as a "zombie process". When it is finally removed from the process table, its lifetime ends.
-    * **Ready suspended** : A process that was initially in ready state but has been swapped out of main memory and placed onto external storage is said to be in suspend ready state. The process will transition back to ready state whenever it is moved to main memory again.
-    * **Blocked suspended** : A process that is blocked may also be swapped out of main memory. It may be swapped back in again under the same conditions as a "ready suspended" process. In such a case, the process will move to the blocked state, and may still be waiting for a resource to become available.
+* **Ready** : After its creation, a process enters the ready state and is loaded into main memory. The process now is ready to run and is waiting for CPU time to be executed. Processes that are ready for execution by the CPU are stored in a queue managed by the OS.
+* **Running** : The operating system has selected the process for execution and the instructions within the process are executed on one or more of the available CPU cores.
+* **Blocked** : A process that is blocked is one that is waiting for an event (such as a system resource becoming available) or the completion of an I/O operation.
+* **Terminated**: When a process completes its execution or when it is being explicitly killed, it changes to the "terminated" state. The underlying program is no longer executing, but the process remains in the process table as a "zombie process". When it is finally removed from the process table, its lifetime ends.
+* **Ready suspended** : A process that was initially in ready state but has been swapped out of main memory and placed onto external storage is said to be in suspend ready state. The process will transition back to ready state whenever it is moved to main memory again.
+* **Blocked suspended** : A process that is blocked may also be swapped out of main memory. It may be swapped back in again under the same conditions as a "ready suspended" process. In such a case, the process will move to the blocked state, and may still be waiting for a resource to become available.
 
 * Processes are managed by the `scheduler` of the OS. The `scheduler` can either let a process run until it ends or blocks (**non-interrupting scheduler**), or it can ensure that the currently running process is interrupted after a short period of time. The scheduler can switch back and forth between different active processes (**interrupting scheduler**), alternately assigning them CPU time. The latter is the typical scheduling strategy of any modern operating system.
 
