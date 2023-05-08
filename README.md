@@ -6190,7 +6190,7 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
     Finished work 2 in main
     ```
 
-* n later sections of this course, we will make extended use of the join() function to carefully control the flow of execution in our programs and to ensure that results of thread functions are available and complete where we need them to be.
+* In later sections of this course, we will make extended use of the join() function to carefully control the flow of execution in our programs and to ensure that results of thread functions are available and complete where we need them to be.
 
 #### Detach
 
@@ -6276,141 +6276,141 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
 
 * The order in which even and odd threads are executed changes. Also, some threads are executed after the main function reaches its end. When `sleep_for` is removed, threads will not finish before the program terminates.
 
-* Starting a Thread with a Function Object
+### Starting a Thread with a Function Object
 
-    * Functions and Callable Objects
+#### Functions and Callable Objects
 
-    * In the previous section, we have created our first thread by passing it a function to execute. We did not discuss this concept in depth at the time, but in this section we will focus on the details of passing functions to other functions, which is one form of a `callable object`.
+* In the previous section, we have created our first thread by passing it a function to execute. We did not discuss this concept in depth at the time, but in this section we will focus on the details of passing functions to other functions, which is one form of a `callable object`.
 
-    * In C++, `callable objects` are object that can appear as the left-hand operand of the call operator. These can be pointers to functions, objects of a class that defines an overloaded function call operator and lambdas (an anonymous inline function), with which function objects can be created in a very simple way. In the context of concurrency, we can use callable objects to attach a function to a thread.
+* In C++, `callable objects` are object that can appear as the left-hand operand of the call operator. These can be pointers to functions, objects of a class that defines an overloaded function call operator and lambdas (an anonymous inline function), with which function objects can be created in a very simple way. In the context of concurrency, we can use callable objects to attach a function to a thread.
 
-    * Functor example (defines an overloaded function call operator): 
-    * ```cpp
-        // this is a functor
-        struct add_x {
-            add_x(int val) : x(val) {}  // Constructor
-            int operator()(int y) const { return x + y; }
-        
-            private:
-            int x;
-        };
-        
-        // Now you can use it like this:
-        add_x add42(42); // create an instance of the functor class
-        ```
-
-    * In the last section, we constructed a thread object by passing a function to it without any arguments. If we were limited to this approach, the only way to make data available from within the thread function would be to use global variables - which is definitely not recommendable and also incredibly messy.
-
-    * In this section, we will therefore look at several ways of passing data to a thread function.
-
-    * The `std::thread` constructor can also be called with instances of classes that implement the function-call operator. In the following, we will thus define a class that has an overloaded `()`-operator. In preparation for the final project of this course, which will be a traffic simulation with vehicles moving through intersections in a street grid, we will define a (very) early version of the `Vehicle` class in this example:
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        
-        class Vehicle
-        {
-        public:
-            void operator()()
-            {
-                std::cout << "Vehicle object has been created \n" << std::endl;
-            }
-        };
-
-
-        int main()
-        {
-            // create thread 
-            std::thread t(Vehicle()); // C++'s most vexing parse
-    
-            // do something in main()
-            std::cout << "Finished work in main \n";
-    
-            // wait for thread to finish
-            t.join();
-    
-            return 0;
-        }
-        ```
-    
-    * When executing this code, the clang++ compiler generates a warning, which is followed by an error:
-    
-    * ```bash
-        example_1.cpp: In function ‘int main()’:
-        example_1.cpp:23:7: error: request for member ‘join’ in ‘t’, which is of non-class type ‘std::thread(Vehicle (*)())’
-            t.join();
-        ```
-    
-    * The extra parentheses suggested by the compiler avoid what is known as C++'s "most vexing parse", which is a specific form of syntactic ambiguity resolution in the C++ programming language.
-    
-    * The expression was coined by Scott Meyers in 2001, who talks about it in details in his book "Effective STL". The "most vexing parse" comes from a rule in C++ that says that anything that could be considered as a function declaration, the compiler should parse it as a function declaration - even if it could be interpreted as something else.
-    
-    * In the previous code example, the line `std::thread t(Vehicle());` is seemingly ambiguous, since it could be interpreted either as:
-    
-        * a variable definition for variable `t` of class `std::thread`, initialized with an anonymous instance of class Vehicle or
-        * a function declaration for a function `t` that returns an object of type `std::thread` and has a single (unnamed) parameter that is a **pointer to function returning an object of type `Vehicle`**
-    
-    * Most programmers would presumable expect the first case to be true, but the C++ standard requires it to be interpreted as the second - hence the compiler warning.
-    
-    * There are three ways of forcing the compiler to consider the line as the first case, which would create the thread object we want:
-    
-        * Add an extra pair of parentheses
-        * Use copy initialization
-        * Use uniform initialization with braces
-    
-    * The following code shows all three variants:
-    
-    * ```cpp
-        std::thread t1( (Vehicle()) ); // Add an extra pair of parantheses
-        
-        std::thread t2 = std::thread( Vehicle() ); // Use copy initialization
-        
-        std::thread t3{ Vehicle() };// Use uniform initialization with braces
-        ```
-    
-    * Whichever option we use, the idea is the same: the function object is copied into internal storage accessible to the new `thread`, and the new thread invokes the operator `()`. The `Vehicle` class can of course have data members and other member functions too, and this is one way of passing data to the thread function: pass it in as a constructor argument and store it as a data member:
-    
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-    
-        class Vehicle
-        {
-        public:
-            Vehicle(int id) : _id(id) {}
-            void operator()()
-            {
-                std::cout << "Vehicle #" << _id << " has been created" << std::endl;
-            }
+* Functor example (defines an overloaded function call operator): 
+* ```cpp
+    // this is a functor
+    struct add_x {
+        add_x(int val) : x(val) {}  // Constructor
+        int operator()(int y) const { return x + y; }
     
         private:
-            int _id;
-        };
+        int x;
+    };
     
-        int main()
+    // Now you can use it like this:
+    add_x add42(42); // create an instance of the functor class
+    ```
+
+* In the last section, we constructed a thread object by passing a function to it without any arguments. If we were limited to this approach, the only way to make data available from within the thread function would be to use global variables - which is definitely not recommendable and also incredibly messy.
+
+* In this section, we will therefore look at several ways of passing data to a thread function.
+
+* The `std::thread` constructor can also be called with instances of classes that implement the function-call operator. In the following, we will thus define a class that has an overloaded `()`-operator. In preparation for the final project of this course, which will be a traffic simulation with vehicles moving through intersections in a street grid, we will define a (very) early version of the `Vehicle` class in this example:
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    
+    class Vehicle
+    {
+    public:
+        void operator()()
         {
-            // create thread
-            std::thread t = std::thread(Vehicle(1)); // Use copy initialization
-    
-            // do something in main()
-            std::cout << "Finished work in main \n";
-    
-            // wait for thread to finish
-            t.join();
-    
-            return 0;
+            std::cout << "Vehicle object has been created \n" << std::endl;
         }
-        ```
+    };
+
+
+    int main()
+    {
+        // create thread 
+        std::thread t(Vehicle()); // C++'s most vexing parse
+
+        // do something in main()
+        std::cout << "Finished work in main \n";
+
+        // wait for thread to finish
+        t.join();
+
+        return 0;
+    }
+    ```
+
+* When executing this code, the clang++ compiler generates a warning, which is followed by an error:
+
+* ```bash
+    example_1.cpp: In function ‘int main()’:
+    example_1.cpp:23:7: error: request for member ‘join’ in ‘t’, which is of non-class type ‘std::thread(Vehicle (*)())’
+        t.join();
+    ```
+
+* The extra parentheses suggested by the compiler avoid what is known as C++'s "most vexing parse", which is a specific form of syntactic ambiguity resolution in the C++ programming language.
+
+* The expression was coined by Scott Meyers in 2001, who talks about it in details in his book "Effective STL". The "most vexing parse" comes from a rule in C++ that says that anything that could be considered as a function declaration, the compiler should parse it as a function declaration - even if it could be interpreted as something else.
+
+* In the previous code example, the line `std::thread t(Vehicle());` is seemingly ambiguous, since it could be interpreted either as:
+
+    * a variable definition for variable `t` of class `std::thread`, initialized with an anonymous instance of class Vehicle or
+    * a function declaration for a function `t` that returns an object of type `std::thread` and has a single (unnamed) parameter that is a **pointer to function returning an object of type `Vehicle`**
+
+* Most programmers would presumable expect the first case to be true, but the C++ standard requires it to be interpreted as the second - hence the compiler warning.
+
+* There are three ways of forcing the compiler to consider the line as the first case, which would create the thread object we want:
+
+    * Add an extra pair of parentheses
+    * Use copy initialization
+    * Use uniform initialization with braces
+
+* The following code shows all three variants:
+
+* ```cpp
+    std::thread t1( (Vehicle()) ); // Add an extra pair of parantheses
     
-    * In the above code example, the class `Vehicle` has a constructor that takes an integer and it will store it internally in a variable `_id`. In the overloaded function call operator, the vehicle `id` is printed to the console. In `main()`, we are creating the `Vehicle` object using `copy initialization`. The output of the program is given below:
+    std::thread t2 = std::thread( Vehicle() ); // Use copy initialization
     
-    * ```bash
-        Finished work in main 
-        Vehicle #1 has been created
-        ```
-    
-    * As can easily be seen, the integer ID has been successfully passed into the thread function.
+    std::thread t3{ Vehicle() };// Use uniform initialization with braces
+    ```
+
+* Whichever option we use, the idea is the same: the function object is copied into internal storage accessible to the new `thread`, and the new thread invokes the operator `()`. The `Vehicle` class can of course have data members and other member functions too, and this is one way of passing data to the thread function: pass it in as a constructor argument and store it as a data member:
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+
+    class Vehicle
+    {
+    public:
+        Vehicle(int id) : _id(id) {}
+        void operator()()
+        {
+            std::cout << "Vehicle #" << _id << " has been created" << std::endl;
+        }
+
+    private:
+        int _id;
+    };
+
+    int main()
+    {
+        // create thread
+        std::thread t = std::thread(Vehicle(1)); // Use copy initialization
+
+        // do something in main()
+        std::cout << "Finished work in main \n";
+
+        // wait for thread to finish
+        t.join();
+
+        return 0;
+    }
+    ```
+
+* In the above code example, the class `Vehicle` has a constructor that takes an integer and it will store it internally in a variable `_id`. In the overloaded function call operator, the vehicle `id` is printed to the console. In `main()`, we are creating the `Vehicle` object using `copy initialization`. The output of the program is given below:
+
+* ```bash
+    Finished work in main 
+    Vehicle #1 has been created
+    ```
+
+* As can easily be seen, the integer ID has been successfully passed into the thread function.
 
 * Lambdas
 
