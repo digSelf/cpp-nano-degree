@@ -6095,186 +6095,186 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
 
 * Not surprisingly, the main function finishes before the thread because the delay inserted into the thread function is much larger than in the main path of execution. The call to `join()` at the end of the main function ensures that it will not prematurely return. As an experiment, comment out `t.join()` and execute the program. What do you expect will happen?
 
-* Randomness of events
+#### Randomness of events
 
-    * One very important trait of concurrent programs is their non-deterministic behavior. It can not be predicted which `thread` the `scheduler` will execute at which point in time. In the code on the right, the amount of work to be performed both in the thread function and in main has been split into two separate jobs.
+* One very important trait of concurrent programs is their non-deterministic behavior. It can not be predicted which `thread` the `scheduler` will execute at which point in time. In the code on the right, the amount of work to be performed both in the thread function and in main has been split into two separate jobs.
 
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        
-        void threadFunction()
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(50)); // simulate work
-            std::cout << "Finished work 1 in thread\n"; 
-        
-            std::this_thread::sleep_for(std::chrono::milliseconds(50)); 
-            std::cout << "Finished work 2 in thread\n"; 
-        }
-        
-        int main()
-        {
-            // create thread
-            std::thread t(threadFunction);
-        
-            // do something in main()
-            std::this_thread::sleep_for(std::chrono::milliseconds(50)); // simulate work
-            std::cout << "Finished work 1 in main\n";
-        
-            std::this_thread::sleep_for(std::chrono::milliseconds(50)); 
-            std::cout << "Finished work 2 in main\n";
-            
-            // wait for thread to finish
-            t.join();
-        
-            return 0;
-        }
-        ```
-    * The console output shows that the work packages in both threads have been interleaved with the first package being performed before the second package.
-
-    * ```bash
-        Finished work 1 in thread
-        Finished work 1 in main
-        Finished work 2 in thread
-        Finished work 2 in main
-        ```
-
-    * Interestingly, when executed on my local machine, the order of execution has changed. Now, instead of finishing the second work package in the thread first, main gets there first.
-
-    * Executing the code several times more shows that the two versions of program output interchange in a seemingly random manner. This element of **randomness is an important characteristic of concurrent programs** and we have to take measures to deal with it in a controlled way that prevent unwanted behavior or even program crashes.
-
-    * Reminder: You will need to use the `-pthread` flag when compiling this code, just as you did with the previous example. This flag will be needed for all future multithreaded programs in this course as well.
-
-* Using `join()` as a barrier
-
-    * In the previous example, the order of execution is determined by the scheduler. If we wanted to ensure that the `thread` function completed its work before the `main function` started its own work (because it might be waiting for a result to be available), we could achieve this by repositioning the call to join.
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        
-        void threadFunction()
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(50)); // simulate work
-            std::cout << "Finished work 1 in thread\n"; 
-        
-            std::this_thread::sleep_for(std::chrono::milliseconds(50)); 
-            std::cout << "Finished work 2 in thread\n"; 
-        }
-        
-        int main()
-        {
-            // create thread
-            std::thread t(threadFunction);
-            
-            // wait for thread to finish
-            t.join();
-        
-            // do something in main()
-            std::this_thread::sleep_for(std::chrono::milliseconds(50)); // simulate work
-            std::cout << "Finished work 1 in main\n";
-        
-            std::this_thread::sleep_for(std::chrono::milliseconds(50)); 
-            std::cout << "Finished work 2 in main\n";
-        
-            return 0;
-        }
-        ```
-
-    * In the file on the right, the `.join()` has been moved to before the work in `main()`. The order of execution now always looks like the following:
-
-    * ```bash
-        Finished work 1 in thread
-        Finished work 2 in thread
-        Finished work 1 in main
-        Finished work 2 in main
-        ```
+* ```cpp
+    #include <iostream>
+    #include <thread>
     
-    * n later sections of this course, we will make extended use of the join() function to carefully control the flow of execution in our programs and to ensure that results of thread functions are available and complete where we need them to be.
-
-* Detach
-
-    * Let us now take a look at what happens if we don’t join a thread before its destructor is called. When we comment out `join` in the example above and then run the program again, it aborts with an error. The reason why this is done is that the designers of the C++ standard wanted to make debugging a multi-threaded program easier: Having the program crash forces the programer to remember joining the `threads` that are created in a proper way. Such a hard error is usually much easier to detect than soft errors that do not show themselves so obviously.
-
-    * There are some situations however, where it might make sense **to not wait for a thread to finish its work.** This can be achieved by "detaching" the thread, by which the internal state variable "joinable" is set to "false". This works by calling the `detach()` method on the `thread`. **The destructor of a detached thread does nothing**: It neither blocks nor does it terminate the thread. In the following example, `detach` is called on the thread object, which causes the main thread to immediately continue until it reaches the end of the program code and returns. **Note that a detached thread can not be joined ever again.**
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        
-        void threadFunction()
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(50)); // simulate work
-            std::cout << "Finished work in thread\n"; 
-        }
-        
-        int main()
-        {
-            // create thread
-            std::thread t(threadFunction);
-        
-            // detach thread and continue with main
-            t.detach();
-        
-            // do something in main()
-            std::this_thread::sleep_for(std::chrono::milliseconds(50)); // simulate work
-            std::cout << "Finished work in main\n";
-        
-            return 0;
-        }
-        ```
+    void threadFunction()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50)); // simulate work
+        std::cout << "Finished work 1 in thread\n"; 
     
-    * You can run the code above using `example_6.cpp` over on the right side of the screen.
-
-    * Programmers should be very careful though when using the `detach()-method`. You have to **make sure that the thread does not access any data that might get out of scope or be deleted**. Also, we do not want our program to terminate with threads still running. Should this happen, **such threads will be terminated very harshly without giving them the chance to properly clean up their resources** - what would usually happen in the destructor. So a well-designed program usually has a well-designed mechanism for joining all threads before exiting.
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
+        std::this_thread::sleep_for(std::chrono::milliseconds(50)); 
+        std::cout << "Finished work 2 in thread\n"; 
+    }
+    
+    int main()
+    {
+        // create thread
+        std::thread t(threadFunction);
+    
+        // do something in main()
+        std::this_thread::sleep_for(std::chrono::milliseconds(50)); // simulate work
+        std::cout << "Finished work 1 in main\n";
+    
+        std::this_thread::sleep_for(std::chrono::milliseconds(50)); 
+        std::cout << "Finished work 2 in main\n";
         
-        void threadFunctionEven()
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1)); // simulate work
-            std::cout << "Even thread\n";
-        }
+        // wait for thread to finish
+        t.join();
+    
+        return 0;
+    }
+    ```
+* The console output shows that the work packages in both threads have been interleaved with the first package being performed before the second package.
+
+* ```bash
+    Finished work 1 in thread
+    Finished work 1 in main
+    Finished work 2 in thread
+    Finished work 2 in main
+    ```
+
+* Interestingly, when executed on my local machine, the order of execution has changed. Now, instead of finishing the second work package in the thread first, main gets there first.
+
+* Executing the code several times more shows that the two versions of program output interchange in a seemingly random manner. This element of **randomness is an important characteristic of concurrent programs** and we have to take measures to deal with it in a controlled way that prevent unwanted behavior or even program crashes.
+
+* Reminder: You will need to use the `-pthread` flag when compiling this code, just as you did with the previous example. This flag will be needed for all future multithreaded programs in this course as well.
+
+#### Using `join()` as a barrier
+
+* In the previous example, the order of execution is determined by the scheduler. If we wanted to ensure that the `thread` function completed its work before the `main function` started its own work (because it might be waiting for a result to be available), we could achieve this by repositioning the call to join.
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    
+    void threadFunction()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50)); // simulate work
+        std::cout << "Finished work 1 in thread\n"; 
+    
+        std::this_thread::sleep_for(std::chrono::milliseconds(50)); 
+        std::cout << "Finished work 2 in thread\n"; 
+    }
+    
+    int main()
+    {
+        // create thread
+        std::thread t(threadFunction);
         
+        // wait for thread to finish
+        t.join();
+    
+        // do something in main()
+        std::this_thread::sleep_for(std::chrono::milliseconds(50)); // simulate work
+        std::cout << "Finished work 1 in main\n";
+    
+        std::this_thread::sleep_for(std::chrono::milliseconds(50)); 
+        std::cout << "Finished work 2 in main\n";
+    
+        return 0;
+    }
+    ```
+
+* In the file on the right, the `.join()` has been moved to before the work in `main()`. The order of execution now always looks like the following:
+
+* ```bash
+    Finished work 1 in thread
+    Finished work 2 in thread
+    Finished work 1 in main
+    Finished work 2 in main
+    ```
+
+* n later sections of this course, we will make extended use of the join() function to carefully control the flow of execution in our programs and to ensure that results of thread functions are available and complete where we need them to be.
+
+#### Detach
+
+* Let us now take a look at what happens if we don’t join a thread before its destructor is called. When we comment out `join` in the example above and then run the program again, it aborts with an error. The reason why this is done is that the designers of the C++ standard wanted to make debugging a multi-threaded program easier: Having the program crash forces the programer to remember joining the `threads` that are created in a proper way. Such a hard error is usually much easier to detect than soft errors that do not show themselves so obviously.
+
+* There are some situations however, where it might make sense **to not wait for a thread to finish its work.** This can be achieved by "detaching" the thread, by which the internal state variable "joinable" is set to "false". This works by calling the `detach()` method on the `thread`. **The destructor of a detached thread does nothing**: It neither blocks nor does it terminate the thread. In the following example, `detach` is called on the thread object, which causes the main thread to immediately continue until it reaches the end of the program code and returns. **Note that a detached thread can not be joined ever again.**
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    
+    void threadFunction()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50)); // simulate work
+        std::cout << "Finished work in thread\n"; 
+    }
+    
+    int main()
+    {
+        // create thread
+        std::thread t(threadFunction);
+    
+        // detach thread and continue with main
+        t.detach();
+    
+        // do something in main()
+        std::this_thread::sleep_for(std::chrono::milliseconds(50)); // simulate work
+        std::cout << "Finished work in main\n";
+    
+        return 0;
+    }
+    ```
+
+* You can run the code above using `example_6.cpp` over on the right side of the screen.
+
+* Programmers should be very careful though when using the `detach()-method`. You have to **make sure that the thread does not access any data that might get out of scope or be deleted**. Also, we do not want our program to terminate with threads still running. Should this happen, **such threads will be terminated very harshly without giving them the chance to properly clean up their resources** - what would usually happen in the destructor. So a well-designed program usually has a well-designed mechanism for joining all threads before exiting.
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    
+    void threadFunctionEven()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); // simulate work
+        std::cout << "Even thread\n";
+    }
+    
+    /* Student Task START */
+    void threadFunctionOdd()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); // simulate work
+        std::cout << "Odd thread\n";
+    }
+    /* Student Task END */
+    
+    int main()
+    {
         /* Student Task START */
-        void threadFunctionOdd()
+        for (int i = 0; i < 6; ++i)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1)); // simulate work
-            std::cout << "Odd thread\n";
+            if (i % 2 == 0)
+            {
+                std::thread t(threadFunctionEven);
+                t.detach();
+            }
+            else
+            {
+                std::thread t(threadFunctionOdd);
+                t.detach();
+            }
         }
         /* Student Task END */
-        
-        int main()
-        {
-            /* Student Task START */
-            for (int i = 0; i < 6; ++i)
-            {
-                if (i % 2 == 0)
-                {
-                    std::thread t(threadFunctionEven);
-                    t.detach();
-                }
-                else
-                {
-                    std::thread t(threadFunctionOdd);
-                    t.detach();
-                }
-            }
-            /* Student Task END */
-        
-            // ensure that main does not return before the threads are finished
-            std::this_thread::sleep_for(std::chrono::milliseconds(1)); // simulate work
-        
-            std::cout << "End of main is reached" << std::endl;
-            return 0;
-        }
-        ```
     
-    * Run the program several times and look the console output. What do you observe? As a second experiment, comment out the `sleep_for` function in the main thread. What happens to the detached threads in this case?
+        // ensure that main does not return before the threads are finished
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); // simulate work
+    
+        std::cout << "End of main is reached" << std::endl;
+        return 0;
+    }
+    ```
 
-    * The order in which even and odd threads are executed changes. Also, some threads are executed after the main function reaches its end. When `sleep_for` is removed, threads will not finish before the program terminates.
+* Run the program several times and look the console output. What do you observe? As a second experiment, comment out the `sleep_for` function in the main thread. What happens to the detached threads in this case?
+
+* The order in which even and odd threads are executed changes. Also, some threads are executed after the main function reaches its end. When `sleep_for` is removed, threads will not finish before the program terminates.
 
 * Starting a Thread with a Function Object
 
