@@ -9,10 +9,16 @@ int main()
     // starting a first thread (by reference)
     auto f0 = [&id]() {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        ++id;
         std::cout << "a) ID in thread (call-by-reference) = " << id << std::endl;
     };
 
     std::thread t0(f0);
+
+    t0.join();
+    std::cout << "id in main: " << id << std::endl;
+
+    /*
 
     // starting a second thread (by value)
     auto f1 = [id]() mutable {
@@ -27,7 +33,7 @@ int main()
 
     t0.join();
     t1.join();
-
+*/
     return 0;
 }
 
