@@ -6589,7 +6589,7 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
 * There is one more difference between calling a function directly and passing it to a thread: With the former, arguments may be passed by value, by reference or by using move semantics - depending on the signature of the function. When calling a function using a `variadic template`, the arguments are by default either **moved or copied** - depending on wether they are `rvalues` or `lvalues`. There are ways however which allow us to overwrite this behavior. If you want to move an `lvalue` for example, we can call `std::move`. In the following example, two threads are started, each with a different string as a parameter. With `t1`, the string `name1` is copied by value, which allows us to print `name1` even after join has been called. The second string `name2` is passed to the thread function using `move semantics`, which means that it is not available any more after `join` has been called on `t2`.
 
 * ```cpp
-    ``#include <iostream>
+    #include <iostream>
     #include <thread>
     #include <string>
 
