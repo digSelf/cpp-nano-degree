@@ -6801,221 +6801,221 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
     }
     ```
 
-* Running Multiple Threads
+### Running Multiple Threads
 
-    * Fork-Join Parallelism
+#### Fork-Join Parallelism
 
-    * Using threads follows a basic concept called "fork-join-parallelism". The basic mechanism of this concept follows a simple three-step pattern:
+* Using threads follows a basic concept called "fork-join-parallelism". The basic mechanism of this concept follows a simple three-step pattern:
 
-        * Split the flow of execution into a parallel thread ("fork")
-        * Perform some work in both the `main` thread and the `parallel thread`
-        * Wait for the parallel thread to finish and unite the split flow of execution again ("join")
+    * Split the flow of execution into a parallel thread ("fork")
+    * Perform some work in both the `main` thread and the `parallel thread`
+    * Wait for the parallel thread to finish and unite the split flow of execution again ("join")
+
+* The following diagram illustrates the basic idea of forking:
+
+* ![thread-forking](./images/thread-forking.png)
+
+* In the `main` thread, the program flow is forked into three parallel branches. In both worker branches, some work is performed - which is why `threads` are often referred to as `"worker threads"`. Once the work is completed, the flow of execution is united again in the main function using the `join()` command. In this example, join acts as a barrier where all threads are united. The execution of `main` is in fact halted, until both worker threads have successfully completed their respective work.
+
+* In the following example, a number of threads is created and added to a `vector`. The basic idea is to loop over the vector at the end of the `main` function and call `join` on all the thread objects inside the vector.
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <vector>
     
-    * The following diagram illustrates the basic idea of forking:
-
-    * ![thread-forking](./images/thread-forking.png)
-
-    * In the `main` thread, the program flow is forked into three parallel branches. In both worker branches, some work is performed - which is why `threads` are often referred to as `"worker threads"`. Once the work is completed, the flow of execution is united again in the main function using the `join()` command. In this example, join acts as a barrier where all threads are united. The execution of `main` is in fact halted, until both worker threads have successfully completed their respective work.
-
-    * In the following example, a number of threads is created and added to a `vector`. The basic idea is to loop over the vector at the end of the `main` function and call `join` on all the thread objects inside the vector.
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <vector>
-        
-        void printHello()
-        {
-            // perform work
-            std::cout << "Hello from Worker thread #" << std::this_thread::get_id() << std::endl;
-        }
-        
-        int main()
-        {
-            // create threads
-            std::vector<std::thread> threads;
-            for (size_t i = 0; i < 5; ++i)
-            {
-                // copying thread objects causes a compile error
-                /*
-                std::thread t(printHello);
-                threads.push_back(t); 
-                */
-        
-                // moving thread objects will work
-                threads.emplace_back(std::thread(printHello));
-            }
-        
-            // do something in main()
-            std::cout << "Hello from Main thread #" << std::this_thread::get_id() << std::endl;
-        
-            // call join on all thread objects using a range-based loop
-            for (auto &t : threads)
-                t.join();
-        
-            return 0;
-        }
-        ```
+    void printHello()
+    {
+        // perform work
+        std::cout << "Hello from Worker thread #" << std::this_thread::get_id() << std::endl;
+    }
     
-    * When we try to compile the program using the `push_back()` function (which is the usual way in most cases), we get a compiler error. The problem with our code is that by pushing the thread object into the vector, **we attempt to make a copy of it**. However, thread objects do not have a `copy constructor` and thus can not be duplicated. If this were possible, we would create yet another branch in the flow of execution - which is not what we want. The solution to this problem is to use `move semantics`, which provide a convenient way for the contents of objects to be 'moved' between objects, rather than copied. It might be a good idea at this point to refresh your knowledge on `move semantics`, on `rvalues` and `lvalues` as well as on `rvalue references`, as we will make use of these concepts throughout the course.
-
-    * **To solve our problem, we can use the function `emplace_back()` instead of `push_back()`, which internally uses `move semantics` to move our thread object into the vector without making a copy. When executing the code, we get the following output:**
-
-    * ```bash
-        Hello from Worker thread #Hello from Worker thread #140370329347840140370337740544
-        Hello from Worker thread #140370320955136
-        Hello from Worker thread #140370346133248
-        
-        Hello from Main thread #140370363660096
-        Hello from Worker thread #140370312562432
-        ```
+    int main()
+    {
+        // create threads
+        std::vector<std::thread> threads;
+        for (size_t i = 0; i < 5; ++i)
+        {
+            // copying thread objects causes a compile error
+            /*
+            std::thread t(printHello);
+            threads.push_back(t); 
+            */
     
-    * This is surely not how we intended the console output to look like. When we take a close look at the call to `std::cout` in the thread function, we can see that it actually consists of three parts: the string "Hello from worker…", the respective `thread id` and finally the line break at the end. In the output, all three components are completely intermingled. Also, when the program is run several times, the output will look different with each execution. This shows us two important properties of concurrent programs:
-
-        * **The order in which threads are executed is non-deterministic**. Every time a program is executed, there is a chance for a completely different order of execution.
-        * Threads may get preempted in the middle of execution and another thread may be selected to run.
-
-    * These two properties pose a major problem with concurrent applications: A program may run correctly for thousands of times and suddenly, due to a particular interleaving of threads, there might be a problem. From a debugging perspective, such errors are very hard to detect as they can not be reproduced easily.
-
-* A First Concurrency Bug
-
-    * Let us adjust the program code from the previous example and use a Lambda instead of the function `printHello()`. Also, we will pass the loop counter `i` into the Lambda to enforce an individual wait time for each thread. The idea is to prevent the interleaving of text on the command line which we saw in the previous example.
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <chrono>
-        #include <random>
-        #include <vector>
-        
-        int main()
-        {
-            // create threads
-            std::vector<std::thread> threads;
-            for (size_t i = 0; i < 10; ++i)
-            {
-                // create new thread from a Lambda
-                threads.emplace_back([&i]() {
-        
-                    // wait for certain amount of time
-                    std::this_thread::sleep_for(std::chrono::milliseconds(10 * i));
-        
-                    // perform work
-                    std::cout << "Hello from Worker thread #" << i << std::endl;
-                });
-            }
-        
-            // do something in main()
-            std::cout << "Hello from Main thread" << std::endl;
-        
-            // call join on all thread objects using a range-based loop
-            for (auto &t : threads)
-                t.join();
-        
-            return 0;
+            // moving thread objects will work
+            threads.emplace_back(std::thread(printHello));
         }
-        ```
     
-    * In order to ensure the correct view on the counter variable `i`, pass it to the `Lambda` function by value and not by reference.
-
-* C3.2 : Promises and Futures
-
-    * The promise - future communication channel¶
-
-    * The methods for passing data to a thread we have discussed so far are both useful during `thread construction`: We can either pass arguments to the thread function using `variadic templates` or we can use a `Lambda` to capture arguments by value or by reference. The following example illustrates the use of these methods again:
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        
-        void printMessage(std::string message)
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10)); // simulate work
-            std::cout << "Thread 1: " << message << std::endl;
-        }
-        
-        int main()
-        {
-            // define message
-            std::string message = "My Message";
-        
-            // start thread using variadic templates
-            std::thread t1(printMessage, message);
-        
-            // start thread using a Lambda
-            std::thread t2([message] {
-                std::this_thread::sleep_for(std::chrono::milliseconds(10)); // simulate work
-                std::cout << "Thread 2: " << message << std::endl;
-            });
-        
-            // thread barrier
-            t1.join();
-            t2.join();
-        
-            return 0;
-        }
-        ```
+        // do something in main()
+        std::cout << "Hello from Main thread #" << std::this_thread::get_id() << std::endl;
     
-    * A drawback of these two approaches is that the information flows from the parent thread `(main)` to the worker threads `(t1 and t2)`. In this section, we want to look at a way to pass data in the opposite direction - that is from the worker threads back to the parent thread.
-
-    * In order to achieve this, the threads need to adhere to a strict `synchronization protocol`. There is a such a mechanism available in the C++ standard that we can use for this purpose. This mechanism acts as a `single-use` channel between the `threads`. The sending end of the channel is called `"promise"` while the receiving end is called `"future"`.
-
-    * In the C++ standard, the class template `std::promise` provides a convenient way to store a `value` or an `exception` that will acquired `asynchronously` at a later time via a `std::future` object. Each `std::promise` object is meant to be used only a single time.
-
-    * In the following example, we want to declare a promise which allows for transmitting a string between two threads and modifying it in the process.
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <future>
-        
-        void modifyMessage(std::promise<std::string> && prms, std::string message)
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(4000)); // simulate work
-            std::string modifiedMessage = message + " has been modified"; 
-            prms.set_value(modifiedMessage);
-        }
-        
-        int main()
-        {
-            // define message
-            std::string messageToThread = "My Message";
-        
-            // create promise and future
-            std::promise<std::string> prms;
-            std::future<std::string> ftr = prms.get_future();
-        
-            // start thread and pass promise as argument
-            std::thread t(modifyMessage, std::move(prms), messageToThread);
-        
-            // print original message to console
-            std::cout << "Original message from main(): " << messageToThread << std::endl;
-        
-            // retrieve modified message via future and print to console
-            std::string messageFromThread = ftr.get();
-            std::cout << "Modified message from thread(): " << messageFromThread << std::endl;
-        
-            // thread barrier
+        // call join on all thread objects using a range-based loop
+        for (auto &t : threads)
             t.join();
-        
-            return 0;
+    
+        return 0;
+    }
+    ```
+
+* When we try to compile the program using the `push_back()` function (which is the usual way in most cases), we get a compiler error. The problem with our code is that by pushing the thread object into the vector, **we attempt to make a copy of it**. However, thread objects do not have a `copy constructor` and thus can not be duplicated. If this were possible, we would create yet another branch in the flow of execution - which is not what we want. The solution to this problem is to use `move semantics`, which provide a convenient way for the contents of objects to be 'moved' between objects, rather than copied. It might be a good idea at this point to refresh your knowledge on `move semantics`, on `rvalues` and `lvalues` as well as on `rvalue references`, as we will make use of these concepts throughout the course.
+
+* **To solve our problem, we can use the function `emplace_back()` instead of `push_back()`, which internally uses `move semantics` to move our thread object into the vector without making a copy. When executing the code, we get the following output:**
+
+* ```bash
+    Hello from Worker thread #Hello from Worker thread #140370329347840140370337740544
+    Hello from Worker thread #140370320955136
+    Hello from Worker thread #140370346133248
+    
+    Hello from Main thread #140370363660096
+    Hello from Worker thread #140370312562432
+    ```
+
+* This is surely not how we intended the console output to look like. When we take a close look at the call to `std::cout` in the thread function, we can see that it actually consists of three parts: the string "Hello from worker…", the respective `thread id` and finally the line break at the end. In the output, all three components are completely intermingled. Also, when the program is run several times, the output will look different with each execution. This shows us two important properties of concurrent programs:
+
+    * **The order in which threads are executed is non-deterministic**. Every time a program is executed, there is a chance for a completely different order of execution.
+    * Threads may get preempted in the middle of execution and another thread may be selected to run.
+
+* These two properties pose a major problem with concurrent applications: A program may run correctly for thousands of times and suddenly, due to a particular interleaving of threads, there might be a problem. From a debugging perspective, such errors are very hard to detect as they can not be reproduced easily.
+
+#### A First Concurrency Bug
+
+* Let us adjust the program code from the previous example and use a Lambda instead of the function `printHello()`. Also, we will pass the loop counter `i` into the Lambda to enforce an individual wait time for each thread. The idea is to prevent the interleaving of text on the command line which we saw in the previous example.
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <chrono>
+    #include <random>
+    #include <vector>
+    
+    int main()
+    {
+        // create threads
+        std::vector<std::thread> threads;
+        for (size_t i = 0; i < 10; ++i)
+        {
+            // create new thread from a Lambda
+            threads.emplace_back([&i]() {
+    
+                // wait for certain amount of time
+                std::this_thread::sleep_for(std::chrono::milliseconds(10 * i));
+    
+                // perform work
+                std::cout << "Hello from Worker thread #" << i << std::endl;
+            });
         }
-        ```
     
-    * After defining a message, we have to create a suitable `promise` that can take a `string` object. To obtain the corresponding future, we need to call the method `get_future()` on the promise. `Promise` and `future` are the two types of the communication channel we want to use to pass a string between threads. The communication channel set up in this manner can only pass a string.
-
-    * We can now create a thread that takes a function and we will pass it the `promise` as an argument as well as the message to be modified. `Promises` **can not be copied**, because the `promise-future` concept is a two-point communication channel for **one-time use**. Therefore, we must pass the `promise` to the `thread` function using `std::move`. The thread will then, during its execution, use the promise to pass back the modified message.
-
-    * The thread function takes the `promise` as an `rvalue` reference in accordance with `move semantics`. After waiting for several seconds, the message is modified and the method `set_value()` is called on the `promise`.
-
-    * Back in the main thread, after starting the thread, the original message is printed to the console. Then, we start listening on the other end of the communication channel by calling the function `get()` on the `future`. This method will **block until data is available** - which happens as soon as `set_value` has been called on the `promise` (from the thread). If the result is movable (which is the case for `std::string`), it will be moved - otherwise it will be copied instead. After the data has been received (with a considerable delay), the modified message is printed to the console.
-
-    * ```bash
-        Original message from main(): My Message
-        Modified message from thread(): My Message has been modified
-        ```
+        // do something in main()
+        std::cout << "Hello from Main thread" << std::endl;
     
-    * It is also possible that the worker value calls `set_value` on the promise before `get()` is called on the `future`. In this case, `get()` returns immediately without any delay. After `get()` has been called once, the `future` is no longer usable. This makes sense as the normal mode of data exchange between `promise` and `future` works with `std::move` - and in this case, the data is no longer available in the channel after the first call to `get()`. If `get()` is called a second time, **an exception is thrown**.
+        // call join on all thread objects using a range-based loop
+        for (auto &t : threads)
+            t.join();
+    
+        return 0;
+    }
+    ```
+
+* In order to ensure the correct view on the counter variable `i`, pass it to the `Lambda` function by value and not by reference.
+
+## C3.2 : Promises and Futures
+
+### The promise - future communication channel¶
+
+* The methods for passing data to a thread we have discussed so far are both useful during `thread construction`: We can either pass arguments to the thread function using `variadic templates` or we can use a `Lambda` to capture arguments by value or by reference. The following example illustrates the use of these methods again:
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    
+    void printMessage(std::string message)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10)); // simulate work
+        std::cout << "Thread 1: " << message << std::endl;
+    }
+    
+    int main()
+    {
+        // define message
+        std::string message = "My Message";
+    
+        // start thread using variadic templates
+        std::thread t1(printMessage, message);
+    
+        // start thread using a Lambda
+        std::thread t2([message] {
+            std::this_thread::sleep_for(std::chrono::milliseconds(10)); // simulate work
+            std::cout << "Thread 2: " << message << std::endl;
+        });
+    
+        // thread barrier
+        t1.join();
+        t2.join();
+    
+        return 0;
+    }
+    ```
+
+* A drawback of these two approaches is that the information flows from the parent thread `(main)` to the worker threads `(t1 and t2)`. In this section, we want to look at a way to pass data in the opposite direction - that is from the worker threads back to the parent thread.
+
+* In order to achieve this, the threads need to adhere to a strict `synchronization protocol`. There is a such a mechanism available in the C++ standard that we can use for this purpose. This mechanism acts as a `single-use` channel between the `threads`. The sending end of the channel is called `"promise"` while the receiving end is called `"future"`.
+
+* In the C++ standard, the class template `std::promise` provides a convenient way to store a `value` or an `exception` that will acquired `asynchronously` at a later time via a `std::future` object. Each `std::promise` object is meant to be used only a single time.
+
+* In the following example, we want to declare a promise which allows for transmitting a string between two threads and modifying it in the process.
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <future>
+    
+    void modifyMessage(std::promise<std::string> && prms, std::string message)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(4000)); // simulate work
+        std::string modifiedMessage = message + " has been modified"; 
+        prms.set_value(modifiedMessage);
+    }
+    
+    int main()
+    {
+        // define message
+        std::string messageToThread = "My Message";
+    
+        // create promise and future
+        std::promise<std::string> prms;
+        std::future<std::string> ftr = prms.get_future();
+    
+        // start thread and pass promise as argument
+        std::thread t(modifyMessage, std::move(prms), messageToThread);
+    
+        // print original message to console
+        std::cout << "Original message from main(): " << messageToThread << std::endl;
+    
+        // retrieve modified message via future and print to console
+        std::string messageFromThread = ftr.get();
+        std::cout << "Modified message from thread(): " << messageFromThread << std::endl;
+    
+        // thread barrier
+        t.join();
+    
+        return 0;
+    }
+    ```
+
+* After defining a message, we have to create a suitable `promise` that can take a `string` object. To obtain the corresponding future, we need to call the method `get_future()` on the promise. `Promise` and `future` are the two types of the communication channel we want to use to pass a string between threads. The communication channel set up in this manner can only pass a string.
+
+* We can now create a thread that takes a function and we will pass it the `promise` as an argument as well as the message to be modified. `Promises` **can not be copied**, because the `promise-future` concept is a two-point communication channel for **one-time use**. Therefore, we must pass the `promise` to the `thread` function using `std::move`. The thread will then, during its execution, use the promise to pass back the modified message.
+
+* The thread function takes the `promise` as an `rvalue` reference in accordance with `move semantics`. After waiting for several seconds, the message is modified and the method `set_value()` is called on the `promise`.
+
+* Back in the main thread, after starting the thread, the original message is printed to the console. Then, we start listening on the other end of the communication channel by calling the function `get()` on the `future`. This method will **block until data is available** - which happens as soon as `set_value` has been called on the `promise` (from the thread). If the result is movable (which is the case for `std::string`), it will be moved - otherwise it will be copied instead. After the data has been received (with a considerable delay), the modified message is printed to the console.
+
+* ```bash
+    Original message from main(): My Message
+    Modified message from thread(): My Message has been modified
+    ```
+
+* It is also possible that the worker value calls `set_value` on the promise before `get()` is called on the `future`. In this case, `get()` returns immediately without any delay. After `get()` has been called once, the `future` is no longer usable. This makes sense as the normal mode of data exchange between `promise` and `future` works with `std::move` - and in this case, the data is no longer available in the channel after the first call to `get()`. If `get()` is called a second time, **an exception is thrown**.
 
 * `get()` vs. `wait()`
 
@@ -7072,70 +7072,70 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
         }
         ```
 
-* Passing exceptions
+### Passing exceptions
 
-    * The `future-promise` communication channel may also be used for passing `exceptions`. To do this, the worker thread simply sets an `exception` rather than a value in the `promise`. In the parent thread, the `exception` is then `re-thrown` once `get()` is called on the `future`.
+* The `future-promise` communication channel may also be used for passing `exceptions`. To do this, the worker thread simply sets an `exception` rather than a value in the `promise`. In the parent thread, the `exception` is then `re-thrown` once `get()` is called on the `future`.
 
-    * Let us take a look at the following example to see how this mechanism works:
+* Let us take a look at the following example to see how this mechanism works:
 
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <future>
-        #include <cmath>
-        #include <memory>
-        
-        void divideByNumber(std::promise<double> &&prms, double num, double denom)
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(500)); // simulate work
-            try
-            {
-                if (denom == 0)
-                    throw std::runtime_error("Exception from thread: Division by zero!");
-                else
-                    prms.set_value(num / denom);
-            }
-            catch (...)
-            {
-                prms.set_exception(std::current_exception());
-            }
-        }
-        
-        int main()
-        {
-            // create promise and future
-            std::promise<double> prms;
-            std::future<double> ftr = prms.get_future();
-        
-            // start thread and pass promise as argument
-            double num = 42.0, denom = 0.0;
-            std::thread t(divideByNumber, std::move(prms), num, denom);
-        
-            // retrieve result within try-catch-block
-            try
-            {
-                double result = ftr.get();
-                std::cout << "Result = " << result << std::endl;
-            }
-            catch (std::runtime_error e)
-            {
-                std::cout << e.what() << std::endl;
-            }
-        
-            // thread barrier
-            t.join();
-        
-            return 0;
-        }
-        ```
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <future>
+    #include <cmath>
+    #include <memory>
     
-    * In the thread function, we need to implement a `try-catch` block which can be set to catch a particular exception or - as in our case - to catch `all exceptions`. Instead of setting a value, we now want to throw a `std::exception` along with a customized error message. In the `catch-block`, we catch this exception and throw it to the parent thread using the promise with `set_exception`. The function `std::current_exception` allows us to easily retrieve the exception which has been thrown.
+    void divideByNumber(std::promise<double> &&prms, double num, double denom)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500)); // simulate work
+        try
+        {
+            if (denom == 0)
+                throw std::runtime_error("Exception from thread: Division by zero!");
+            else
+                prms.set_value(num / denom);
+        }
+        catch (...)
+        {
+            prms.set_exception(std::current_exception());
+        }
+    }
+    
+    int main()
+    {
+        // create promise and future
+        std::promise<double> prms;
+        std::future<double> ftr = prms.get_future();
+    
+        // start thread and pass promise as argument
+        double num = 42.0, denom = 0.0;
+        std::thread t(divideByNumber, std::move(prms), num, denom);
+    
+        // retrieve result within try-catch-block
+        try
+        {
+            double result = ftr.get();
+            std::cout << "Result = " << result << std::endl;
+        }
+        catch (std::runtime_error e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+    
+        // thread barrier
+        t.join();
+    
+        return 0;
+    }
+    ```
 
-    * On the parent side, we now need to catch this exception. In order to do this, we can use a `try-block` around the call to `get()`. We can set the `catch-block` to catch all exceptions or - as in this example - we could also catch a particular one such as the standard `exception`. Calling the method `what()` on the exception allows us to retrieve the message from the exception - which is the one defined on the promise side of the communication channel.
+* In the thread function, we need to implement a `try-catch` block which can be set to catch a particular exception or - as in our case - to catch `all exceptions`. Instead of setting a value, we now want to throw a `std::exception` along with a customized error message. In the `catch-block`, we catch this exception and throw it to the parent thread using the promise with `set_exception`. The function `std::current_exception` allows us to easily retrieve the exception which has been thrown.
 
-    * When we run the program, we can see that the exception is being thrown in the `worker thread` with the `main thread `printing the corresponding error message to the console.
+* On the parent side, we now need to catch this exception. In order to do this, we can use a `try-block` around the call to `get()`. We can set the `catch-block` to catch all exceptions or - as in this example - we could also catch a particular one such as the standard `exception`. Calling the method `what()` on the exception allows us to retrieve the message from the exception - which is the one defined on the promise side of the communication channel.
 
-    * So a `promise future` pair can be used to pass either values or exceptions between threads.
+* When we run the program, we can see that the exception is being thrown in the `worker thread` with the `main thread `printing the corresponding error message to the console.
+
+* So a `promise future` pair can be used to pass either values or exceptions between threads.
 
 * Threads vs. Tasks
 
