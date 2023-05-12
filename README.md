@@ -7872,558 +7872,558 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
 
 * It seems that not all the vehicles could be added to the queue. But why is that? Note that in the thread function `"pushBack"` there is a call to `sleep_for`, which pauses the `thread` execution for a short time. This is the position where the data race occurs: First, the current value of `_tmpVehicles` is stored in a temporary variable `oldNum`. While the thread is paused, there might (and will) be changes to `_tmpVehicles` performed by other `threads`. When the execution resumes, the former value of `_tmpVehicles` is written back, thus invalidating the contribution of all the `threads` who had write access in the mean time. Interestingly, when `sleep_for` is commented out, the output of the program is the same as with `std::launch::deferred` - at least that will be the case for most of the time when we run the program. But once in a while, there might be a `scheduling constellation` which causes the bug to expose itself. Apart from understanding the data race, you should take as an advice that introducing deliberate time delays in the testing / debugging phase of development can help expose many concurrency bugs.
 
-* Using mutex to protect data
+#### Using mutex to protect data
 
-    * In its simplest form, using a mutex consists of four straight-forward steps:
+* In its simplest form, using a mutex consists of four straight-forward steps:
 
-        * Include the `<mutex>` header
-        * Create an `std::mutex`
-        * Lock the `mutex` using `lock()` before `read/write` is called
-        * Unlock the `mutex` after the `read/write` operation is finished using `unlock()`
+    * Include the `<mutex>` header
+    * Create an `std::mutex`
+    * Lock the `mutex` using `lock()` before `read/write` is called
+    * Unlock the `mutex` after the `read/write` operation is finished using `unlock()`
+
+* In order to protect the access to `_vehicles` from being manipulated by several `threads` at once, a `mutex` has been added to the class as a `private data member`. In the `pushBack` function, the `mutex` is locked before a new element is added to the vector and unlocked after the operation is complete.
+
+* Note that the `mutex` is also locked in the function `printSize` just before printing the size of the `vector`. The reason for this lock is two-fold: First, we want to prevent a `data race` that would occur when a `read-access` to the vector and a simultaneous `write access` (even when under the lock) would occur. And second, we want to exclusively reserve the `standard output` to the console for printing the vector size without other `threads` printing to it at the same time.
+
+* When this code is executed, `1000` elements will be in the vector. By using a `mutex` to our shared resource, a data race has been effectively avoided.
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <vector>
+    #include <future>
+    #include <mutex>
+    #include<algorithm>
     
-    * In order to protect the access to `_vehicles` from being manipulated by several `threads` at once, a `mutex` has been added to the class as a `private data member`. In the `pushBack` function, the `mutex` is locked before a new element is added to the vector and unlocked after the operation is complete.
-
-    * Note that the `mutex` is also locked in the function `printSize` just before printing the size of the `vector`. The reason for this lock is two-fold: First, we want to prevent a `data race` that would occur when a `read-access` to the vector and a simultaneous `write access` (even when under the lock) would occur. And second, we want to exclusively reserve the `standard output` to the console for printing the vector size without other `threads` printing to it at the same time.
-
-    * When this code is executed, `1000` elements will be in the vector. By using a `mutex` to our shared resource, a data race has been effectively avoided.
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <vector>
-        #include <future>
-        #include <mutex>
-        #include<algorithm>
-        
-        class Vehicle
-        {
-        public:
-            Vehicle(int id) : _id(id) {}
-        
-        private:
-            int _id;
-        };
-        
-        class WaitingVehicles
-        {
-        public:
-            WaitingVehicles() {}
-        
-            // getters / setters
-            void printSize()
-            {
-                _mutex.lock();
-                std::cout << "#vehicles = " << _vehicles.size() << std::endl;
-                _mutex.unlock();
-            }
-        
-            // typical behaviour methods
-            void pushBack(Vehicle &&v)
-            {
-                _mutex.lock();
-                _vehicles.emplace_back(std::move(v)); // data race would cause an exception
-                _mutex.unlock();
-            }
-        
-        private:
-            std::vector<Vehicle> _vehicles; // list of all vehicles waiting to enter this intersection
-            std::mutex _mutex;
-        };
-        
-        int main()
-        {
-            std::shared_ptr<WaitingVehicles> queue(new WaitingVehicles); 
-            std::vector<std::future<void>> futures;
-            for (int i = 0; i < 1000; ++i)
-            {
-                Vehicle v(i);
-                futures.emplace_back(std::async(std::launch::async, &WaitingVehicles::pushBack, queue, std::move(v)));
-            }
-        
-            std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
-                ftr.wait();
-            });
-        
-            queue->printSize();
-        
-            return 0;
-        }
-        ```
-
-* Using timed_mutex
-
-    * In the following, a short overview of the different available `mutex` types is given:
-
-        * `mutex`: provides the core functions `lock()` and `unlock()` and the non-blocking `try_lock()` method that returns if the `mutex` is not available.
-        * `recursive_mutex`: allows multiple acquisitions of the `mutex` from the same `thread`.
-        * `timed_mutex`: similar to `mutex`, but it comes with two more methods `try_lock_for()` and `try_lock_until()` that try to acquire the `mutex` for a period of time or until a moment in time is reached.
-        * `recursive_timed_mutex`: is a combination of `timed_mutex` and `recursive_mutex`.
+    class Vehicle
+    {
+    public:
+        Vehicle(int id) : _id(id) {}
     
-    * Please adapt the code from the previous example (example_2.cpp) in a way that a `timed_mutex` is used. Also, in the function `pushBack`, please use the method try_lock_for instead of lock, which should be executed until a maximum number of attempts is reached (e.g. 3 times) or until it succeeds. When an attempt fails, you should print an error message to the console that also contains the respective vehicle id and then put the thread to sleep for an amount of time before the next attempt is trief. Also, to expose the timing issues in this example, please introduce a call to sleep_for with a delay of several milliseconds before releasing the lock on the mutex. When done, experiment with the timing parameters to see how many vehicles will be added to the vector in the end.
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <vector>
-        #include <future>
-        #include <mutex>
-        
-        class Vehicle
+    private:
+        int _id;
+    };
+    
+    class WaitingVehicles
+    {
+    public:
+        WaitingVehicles() {}
+    
+        // getters / setters
+        void printSize()
         {
-        public:
-            Vehicle(int id) : _id(id) {}
-            int getID() { return _id; }
-        
-        private:
-            int _id;
-        };
-        
-        class WaitingVehicles
-        {
-        public:
-            WaitingVehicles() {}
-        
-            // getters / setters
-            void printSize()
-            {
-                _mutex.lock();
-                std::cout << "#vehicles = " << _vehicles.size() << std::endl;
-                _mutex.unlock();
-            }
-        
-            // typical behaviour methods
-            void pushBack(Vehicle &&v)
-            {
-                for (size_t i = 0; i < 3; ++i)
-                {
-                    if (_mutex.try_lock_for(std::chrono::milliseconds(100)))
-                    {
-                        _vehicles.emplace_back(std::move(v));
-                        //std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                        _mutex.unlock();
-                        break;
-                    }
-                    else
-                    {
-                        std::cout << "Error! Vehicle #" << v.getID() << " could not be added to the vector" << std::endl;
-                        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                    }
-                }
-            }
-        
-        private:
-            std::vector<Vehicle> _vehicles; // list of all vehicles waiting to enter this intersection
-            std::timed_mutex _mutex;
-        };
-        
-        int main()
-        {
-            std::shared_ptr<WaitingVehicles> queue(new WaitingVehicles);
-            std::vector<std::future<void>> futures;
-            for (int i = 0; i < 1000; ++i)
-            {
-                Vehicle v(i);
-                futures.emplace_back(std::async(std::launch::async, &WaitingVehicles::pushBack, queue, std::move(v)));
-            }
-        
-            std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
-                ftr.wait();
-            });
-        
-            queue->printSize();
-        
-            return 0;
+            _mutex.lock();
+            std::cout << "#vehicles = " << _vehicles.size() << std::endl;
+            _mutex.unlock();
         }
-        ```
-
-* Deadlock 1
-
-    * Using `mutexes` can significantly reduce the risk of data races as seen in the example above. But imagine what would happen if an exception was thrown while executing code in the critical section, i.e. between `lock` and `unlock`. In such a case, the `mutex` would remain `locked` indefinitely and no other `thread` could unlock it - the program would most likely freeze.
-
-    * Let us take a look at the following code example, which performs a division of numbers:
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <vector>
-        #include <future>
-        #include<algorithm>
-        
-        double result;
-        
-        void printResult(int denom)
+    
+        // typical behaviour methods
+        void pushBack(Vehicle &&v)
         {
-            std::cout << "for denom = " << denom << ", the result is " << result << std::endl;
+            _mutex.lock();
+            _vehicles.emplace_back(std::move(v)); // data race would cause an exception
+            _mutex.unlock();
         }
-        
-        void divideByNumber(double num, double denom)
+    
+    private:
+        std::vector<Vehicle> _vehicles; // list of all vehicles waiting to enter this intersection
+        std::mutex _mutex;
+    };
+    
+    int main()
+    {
+        std::shared_ptr<WaitingVehicles> queue(new WaitingVehicles); 
+        std::vector<std::future<void>> futures;
+        for (int i = 0; i < 1000; ++i)
         {
-            try
+            Vehicle v(i);
+            futures.emplace_back(std::async(std::launch::async, &WaitingVehicles::pushBack, queue, std::move(v)));
+        }
+    
+        std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
+            ftr.wait();
+        });
+    
+        queue->printSize();
+    
+        return 0;
+    }
+    ```
+
+#### Using timed_mutex
+
+* In the following, a short overview of the different available `mutex` types is given:
+
+    * `mutex`: provides the core functions `lock()` and `unlock()` and the non-blocking `try_lock()` method that returns if the `mutex` is not available.
+    * `recursive_mutex`: allows multiple acquisitions of the `mutex` from the same `thread`.
+    * `timed_mutex`: similar to `mutex`, but it comes with two more methods `try_lock_for()` and `try_lock_until()` that try to acquire the `mutex` for a period of time or until a moment in time is reached.
+    * `recursive_timed_mutex`: is a combination of `timed_mutex` and `recursive_mutex`.
+
+* Please adapt the code from the previous example (example_2.cpp) in a way that a `timed_mutex` is used. Also, in the function `pushBack`, please use the method try_lock_for instead of lock, which should be executed until a maximum number of attempts is reached (e.g. 3 times) or until it succeeds. When an attempt fails, you should print an error message to the console that also contains the respective vehicle id and then put the thread to sleep for an amount of time before the next attempt is trief. Also, to expose the timing issues in this example, please introduce a call to sleep_for with a delay of several milliseconds before releasing the lock on the mutex. When done, experiment with the timing parameters to see how many vehicles will be added to the vector in the end.
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <vector>
+    #include <future>
+    #include <mutex>
+    
+    class Vehicle
+    {
+    public:
+        Vehicle(int id) : _id(id) {}
+        int getID() { return _id; }
+    
+    private:
+        int _id;
+    };
+    
+    class WaitingVehicles
+    {
+    public:
+        WaitingVehicles() {}
+    
+        // getters / setters
+        void printSize()
+        {
+            _mutex.lock();
+            std::cout << "#vehicles = " << _vehicles.size() << std::endl;
+            _mutex.unlock();
+        }
+    
+        // typical behaviour methods
+        void pushBack(Vehicle &&v)
+        {
+            for (size_t i = 0; i < 3; ++i)
             {
-                // divide num by denom but throw an exception if division by zero is attempted
-                if (denom != 0) 
+                if (_mutex.try_lock_for(std::chrono::milliseconds(100)))
                 {
-                    result = num / denom;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
-                    printResult(denom);
+                    _vehicles.emplace_back(std::move(v));
+                    //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    _mutex.unlock();
+                    break;
                 }
                 else
                 {
-                    throw std::invalid_argument("Exception from thread: Division by zero!");
+                    std::cout << "Error! Vehicle #" << v.getID() << " could not be added to the vector" << std::endl;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 }
             }
-            catch (const std::invalid_argument &e)
-            {
-                // notify the user about the exception and return
-                std::cout << e.what() << std::endl;
-                return; 
-            }
         }
-        
-        int main()
-        {
-            // create a number of threads which execute the function "divideByNumber" with varying parameters
-            std::vector<std::future<void>> futures;
-            for (double i = -5; i <= +5; ++i)
-            {
-                futures.emplace_back(std::async(std::launch::async, divideByNumber, 50.0, i));
-            }
-        
-            // wait for the results
-            std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
-                ftr.wait();
-            });
-        
-            return 0;
-        }
-        ```
     
-    * In this example, a number of tasks is started up in `main()` with the method `divideByNumber` as the `thread` function. Each `task` is given a different denominator and within `divideByNumber` a check is performed to avoid a division by zero. If `denom` should be zero, an `exception is thrown`. In the `catch-block`, the exception is caught, printed to the console and then the function returns immediately. The output of the program changes with each execution and might look like this:
-
-    * ```bash
-        for denom = -3, the result is -25
-        for denom = -2, the result is -50
-        for denom = -5, the result is -50
-        for denom = -4, the result is 50
-        Exception from thread: Division by zero!
-        for denom = -1, the result is 16.6667
-        for denom = 3, the result is 12.5
-        for denom = 1, the result is 10
-        for denom = 2, the result is 10
-        for denom = 4, the result is 10
-        for denom = 5, the result is 10
-        ```
+    private:
+        std::vector<Vehicle> _vehicles; // list of all vehicles waiting to enter this intersection
+        std::timed_mutex _mutex;
+    };
     
-    * As can easily be seen, the console output is totally mixed up and some results appear multiple times. There are several issues with this program, so let us look at them in turn:
-
-        * First, the thread function writes its result to a `global variable` which is passed to it by `reference`. This will cause a data race as illustrated in the last section. The `sleep_for` function exposes the data race clearly.
-        * Second, the result is printed to the console by several `threads` at the same time, causing the chaotic output.
+    int main()
+    {
+        std::shared_ptr<WaitingVehicles> queue(new WaitingVehicles);
+        std::vector<std::future<void>> futures;
+        for (int i = 0; i < 1000; ++i)
+        {
+            Vehicle v(i);
+            futures.emplace_back(std::async(std::launch::async, &WaitingVehicles::pushBack, queue, std::move(v)));
+        }
     
-    * As we have seen already, using a `mutex` can protect shared resources. So please modify the code in a way that both the console as well as the shared `global` variable result are properly protected.
-
-    * The problem you have just seen is one type of deadlock, which causes a program to freeze because one thread does not release the lock on the mutex while all other threads are waiting for access indefinitely. Let us now look at another type.
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <vector>
-        #include <future>
-        #include <mutex>
-        
-        std::mutex mtx;
-        double result;
-        
-        void printResult(int denom)
-        {
-            std::cout << "for denom = " << denom << ", the result is " << result << std::endl;
-        }
-        
-        void divideByNumber(double num, double denom)
-        {
-            mtx.lock();
-            try
-            {
-                // divide num by denom but throw an exception if division by zero is attempted
-                if (denom != 0) 
-                {
-                    result = num / denom;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
-                    printResult(denom);
-                }
-                else
-                {
-                    throw std::invalid_argument("Exception from thread: Division by zero!");
-                }
-            }
-            catch (const std::invalid_argument &e)
-            {
-                // notify the user about the exception and return
-                std::cout << e.what() << std::endl;
-                return; // deadlock
-            } 
-            mtx.unlock();
-        }
-        
-        int main()
-        {
-            // create a number of threads which execute the function "divideByNumber" with varying parameters
-            std::vector<std::future<void>> futures;
-            for (double i = -5; i <= +5; ++i)
-            {
-                futures.emplace_back(std::async(std::launch::async, divideByNumber, 50.0, i));
-            }
-        
-            // wait for the results
-            std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
-                ftr.wait();
-            });
-        
-            return 0;
-        }
-        ```
-
-* Deadlock 2
-
-    * A second type of `deadlock` is a state in which two or more threads are blocked because each thread waits for the resource of the other `thread` to be released before releasing its resource. The result of the `deadlock` is a complete standstill. The `thread` and therefore usually the whole program is blocked forever. The following code illustrates the problem:
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <mutex>
-        
-        std::mutex mutex1, mutex2;
-        
-        void ThreadA()
-        {
-            // Creates deadlock problem
-            mutex2.lock();
-            std::cout << "Thread A" << std::endl;
-            mutex1.lock();
-            mutex2.unlock();
-            mutex1.unlock();
-        }
-        
-        void ThreadB()
-        {
-            // Creates deadlock problem
-            mutex1.lock();
-            std::cout << "Thread B" << std::endl;
-            mutex2.lock();
-            mutex1.unlock();
-            mutex2.unlock();
-        }
-        
-        void ExecuteThreads()
-        {
-            std::thread t1( ThreadA );
-            std::thread t2( ThreadB );
-        
-            t1.join();
-            t2.join();
-        
-            std::cout << "Finished" << std::endl;
-        }
-        
-        int main()
-        {
-            ExecuteThreads();
-        
-            return 0;
-        }
-        ```
+        std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
+            ftr.wait();
+        });
     
-    * When the program is executed, it produces the following output:
-
-    * `Thread AThread B`
-
-    * Notice that it does not print the `"Finished"` statement nor does it return - the program is in a `deadlock`, which it can never leave.
-
-    * Let us take a closer look at this problem:
-
-    * `ThreadA` and `ThreadB` both require access to the console. Unfortunately, they request this resource which is protected by two `mutexes` in different order. If the two `threads` work `interlocked` so that first `ThreadA` locks `mutex 1`, then `ThreadB` locks `mutex 2`, the program is in a `deadlock`: Each `thread` tries to lock the other `mutex` and needs to wait for its release, which never comes. The following figure illustrates the problem graphically.
-
-    * ![deadlock](./images/deadlock.png)
-
-    * One way to avoid such a `deadlock` would be to number all resources and require that processes request resources only in strictly increasing (or decreasing) order. Please try to manually rearrange the locks and unlocks in a way that the deadlock does not occur and the following text is printed to the console:
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <mutex>
-        
-        std::mutex mutex1, mutex2;
-        
-        void ThreadA()
-        {
-            // Solves deadlock problem
-            mutex1.lock();
-            std::cout << "Thread A" << std::endl;
-            mutex2.lock();
-            mutex2.unlock();
-            mutex1.unlock();
-        }
-        
-        void ThreadB()
-        {
-            // Solves deadlock problem
-            mutex1.lock();
-            std::cout << "Thread B" << std::endl;
-            mutex2.lock();
-            mutex1.unlock();
-            mutex2.unlock();
-        }
-        
-        void ExecuteThreads()
-        {
-            std::thread t1( ThreadA );
-            std::thread t2( ThreadB );
-        
-            t1.join();
-            t2.join();
-        
-            std::cout << "Finished" << std::endl;
-        }
-        
-        int main()
-        {
-            ExecuteThreads();
-        
-            return 0;
-        }
-        ```
+        queue->printSize();
     
-    * As you have seen, avoiding such a deadlock is possible but requires time and a great deal of experience. In the next section, we will look at ways to avoid deadlocks - both of this type as well as the previous type, where a call to unlock the mutex had not been issued.
+        return 0;
+    }
+    ```
 
-* Using Locks to Avoid Deadlocks
+#### Deadlock 1
 
-    * Lock Guard
+* Using `mutexes` can significantly reduce the risk of data races as seen in the example above. But imagine what would happen if an exception was thrown while executing code in the critical section, i.e. between `lock` and `unlock`. In such a case, the `mutex` would remain `locked` indefinitely and no other `thread` could unlock it - the program would most likely freeze.
 
-    * In the previous example, we have directly called the `lock()` and `unlock()` functions of a `mutex`. The idea of "working under the lock" is to block unwanted access by other `threads` to the same resource. Only the thread which acquired the `lock` can `unlock` the `mutex` and give all remaining `threads` the chance to acquire the `lock`. In practice however, direct calls to `lock()` should be avoided at all cost! Imagine that while working under the `lock`, a `thread` would throw an `exception` and exit the critical section without calling the `unlock` function on the `mutex`. In such a situation, the program would most likely freeze as no other `thread` could acquire the `mutex` any more. This is exactly what we have seen in the function `divideByNumber` from the previous example.
+* Let us take a look at the following code example, which performs a division of numbers:
 
-    * We can avoid this problem by creating a `std::lock_guard` object, which keeps an associated `mutex` locked during the entire object life time. The lock is acquired on `construction` and released automatically on `destruction`. This makes it impossible to forget `unlocking` a critical section. Also, `std::lock_guard` guarantees `exception` safety because any critical section is automatically `unlocked` when an exception is thrown. In our previous example, we can simply replace `_mutex.lock()` and `_mutex.unlock()` with the following code:
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <vector>
-        #include <future>
-        #include <mutex>
-        #include<algorithm>
-        
-        std::mutex mtx;
-        double result;
-        
-        void printResult(int denom)
-        {
-            std::cout << "for denom = " << denom << ", the result is " << result << std::endl;
-        }
-        
-        void divideByNumber(double num, double denom)
-        {
-            try
-            {
-                // divide num by denom but throw an exception if division by zero is attempted
-                if (denom != 0) 
-                {
-                    std::lock_guard<std::mutex> lck(mtx);
-                    
-                    result = num / denom;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
-                    printResult(denom);
-                }
-                else
-                {
-                    throw std::invalid_argument("Exception from thread: Division by zero!");
-                }
-            }
-            catch (const std::invalid_argument &e)
-            {
-                // notify the user about the exception and return
-                std::cout << e.what() << std::endl;
-                return; 
-            }
-        }
-        
-        int main()
-        {
-            // create a number of threads which execute the function "divideByNumber" with varying parameters
-            std::vector<std::future<void>> futures;
-            for (double i = -5; i <= +5; ++i)
-            {
-                futures.emplace_back(std::async(std::launch::async, divideByNumber, 50.0, i));
-            }
-        
-            // wait for the results
-            std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
-                ftr.wait();
-            });
-        
-            return 0;
-        }
-        ```
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <vector>
+    #include <future>
+    #include<algorithm>
     
-    * Note that there is no direct call to `lock` or `unlock` the `mutex` anymore. We now have a `std::lock_guard` object that takes the mutex as an argument and `locks` it at creation. When the method `divideByNumber` exits, the `mutex` is automatically `unlocked` by the `std::lock_guard` object as soon as it is destroyed - which happens, when the local variable gets out of scope.
+    double result;
+    
+    void printResult(int denom)
+    {
+        std::cout << "for denom = " << denom << ", the result is " << result << std::endl;
+    }
+    
+    void divideByNumber(double num, double denom)
+    {
+        try
+        {
+            // divide num by denom but throw an exception if division by zero is attempted
+            if (denom != 0) 
+            {
+                result = num / denom;
+                std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
+                printResult(denom);
+            }
+            else
+            {
+                throw std::invalid_argument("Exception from thread: Division by zero!");
+            }
+        }
+        catch (const std::invalid_argument &e)
+        {
+            // notify the user about the exception and return
+            std::cout << e.what() << std::endl;
+            return; 
+        }
+    }
+    
+    int main()
+    {
+        // create a number of threads which execute the function "divideByNumber" with varying parameters
+        std::vector<std::future<void>> futures;
+        for (double i = -5; i <= +5; ++i)
+        {
+            futures.emplace_back(std::async(std::launch::async, divideByNumber, 50.0, i));
+        }
+    
+        // wait for the results
+        std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
+            ftr.wait();
+        });
+    
+        return 0;
+    }
+    ```
 
-    * We can improve even further on this code by limiting the scope of the `mutex` to the section which accesses the critical resource. Please change the code in a way that the `mutex` is only locked for the time when result is modified and the result is printed.
+* In this example, a number of tasks is started up in `main()` with the method `divideByNumber` as the `thread` function. Each `task` is given a different denominator and within `divideByNumber` a check is performed to avoid a division by zero. If `denom` should be zero, an `exception is thrown`. In the `catch-block`, the exception is caught, printed to the console and then the function returns immediately. The output of the program changes with each execution and might look like this:
 
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <vector>
-        #include <future>
-        #include <mutex>
-        
-        std::mutex mtx;
-        double result;
-        
-        void printResult(int denom)
+* ```bash
+    for denom = -3, the result is -25
+    for denom = -2, the result is -50
+    for denom = -5, the result is -50
+    for denom = -4, the result is 50
+    Exception from thread: Division by zero!
+    for denom = -1, the result is 16.6667
+    for denom = 3, the result is 12.5
+    for denom = 1, the result is 10
+    for denom = 2, the result is 10
+    for denom = 4, the result is 10
+    for denom = 5, the result is 10
+    ```
+
+* As can easily be seen, the console output is totally mixed up and some results appear multiple times. There are several issues with this program, so let us look at them in turn:
+
+    * First, the thread function writes its result to a `global variable` which is passed to it by `reference`. This will cause a data race as illustrated in the last section. The `sleep_for` function exposes the data race clearly.
+    * Second, the result is printed to the console by several `threads` at the same time, causing the chaotic output.
+
+* As we have seen already, using a `mutex` can protect shared resources. So please modify the code in a way that both the console as well as the shared `global` variable result are properly protected.
+
+* The problem you have just seen is one type of deadlock, which causes a program to freeze because one thread does not release the lock on the mutex while all other threads are waiting for access indefinitely. Let us now look at another type.
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <vector>
+    #include <future>
+    #include <mutex>
+    
+    std::mutex mtx;
+    double result;
+    
+    void printResult(int denom)
+    {
+        std::cout << "for denom = " << denom << ", the result is " << result << std::endl;
+    }
+    
+    void divideByNumber(double num, double denom)
+    {
+        mtx.lock();
+        try
         {
-            std::cout << "for denom = " << denom << ", the result is " << result << std::endl;
+            // divide num by denom but throw an exception if division by zero is attempted
+            if (denom != 0) 
+            {
+                result = num / denom;
+                std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
+                printResult(denom);
+            }
+            else
+            {
+                throw std::invalid_argument("Exception from thread: Division by zero!");
+            }
         }
-        
-        void divideByNumber(double num, double denom)
+        catch (const std::invalid_argument &e)
         {
-            try
-            {
-                // divide num by denom but throw an exception if division by zero is attempted
-                if (denom != 0) 
-                {
-                    std::lock_guard<std::mutex> lck(mtx);
-        
-                    result = num / denom;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
-                    printResult(denom);
-                }
-                else
-                {
-                    throw std::invalid_argument("Exception from thread: Division by zero!");
-                }
-            }
-            catch (const std::invalid_argument &e)
-            {
-                // notify the user about the exception and return
-                std::cout << e.what() << std::endl;
-                return; 
-            }
-        }
-        
-        int main()
+            // notify the user about the exception and return
+            std::cout << e.what() << std::endl;
+            return; // deadlock
+        } 
+        mtx.unlock();
+    }
+    
+    int main()
+    {
+        // create a number of threads which execute the function "divideByNumber" with varying parameters
+        std::vector<std::future<void>> futures;
+        for (double i = -5; i <= +5; ++i)
         {
-            // create a number of threads which execute the function "divideByNumber" with varying parameters
-            std::vector<std::future<void>> futures;
-            for (double i = -5; i <= +5; ++i)
-            {
-                futures.emplace_back(std::async(std::launch::async, divideByNumber, 50.0, i));
-            }
-        
-            // wait for the results
-            std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
-                ftr.wait();
-            });
-        
-            return 0;
+            futures.emplace_back(std::async(std::launch::async, divideByNumber, 50.0, i));
         }
-        ```
+    
+        // wait for the results
+        std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
+            ftr.wait();
+        });
+    
+        return 0;
+    }
+    ```
+
+#### Deadlock 2
+
+* A second type of `deadlock` is a state in which two or more threads are blocked because each thread waits for the resource of the other `thread` to be released before releasing its resource. The result of the `deadlock` is a complete standstill. The `thread` and therefore usually the whole program is blocked forever. The following code illustrates the problem:
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <mutex>
+    
+    std::mutex mutex1, mutex2;
+    
+    void ThreadA()
+    {
+        // Creates deadlock problem
+        mutex2.lock();
+        std::cout << "Thread A" << std::endl;
+        mutex1.lock();
+        mutex2.unlock();
+        mutex1.unlock();
+    }
+    
+    void ThreadB()
+    {
+        // Creates deadlock problem
+        mutex1.lock();
+        std::cout << "Thread B" << std::endl;
+        mutex2.lock();
+        mutex1.unlock();
+        mutex2.unlock();
+    }
+    
+    void ExecuteThreads()
+    {
+        std::thread t1( ThreadA );
+        std::thread t2( ThreadB );
+    
+        t1.join();
+        t2.join();
+    
+        std::cout << "Finished" << std::endl;
+    }
+    
+    int main()
+    {
+        ExecuteThreads();
+    
+        return 0;
+    }
+    ```
+
+* When the program is executed, it produces the following output:
+
+* `Thread AThread B`
+
+* Notice that it does not print the `"Finished"` statement nor does it return - the program is in a `deadlock`, which it can never leave.
+
+* Let us take a closer look at this problem:
+
+* `ThreadA` and `ThreadB` both require access to the console. Unfortunately, they request this resource which is protected by two `mutexes` in different order. If the two `threads` work `interlocked` so that first `ThreadA` locks `mutex 1`, then `ThreadB` locks `mutex 2`, the program is in a `deadlock`: Each `thread` tries to lock the other `mutex` and needs to wait for its release, which never comes. The following figure illustrates the problem graphically.
+
+* ![deadlock](./images/deadlock.png)
+
+* One way to avoid such a `deadlock` would be to number all resources and require that processes request resources only in strictly increasing (or decreasing) order. Please try to manually rearrange the locks and unlocks in a way that the deadlock does not occur and the following text is printed to the console:
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <mutex>
+    
+    std::mutex mutex1, mutex2;
+    
+    void ThreadA()
+    {
+        // Solves deadlock problem
+        mutex1.lock();
+        std::cout << "Thread A" << std::endl;
+        mutex2.lock();
+        mutex2.unlock();
+        mutex1.unlock();
+    }
+    
+    void ThreadB()
+    {
+        // Solves deadlock problem
+        mutex1.lock();
+        std::cout << "Thread B" << std::endl;
+        mutex2.lock();
+        mutex1.unlock();
+        mutex2.unlock();
+    }
+    
+    void ExecuteThreads()
+    {
+        std::thread t1( ThreadA );
+        std::thread t2( ThreadB );
+    
+        t1.join();
+        t2.join();
+    
+        std::cout << "Finished" << std::endl;
+    }
+    
+    int main()
+    {
+        ExecuteThreads();
+    
+        return 0;
+    }
+    ```
+
+* As you have seen, avoiding such a deadlock is possible but requires time and a great deal of experience. In the next section, we will look at ways to avoid deadlocks - both of this type as well as the previous type, where a call to unlock the mutex had not been issued.
+
+### Using Locks to Avoid Deadlocks
+
+#### Lock Guard
+
+* In the previous example, we have directly called the `lock()` and `unlock()` functions of a `mutex`. The idea of "working under the lock" is to block unwanted access by other `threads` to the same resource. Only the thread which acquired the `lock` can `unlock` the `mutex` and give all remaining `threads` the chance to acquire the `lock`. In practice however, direct calls to `lock()` should be avoided at all cost! Imagine that while working under the `lock`, a `thread` would throw an `exception` and exit the critical section without calling the `unlock` function on the `mutex`. In such a situation, the program would most likely freeze as no other `thread` could acquire the `mutex` any more. This is exactly what we have seen in the function `divideByNumber` from the previous example.
+
+* We can avoid this problem by creating a `std::lock_guard` object, which keeps an associated `mutex` locked during the entire object life time. The lock is acquired on `construction` and released automatically on `destruction`. This makes it impossible to forget `unlocking` a critical section. Also, `std::lock_guard` guarantees `exception` safety because any critical section is automatically `unlocked` when an exception is thrown. In our previous example, we can simply replace `_mutex.lock()` and `_mutex.unlock()` with the following code:
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <vector>
+    #include <future>
+    #include <mutex>
+    #include<algorithm>
+    
+    std::mutex mtx;
+    double result;
+    
+    void printResult(int denom)
+    {
+        std::cout << "for denom = " << denom << ", the result is " << result << std::endl;
+    }
+    
+    void divideByNumber(double num, double denom)
+    {
+        try
+        {
+            // divide num by denom but throw an exception if division by zero is attempted
+            if (denom != 0) 
+            {
+                std::lock_guard<std::mutex> lck(mtx);
+                
+                result = num / denom;
+                std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
+                printResult(denom);
+            }
+            else
+            {
+                throw std::invalid_argument("Exception from thread: Division by zero!");
+            }
+        }
+        catch (const std::invalid_argument &e)
+        {
+            // notify the user about the exception and return
+            std::cout << e.what() << std::endl;
+            return; 
+        }
+    }
+    
+    int main()
+    {
+        // create a number of threads which execute the function "divideByNumber" with varying parameters
+        std::vector<std::future<void>> futures;
+        for (double i = -5; i <= +5; ++i)
+        {
+            futures.emplace_back(std::async(std::launch::async, divideByNumber, 50.0, i));
+        }
+    
+        // wait for the results
+        std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
+            ftr.wait();
+        });
+    
+        return 0;
+    }
+    ```
+
+* Note that there is no direct call to `lock` or `unlock` the `mutex` anymore. We now have a `std::lock_guard` object that takes the mutex as an argument and `locks` it at creation. When the method `divideByNumber` exits, the `mutex` is automatically `unlocked` by the `std::lock_guard` object as soon as it is destroyed - which happens, when the local variable gets out of scope.
+
+* We can improve even further on this code by limiting the scope of the `mutex` to the section which accesses the critical resource. Please change the code in a way that the `mutex` is only locked for the time when result is modified and the result is printed.
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <vector>
+    #include <future>
+    #include <mutex>
+    
+    std::mutex mtx;
+    double result;
+    
+    void printResult(int denom)
+    {
+        std::cout << "for denom = " << denom << ", the result is " << result << std::endl;
+    }
+    
+    void divideByNumber(double num, double denom)
+    {
+        try
+        {
+            // divide num by denom but throw an exception if division by zero is attempted
+            if (denom != 0) 
+            {
+                std::lock_guard<std::mutex> lck(mtx);
+    
+                result = num / denom;
+                std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
+                printResult(denom);
+            }
+            else
+            {
+                throw std::invalid_argument("Exception from thread: Division by zero!");
+            }
+        }
+        catch (const std::invalid_argument &e)
+        {
+            // notify the user about the exception and return
+            std::cout << e.what() << std::endl;
+            return; 
+        }
+    }
+    
+    int main()
+    {
+        // create a number of threads which execute the function "divideByNumber" with varying parameters
+        std::vector<std::future<void>> futures;
+        for (double i = -5; i <= +5; ++i)
+        {
+            futures.emplace_back(std::async(std::launch::async, divideByNumber, 50.0, i));
+        }
+    
+        // wait for the results
+        std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
+            ftr.wait();
+        });
+    
+        return 0;
+    }
+    ```
 
 * Unique Lock
 
