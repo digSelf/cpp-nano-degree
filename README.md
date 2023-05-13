@@ -8425,316 +8425,316 @@ DELETING instance of MyMovableClass at 0x7ffeefbff718
     }
     ```
 
-* Unique Lock
+#### Unique Lock
 
-    * The problem with the previous example is that we can only `lock` the `mutex` once and the only way to control `lock` and `unlock` is by invalidating the scope of the `std::lock_guard` object. But what if we wanted (or needed) a finer control of the locking mechanism?
+* The problem with the previous example is that we can only `lock` the `mutex` once and the only way to control `lock` and `unlock` is by invalidating the scope of the `std::lock_guard` object. But what if we wanted (or needed) a finer control of the locking mechanism?
 
-    * A more flexible alternative to `std::lock_guard` is `unique_lock`, that also provides support for more advanced mechanisms, such as `deferred locking`, `time locking`, `recursive locking`, `transfer of lock` ownership and use of condition variables (which we will discuss later). It behaves similar to `lock_guard` but provides much more flexibility, especially with regard to the timing behavior of the locking mechanism.
+* A more flexible alternative to `std::lock_guard` is `unique_lock`, that also provides support for more advanced mechanisms, such as `deferred locking`, `time locking`, `recursive locking`, `transfer of lock` ownership and use of condition variables (which we will discuss later). It behaves similar to `lock_guard` but provides much more flexibility, especially with regard to the timing behavior of the locking mechanism.
 
-    * Let us take a look at an adapted version of the code from the previous section above:
+* Let us take a look at an adapted version of the code from the previous section above:
 
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <vector>
-        #include <future>
-        #include <mutex>
-        #include<algorithm>
-        
-        std::mutex mtx;
-        double result;
-        
-        void printResult(int denom)
-        {
-            std::cout << "for denom = " << denom << ", the result is " << result << std::endl;
-        }
-        
-        void divideByNumber(double num, double denom)
-        {
-            std::unique_lock<std::mutex> lck(mtx);
-            try
-            {
-                // divide num by denom but throw an exception if division by zero is attempted
-                if (denom != 0) 
-                {   
-                    result = num / denom;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
-                    printResult(denom);
-                    lck.unlock();
-        
-                    // do something outside of the lock
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
-        
-                    lck.lock(); 
-                    // do someting else under the lock
-                    std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
-                }
-                else
-                {
-                    throw std::invalid_argument("Exception from thread: Division by zero!");
-                }
-            }
-            catch (const std::invalid_argument &e)
-            {
-                // notify the user about the exception and return
-                std::cout << e.what() << std::endl;
-                return; 
-            }
-        }
-        
-        int main()
-        {
-            // create a number of threads which execute the function "divideByNumber" with varying parameters
-            std::vector<std::future<void>> futures;
-            for (double i = -5; i <= +5; ++i)
-            {
-                futures.emplace_back(std::async(std::launch::async, divideByNumber, 50.0, i));
-            }
-        
-            // wait for the results
-            std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
-                ftr.wait();
-            });
-        
-            return 0;
-        }
-        ```
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <vector>
+    #include <future>
+    #include <mutex>
+    #include<algorithm>
     
-    * In this version of the code, `std::lock_guard` has been replaced with `std::unique_lock`. As before, the `lock` object `lck` will `unlock` the `mutex` in its `destructor`, i.e. when the function `divideByNumber` returns and `lck` gets out of scope. In addition to this automatic unlocking, `std::unique_lock` offers the additional flexibility to `engage` and `disengage` the `lock` as needed by manually calling the methods `lock()` and `unlock()`. This ability can greatly improve the performance of a concurrent program, especially when many `threads` are waiting for access to a `locked` resource. In the example, the `lock` is released before some non-critical work is performed (simulated by `sleep_for`) and re-engaged before some other work is performed in the critical section and thus under the `lock` again at the end of the function. This is particularly useful for optimizing performance and responsiveness when a significant amount of time passes between two accesses to a critical resource.
-
-    * The main advantages of using `std::unique_lock<>` over `std::lock_guard` are briefly summarized in the following. Using `std::unique_lock` allows you to…
-
-        * …construct an instance without an associated `mutex` using the default constructor
-        * …construct an instance with an associated `mutex` while leaving the `mutex` `unlocked` at first using the `deferred-locking constructor`
-        * …construct an instance that tries to `lock` a `mutex`, but leaves it `unlocked` if the `lock` failed using the `try-lock` constructor
-        * …construct an instance that tries to acquire a `lock` for either a specified time period or until a specified point in time
-
-    * Despite the advantages of `std::unique_lock<>` and `std::lock_guard` over accessing the `mutex` directly, however, the `deadlock` situation where two mutexes are accessed simultaneously (see the last section) will still occur.
-
-* Avoiding deadlocks with `std::lock()`
-
-    * In most cases, your code should only hold one lock on a `mutex` at a time. Occasionally you can nest your `locks`, for example by calling a subsystem that protects its internal data with a `mutex` while holding a lock on another `mutex`, but it is generally better to avoid `locks` on multiple `mutexes` at the same time, if possible. Sometimes, however, it is necessary to hold a `lock` on more than one `mutex` because you need to perform an operation on two different data elements, each protected by its own mutex.
-
-    * In the last section, we have seen that using several `mutexes` at once can lead to a `deadlock`, if the order of locking them is not carefully managed. To avoid this problem, the system must be told that both `mutexes` should be locked at the same time, so that one of the `threads` takes over both `locks` and **blocking is avoided**. That's what the `std::lock()` function is for - you provide a set of `lock_guard` or `unique_lock` objects and the system ensures that they are all locked when the function returns.
-
-    * In the following example, which is a version of the code we saw in the last section were `std::mutex` has been replaced with `std::lock_guard`.
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <mutex>
-        
-        std::mutex mutex1, mutex2;
-        
-        void ThreadA()
+    std::mutex mtx;
+    double result;
+    
+    void printResult(int denom)
+    {
+        std::cout << "for denom = " << denom << ", the result is " << result << std::endl;
+    }
+    
+    void divideByNumber(double num, double denom)
+    {
+        std::unique_lock<std::mutex> lck(mtx);
+        try
         {
-            // Creates deadlock problem
-            std::lock_guard<std::mutex> lock2(mutex2);
-            std::cout << "Thread A" << std::endl;
-            std::lock_guard<std::mutex> lock1(mutex1);
+            // divide num by denom but throw an exception if division by zero is attempted
+            if (denom != 0) 
+            {   
+                result = num / denom;
+                std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
+                printResult(denom);
+                lck.unlock();
+    
+                // do something outside of the lock
+                std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
+    
+                lck.lock(); 
+                // do someting else under the lock
+                std::this_thread::sleep_for(std::chrono::milliseconds(100)); 
+            }
+            else
+            {
+                throw std::invalid_argument("Exception from thread: Division by zero!");
+            }
+        }
+        catch (const std::invalid_argument &e)
+        {
+            // notify the user about the exception and return
+            std::cout << e.what() << std::endl;
+            return; 
+        }
+    }
+    
+    int main()
+    {
+        // create a number of threads which execute the function "divideByNumber" with varying parameters
+        std::vector<std::future<void>> futures;
+        for (double i = -5; i <= +5; ++i)
+        {
+            futures.emplace_back(std::async(std::launch::async, divideByNumber, 50.0, i));
+        }
+    
+        // wait for the results
+        std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
+            ftr.wait();
+        });
+    
+        return 0;
+    }
+    ```
+
+* In this version of the code, `std::lock_guard` has been replaced with `std::unique_lock`. As before, the `lock` object `lck` will `unlock` the `mutex` in its `destructor`, i.e. when the function `divideByNumber` returns and `lck` gets out of scope. In addition to this automatic unlocking, `std::unique_lock` offers the additional flexibility to `engage` and `disengage` the `lock` as needed by manually calling the methods `lock()` and `unlock()`. This ability can greatly improve the performance of a concurrent program, especially when many `threads` are waiting for access to a `locked` resource. In the example, the `lock` is released before some non-critical work is performed (simulated by `sleep_for`) and re-engaged before some other work is performed in the critical section and thus under the `lock` again at the end of the function. This is particularly useful for optimizing performance and responsiveness when a significant amount of time passes between two accesses to a critical resource.
+
+* The main advantages of using `std::unique_lock<>` over `std::lock_guard` are briefly summarized in the following. Using `std::unique_lock` allows you to…
+
+    * …construct an instance without an associated `mutex` using the default constructor
+    * …construct an instance with an associated `mutex` while leaving the `mutex` `unlocked` at first using the `deferred-locking constructor`
+    * …construct an instance that tries to `lock` a `mutex`, but leaves it `unlocked` if the `lock` failed using the `try-lock` constructor
+    * …construct an instance that tries to acquire a `lock` for either a specified time period or until a specified point in time
+
+* Despite the advantages of `std::unique_lock<>` and `std::lock_guard` over accessing the `mutex` directly, however, the `deadlock` situation where two mutexes are accessed simultaneously (see the last section) will still occur.
+
+#### Avoiding deadlocks with `std::lock()`
+
+* In most cases, your code should only hold one lock on a `mutex` at a time. Occasionally you can nest your `locks`, for example by calling a subsystem that protects its internal data with a `mutex` while holding a lock on another `mutex`, but it is generally better to avoid `locks` on multiple `mutexes` at the same time, if possible. Sometimes, however, it is necessary to hold a `lock` on more than one `mutex` because you need to perform an operation on two different data elements, each protected by its own mutex.
+
+* In the last section, we have seen that using several `mutexes` at once can lead to a `deadlock`, if the order of locking them is not carefully managed. To avoid this problem, the system must be told that both `mutexes` should be locked at the same time, so that one of the `threads` takes over both `locks` and **blocking is avoided**. That's what the `std::lock()` function is for - you provide a set of `lock_guard` or `unique_lock` objects and the system ensures that they are all locked when the function returns.
+
+* In the following example, which is a version of the code we saw in the last section were `std::mutex` has been replaced with `std::lock_guard`.
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <mutex>
+    
+    std::mutex mutex1, mutex2;
+    
+    void ThreadA()
+    {
+        // Creates deadlock problem
+        std::lock_guard<std::mutex> lock2(mutex2);
+        std::cout << "Thread A" << std::endl;
+        std::lock_guard<std::mutex> lock1(mutex1);
+        
+    }
+    
+    void ThreadB()
+    {
+        // Creates deadlock problem
+        std::lock_guard<std::mutex> lock1(mutex1);
+        std::cout << "Thread B" << std::endl;
+        std::lock_guard<std::mutex> lock2(mutex2);
+    }
+    
+    void ExecuteThreads()
+    {
+        std::thread t1( ThreadA );
+        std::thread t2( ThreadB );
+    
+        t1.join();
+        t2.join();
+    
+        std::cout << "Finished" << std::endl;
+    }
+    
+    int main()
+    {
+        ExecuteThreads();
+    
+        return 0;
+    }
+    ```
+
+* Note that when executing this code, it still produces a deadlock, despite the use of `std::lock_guard`.
+
+* In the following `deadlock-free` code, `std::lock` is used to ensure that the `mutexes` are always locked in the same order, regardless of the order of the arguments. Note that `std::adopt_lock` option allows us to use `std::lock_guard` on an already locked `mutex`.
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <mutex>
+    
+    std::mutex mutex1, mutex2;
+    
+    void ThreadA()
+    {
+        // Ensure that locks are always executed in the same order
+        std::lock(mutex1, mutex2);
+        std::lock_guard<std::mutex> lock2(mutex2, std::adopt_lock);
+        std::cout << "Thread A" << std::endl;
+        std::lock_guard<std::mutex> lock1(mutex1, std::adopt_lock);
+        
+    }
+    
+    void ThreadB()
+    {
+        std::lock(mutex1, mutex2);
+        std::lock_guard<std::mutex> lock1(mutex1, std::adopt_lock);
+        std::cout << "Thread B" << std::endl;
+        std::lock_guard<std::mutex> lock2(mutex2, std::adopt_lock);
+    }
+    
+    void ExecuteThreads()
+    {
+        std::thread t1( ThreadA );
+        std::thread t2( ThreadB );
+    
+        t1.join();
+        t2.join();
+    
+        std::cout << "Finished" << std::endl;
+    }
+    
+    int main()
+    {
+        ExecuteThreads();
+    
+        return 0;
+    }
+    ```
+
+* As a rule of thumb, programmers should try to avoid using several mutexes at once. Practice shows that this can be achieved in the majority of cases. For the remaining cases though, using `std::lock` is a safe way to avoid a deadlock situation.
+
+### Condition Variables and Message Queues 
+
+#### The Monitor Object Pattern
+
+* In the previous sections we have learned that data protection is a critical element in concurrent programming. After looking at several ways to achieve this, we now want to build on these concepts to devise a method for a controlled and finely-grained data exchange between `threads` - a concurrent message queue. One important step towards such a construct is to implement a `monitor object`, which is a `design pattern` that `synchronizes` concurrent method execution to ensure that only **one method at a time runs within an object**. It also allows an object's methods to cooperatively schedule their execution sequences. The problem solved by this pattern is based on the observation that many applications contain objects whose methods are invoked concurrently by multiple client threads. These methods often modify the state of their objects, for example by adding data to an internal vector. For such concurrent programs to execute correctly, it is necessary to **synchronize and schedule** access to the objects very carefully. The idea of a monitor object is to `synchronize the access to an object's methods so that only one method can execute at any one time.`
+
+* ```cpp
+    #include <iostream>
+    #include <thread>
+    #include <vector>
+    #include <future>
+    #include <mutex>
+    
+    class Vehicle
+    {
+    public:
+        Vehicle(int id) : _id(id) {}
+        int getID() { return _id; }
+    
+    private:
+        int _id;
+    };
+    
+    class WaitingVehicles
+    {
+    public:
+        WaitingVehicles() {}
+    
+        void printIDs()
+        {
+            std::lock_guard<std::mutex> myLock(_mutex); // lock is released when myLock goes out of scope
+            for(auto &v : _vehicles)
+                std::cout << "   Vehicle #" << v.getID() << " is now waiting in the queue" << std::endl;
             
         }
-        
-        void ThreadB()
-        {
-            // Creates deadlock problem
-            std::lock_guard<std::mutex> lock1(mutex1);
-            std::cout << "Thread B" << std::endl;
-            std::lock_guard<std::mutex> lock2(mutex2);
-        }
-        
-        void ExecuteThreads()
-        {
-            std::thread t1( ThreadA );
-            std::thread t2( ThreadB );
-        
-            t1.join();
-            t2.join();
-        
-            std::cout << "Finished" << std::endl;
-        }
-        
-        int main()
-        {
-            ExecuteThreads();
-        
-            return 0;
-        }
-        ```
     
-    * Note that when executing this code, it still produces a deadlock, despite the use of `std::lock_guard`.
-
-    * In the following `deadlock-free` code, `std::lock` is used to ensure that the `mutexes` are always locked in the same order, regardless of the order of the arguments. Note that `std::adopt_lock` option allows us to use `std::lock_guard` on an already locked `mutex`.
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <mutex>
-        
-        std::mutex mutex1, mutex2;
-        
-        void ThreadA()
+        void pushBack(Vehicle &&v)
         {
-            // Ensure that locks are always executed in the same order
-            std::lock(mutex1, mutex2);
-            std::lock_guard<std::mutex> lock2(mutex2, std::adopt_lock);
-            std::cout << "Thread A" << std::endl;
-            std::lock_guard<std::mutex> lock1(mutex1, std::adopt_lock);
-            
-        }
-        
-        void ThreadB()
-        {
-            std::lock(mutex1, mutex2);
-            std::lock_guard<std::mutex> lock1(mutex1, std::adopt_lock);
-            std::cout << "Thread B" << std::endl;
-            std::lock_guard<std::mutex> lock2(mutex2, std::adopt_lock);
-        }
-        
-        void ExecuteThreads()
-        {
-            std::thread t1( ThreadA );
-            std::thread t2( ThreadB );
-        
-            t1.join();
-            t2.join();
-        
-            std::cout << "Finished" << std::endl;
-        }
-        
-        int main()
-        {
-            ExecuteThreads();
-        
-            return 0;
-        }
-        ```
+            // perform vector modification under the lock
+            std::lock_guard<std::mutex> uLock(_mutex);
+            std::cout << "   Vehicle #" << v.getID() << " will be added to the queue" << std::endl; 
+            _vehicles.emplace_back(std::move(v));
     
-    * As a rule of thumb, programmers should try to avoid using several mutexes at once. Practice shows that this can be achieved in the majority of cases. For the remaining cases though, using `std::lock` is a safe way to avoid a deadlock situation.
-
-* Condition Variables and Message Queues 
-
-    * The Monitor Object Pattern
-
-    * In the previous sections we have learned that data protection is a critical element in concurrent programming. After looking at several ways to achieve this, we now want to build on these concepts to devise a method for a controlled and finely-grained data exchange between `threads` - a concurrent message queue. One important step towards such a construct is to implement a `monitor object`, which is a `design pattern` that `synchronizes` concurrent method execution to ensure that only **one method at a time runs within an object**. It also allows an object's methods to cooperatively schedule their execution sequences. The problem solved by this pattern is based on the observation that many applications contain objects whose methods are invoked concurrently by multiple client threads. These methods often modify the state of their objects, for example by adding data to an internal vector. For such concurrent programs to execute correctly, it is necessary to **synchronize and schedule** access to the objects very carefully. The idea of a monitor object is to `synchronize the access to an object's methods so that only one method can execute at any one time.`
-
-    * ```cpp
-        #include <iostream>
-        #include <thread>
-        #include <vector>
-        #include <future>
-        #include <mutex>
-        
-        class Vehicle
-        {
-        public:
-            Vehicle(int id) : _id(id) {}
-            int getID() { return _id; }
-        
-        private:
-            int _id;
-        };
-        
-        class WaitingVehicles
-        {
-        public:
-            WaitingVehicles() {}
-        
-            void printIDs()
-            {
-                std::lock_guard<std::mutex> myLock(_mutex); // lock is released when myLock goes out of scope
-                for(auto &v : _vehicles)
-                    std::cout << "   Vehicle #" << v.getID() << " is now waiting in the queue" << std::endl;
-                
-            }
-        
-            void pushBack(Vehicle &&v)
-            {
-                // perform vector modification under the lock
-                std::lock_guard<std::mutex> uLock(_mutex);
-                std::cout << "   Vehicle #" << v.getID() << " will be added to the queue" << std::endl; 
-                _vehicles.emplace_back(std::move(v));
-        
-                // simulate some work
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
-            }
-        
-        private:
-            std::vector<Vehicle> _vehicles; // list of all vehicles waiting to enter this intersection
-            std::mutex _mutex;
-        };
-        
-        int main()
-        {
-            // create monitor object as a shared pointer to enable access by multiple threads
-            std::shared_ptr<WaitingVehicles> queue(new WaitingVehicles);
-        
-            std::cout << "Spawning threads..." << std::endl;
-            std::vector<std::future<void>> futures;
-            for (int i = 0; i < 10; ++i)
-            {
-                // create a new Vehicle instance and move it into the queue
-                Vehicle v(i);
-                futures.emplace_back(std::async(std::launch::async, &WaitingVehicles::pushBack, queue, std::move(v)));
-            }
-        
-            std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
-                ftr.wait();
-            });
-        
-            std::cout << "Collecting results..." << std::endl;
-            queue->printIDs();
-        
-            return 0;
+            // simulate some work
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
-        ```
     
-    * In a previous section, we have looked at a code example which came pretty close to the functionality of a `monitor object` : the class `WaitingVehicles`.
-
-    * Let us modify and partially reimplement this class, which we want to use as a shared place where concurrent threads may store data, in our case instances of the class `Vehicle`. As we will be using the same `WaitingVehicles` object for all the threads, we have to pass it to them by `reference` - and as all threads will be writing to this object at the same time (which is a mutating operation) we will pass it as a `shared pointer`. Keep in mind that there will be many threads that will try to pass data to the `WaitingVehicles` object simultaneously and thus there is the danger of a data race.
-
-    * Before we take a look at the implementation of `WaitingVehicles`, let us look at the `main` function first where all the threads are spawned. We need a vector to store the futures as there is no data to be returned from the threads. Also, we need to call `wait()` on the futures at the end of `main()` so the program will not prematurely exit before the thread executions are complete.
-
-    * Instead of using `push_back` we will again be using `emplace_back` to construct the `futures` in place rather than moving them into the `vector`. After constructing a new `Vehicle` object within the `for-loop`, we start a new task by passing it a reference to the `pushBack` function, a `shared pointer` to our `WaitingVehicles` object and the newly created vehicle. Note that the latter is passed using `move semantics`.
-
-    * Now let us take a look at the implementation of the `WaitingVehicle` object.
-
-    * We need to enable it to process write requests from several threads at the same time. Every time a request comes in from a `thread`, the object needs to add the new data to its internal storage. Our storage container will be an `std::vector`. As we need to protect the vector from simultaneous access later, we also need to integrate a `mutex` into the class. As we already know, a `mutex` has the methods `lock` and `unlock`. In order to avoid data races, the `mutex` needs to be locked every time a thread wants to access the vector and it needs to be unlocked one the write operation is complete. In order to avoid a program freeze due to a missing unlock operation, we will be using a `lock guard` object, which automatically `unlocks once the lock object gets out of scope`.
-
-    * In our modified `pushBack` function, we will first create a `lock guard` object and pass it the `mutex` member variable. Now we can freely move the `Vehicle` object into our vector without the danger of a data race. At the end of the function, there is a call to `std::sleep_for`, which simulates some work and helps us to better expose potential concurrency problems. With each new `Vehicle` object that is passed into the queue, we will see an output to the console.
-
-    * Another function within the `WaitingVehicle` class is `printIDs()`, which loops over all the elements of the vector and prints their respective IDs to the console. One major difference between `pushBack()` and `printIDs()` is that the latter function accesses all `Vehicle` objects by looping through the vector while `pushBack` only accesses a single object - which is the newest addition to the `Vehicle` vector.
-
-    * When the program is executed, the following output is printed to the console:
-
-    * ```bash
-        Spawning threads...
-        Vehicle #0 will be added to the queue
-        Vehicle #3 will be added to the queue
-        Vehicle #2 will be added to the queue
-        Vehicle #1 will be added to the queue
-        Vehicle #4 will be added to the queue
-        Vehicle #5 will be added to the queue
-        Vehicle #6 will be added to the queue
-        Vehicle #8 will be added to the queue
-        Vehicle #7 will be added to the queue
-        Vehicle #9 will be added to the queue
-        Collecting results...
-        Vehicle #0 is now waiting in the queue
-        Vehicle #3 is now waiting in the queue
-        Vehicle #2 is now waiting in the queue
-        Vehicle #1 is now waiting in the queue
-        Vehicle #4 is now waiting in the queue
-        Vehicle #5 is now waiting in the queue
-        Vehicle #6 is now waiting in the queue
-        Vehicle #8 is now waiting in the queue
-        Vehicle #7 is now waiting in the queue
-        Vehicle #9 is now waiting in the queue
-        ```
+    private:
+        std::vector<Vehicle> _vehicles; // list of all vehicles waiting to enter this intersection
+        std::mutex _mutex;
+    };
     
-    * As can be seen, the `Vehicle` objects are added one at a time, with all threads duly waiting for their turn. Then, once all `Vehicle` objects have been stored, the call to `printIDs` prints the entire content of the vector all at once.
+    int main()
+    {
+        // create monitor object as a shared pointer to enable access by multiple threads
+        std::shared_ptr<WaitingVehicles> queue(new WaitingVehicles);
+    
+        std::cout << "Spawning threads..." << std::endl;
+        std::vector<std::future<void>> futures;
+        for (int i = 0; i < 10; ++i)
+        {
+            // create a new Vehicle instance and move it into the queue
+            Vehicle v(i);
+            futures.emplace_back(std::async(std::launch::async, &WaitingVehicles::pushBack, queue, std::move(v)));
+        }
+    
+        std::for_each(futures.begin(), futures.end(), [](std::future<void> &ftr) {
+            ftr.wait();
+        });
+    
+        std::cout << "Collecting results..." << std::endl;
+        queue->printIDs();
+    
+        return 0;
+    }
+    ```
 
-    * While the functionality of the `monitor object` we have constructed is an improvement over many other methods that allow passing data to threads, it has one significant disadvantage: The `main thread` has to wait until all `worker threads` have completed their jobs and only then can it access the added data in bulk. A system which is truly interactive however has to react to events as they arrive - it should not wait until all threads have completed their jobs but instead `act` immediately as soon as new data arrives. In the following, we want to add this functionality to our monitor object.
+* In a previous section, we have looked at a code example which came pretty close to the functionality of a `monitor object` : the class `WaitingVehicles`.
+
+* Let us modify and partially reimplement this class, which we want to use as a shared place where concurrent threads may store data, in our case instances of the class `Vehicle`. As we will be using the same `WaitingVehicles` object for all the threads, we have to pass it to them by `reference` - and as all threads will be writing to this object at the same time (which is a mutating operation) we will pass it as a `shared pointer`. Keep in mind that there will be many threads that will try to pass data to the `WaitingVehicles` object simultaneously and thus there is the danger of a data race.
+
+* Before we take a look at the implementation of `WaitingVehicles`, let us look at the `main` function first where all the threads are spawned. We need a vector to store the futures as there is no data to be returned from the threads. Also, we need to call `wait()` on the futures at the end of `main()` so the program will not prematurely exit before the thread executions are complete.
+
+* Instead of using `push_back` we will again be using `emplace_back` to construct the `futures` in place rather than moving them into the `vector`. After constructing a new `Vehicle` object within the `for-loop`, we start a new task by passing it a reference to the `pushBack` function, a `shared pointer` to our `WaitingVehicles` object and the newly created vehicle. Note that the latter is passed using `move semantics`.
+
+* Now let us take a look at the implementation of the `WaitingVehicle` object.
+
+* We need to enable it to process write requests from several threads at the same time. Every time a request comes in from a `thread`, the object needs to add the new data to its internal storage. Our storage container will be an `std::vector`. As we need to protect the vector from simultaneous access later, we also need to integrate a `mutex` into the class. As we already know, a `mutex` has the methods `lock` and `unlock`. In order to avoid data races, the `mutex` needs to be locked every time a thread wants to access the vector and it needs to be unlocked one the write operation is complete. In order to avoid a program freeze due to a missing unlock operation, we will be using a `lock guard` object, which automatically `unlocks once the lock object gets out of scope`.
+
+* In our modified `pushBack` function, we will first create a `lock guard` object and pass it the `mutex` member variable. Now we can freely move the `Vehicle` object into our vector without the danger of a data race. At the end of the function, there is a call to `std::sleep_for`, which simulates some work and helps us to better expose potential concurrency problems. With each new `Vehicle` object that is passed into the queue, we will see an output to the console.
+
+* Another function within the `WaitingVehicle` class is `printIDs()`, which loops over all the elements of the vector and prints their respective IDs to the console. One major difference between `pushBack()` and `printIDs()` is that the latter function accesses all `Vehicle` objects by looping through the vector while `pushBack` only accesses a single object - which is the newest addition to the `Vehicle` vector.
+
+* When the program is executed, the following output is printed to the console:
+
+* ```bash
+    Spawning threads...
+    Vehicle #0 will be added to the queue
+    Vehicle #3 will be added to the queue
+    Vehicle #2 will be added to the queue
+    Vehicle #1 will be added to the queue
+    Vehicle #4 will be added to the queue
+    Vehicle #5 will be added to the queue
+    Vehicle #6 will be added to the queue
+    Vehicle #8 will be added to the queue
+    Vehicle #7 will be added to the queue
+    Vehicle #9 will be added to the queue
+    Collecting results...
+    Vehicle #0 is now waiting in the queue
+    Vehicle #3 is now waiting in the queue
+    Vehicle #2 is now waiting in the queue
+    Vehicle #1 is now waiting in the queue
+    Vehicle #4 is now waiting in the queue
+    Vehicle #5 is now waiting in the queue
+    Vehicle #6 is now waiting in the queue
+    Vehicle #8 is now waiting in the queue
+    Vehicle #7 is now waiting in the queue
+    Vehicle #9 is now waiting in the queue
+    ```
+
+* As can be seen, the `Vehicle` objects are added one at a time, with all threads duly waiting for their turn. Then, once all `Vehicle` objects have been stored, the call to `printIDs` prints the entire content of the vector all at once.
+
+* While the functionality of the `monitor object` we have constructed is an improvement over many other methods that allow passing data to threads, it has one significant disadvantage: The `main thread` has to wait until all `worker threads` have completed their jobs and only then can it access the added data in bulk. A system which is truly interactive however has to react to events as they arrive - it should not wait until all threads have completed their jobs but instead `act` immediately as soon as new data arrives. In the following, we want to add this functionality to our monitor object.
 
 * Creating an infinite polling loop
 
