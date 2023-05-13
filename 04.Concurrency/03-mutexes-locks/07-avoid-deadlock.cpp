@@ -17,6 +17,7 @@ void divide_by_number(double num, double denom) {
         if (denom != 0) {
             std::lock_guard<std::mutex> locker(g_mutex);
             g_result = num / denom;
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             print_result(denom);
         } else {
             throw std::invalid_argument("Exception from thread: Division By 0!");
