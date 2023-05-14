@@ -73,6 +73,7 @@ int main()
         futrs.push_back(std::async(std::launch::async, &WaitingVehicles::pushBack, queue, std::move(v)));
     }
 
+    // prevent the main thread return prematurely.
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
     while (true) {
         if (queue->dataIsAvailable()) {
