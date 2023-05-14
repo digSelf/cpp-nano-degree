@@ -32,7 +32,7 @@ public:
         std::lock_guard<std::mutex> locker(mutex_);
 
         std::cout << "\tMessage " << msg << " has been sent to the queue" << std::endl;
-        messages_.emplace_back(msg);
+        messages_.emplace_back(std::move(msg));
         cond_.notify_one();
     }
 
